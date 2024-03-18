@@ -28,7 +28,8 @@ jobs:
         run: |
           tag="${GITHUB_REF#refs/tags/}"
 
+          zip note-to-mp.zip main.js manifest.json styles.css styles.json
+
           gh release create "$tag" \
             --title="$tag" \
-            --draft \
-            main.js manifest.json styles.css styles.json
+            --draft note-to-mp.zip
