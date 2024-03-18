@@ -2,6 +2,8 @@
 
 这是一个Obsidian插件，针对微信公众号编缉器进行了优化，通过本插件复制笔记可以把笔记样式同步到公众号编缉器，轻轻松松搞定文章格式，一劳永逸，而且支持代码高亮、代码行数显示等。针对微信公众号不能放链接也专门处理了，直接展示链接地址。
 
+![](./screenshot.png)
+
 # 安装
 
 到[Release](https://github.com/sunbooshi/note-to-mp/releases)页面下载最新版本，将插件解压到Obsidian仓库的`.obsidian/plugins/`目录下。
