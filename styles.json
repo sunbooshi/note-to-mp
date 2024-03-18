@@ -1,0 +1,14 @@
+[
+    {
+        "name": "Obsidian Light", 
+        "className": "obsidian-light",
+        "desc": "Obsidian默认样式",
+        "author": "Sun Booshi"
+    },
+    {
+        "name": "Maple", 
+        "className": "maple",
+        "desc": "改自https://github.com/xbmlz/hexo-theme-maple",
+        "author": "Sun Booshi"
+    }
+]
