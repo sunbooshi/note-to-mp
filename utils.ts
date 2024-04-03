@@ -39,7 +39,7 @@ function codeRender(codeToken:Tokens.Code) {
 
 function walkTokens(token:Token) {
 	if (token.type == 'link') {
-		if (token.text.indexOf(token.href) === -1) {
+		if (token.text.indexOf(token.href) === -1 && token.href.indexOf('mailto:') === -1) {
 			token.text = token.text + '[' + token.href + ']';
 			token.tokens = this.Lexer.lexInline(token.text)
 		}
