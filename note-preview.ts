@@ -13,6 +13,7 @@ export class NotePreview extends ItemView {
     mainDiv: HTMLDivElement;
     toolbar: HTMLDivElement;
     renderDiv: HTMLDivElement;
+    renderSection: HTMLElement;
     listeners: EventRef[];
     container: Element;
     settings: PreviewSetting;
@@ -67,9 +68,7 @@ export class NotePreview extends ItemView {
             md = md.replace(FRONT_MATTER_REGEX, '');
         }
 
-        // 追加标题
-        md = `# ${title}\n\n ${md}`;
-        this.renderDiv.innerHTML = await markedParse(md);
+        this.renderSection.innerHTML = await markedParse(md);
     }
 
     buildToolbar(parent: HTMLDivElement) {
@@ -80,7 +79,7 @@ export class NotePreview extends ItemView {
         })
 
         copyBtn.onclick = async () => {
-            copy(document.getElementsByClassName(this.settings.defaultStyle)[0] as Element);
+            copy(this.renderDiv);
             new Notice('复制成功，请到公众号编辑器粘贴。');
         }
 
@@ -120,11 +119,20 @@ export class NotePreview extends ItemView {
 
         this.buildToolbar(this.mainDiv);
 
-        this.renderDiv = this.mainDiv.createDiv({ cls: this.settings.defaultStyle });
+        this.renderDiv = this.mainDiv.createDiv({cls: 'render-div'});
+        this.renderDiv.id = 'render-div';
         this.renderDiv.setAttribute('style', '-webkit-user-select: text; user-select: text;')
+        // 加入两个高度为0的section，确保复制到公众号编辑器中是section元素，这样才能把背景颜色带过去
+        let dummySection = this.renderDiv.createEl('section');
+        dummySection.innerHTML="&nbsp;&nbsp;"
+        dummySection.setAttr('style', 'height:0px;');
+        this.renderSection = this.renderDiv.createEl('section', { cls: this.settings.defaultStyle });
+        dummySection = this.renderDiv.createEl('section');
+        dummySection.innerHTML="&nbsp;&nbsp;"
+        dummySection.setAttr('style', 'height:0px;');
     }
 
     updateStyle(styleName: string) {
-        this.renderDiv.setAttribute('class', styleName);
+        this.renderSection.setAttribute('class', styleName);
     }
 }
