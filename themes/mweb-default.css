@@ -1,0 +1,190 @@
+/*
+ * PrismJS default theme
+ * 这个文件只应该包含变量
+ */
+/*
+ * Default theme，适用于 core/mweb-base.scss。
+ * 取值参考 chrome 默认样式：
+ * https://chromium.googlesource.com/chromium/blink/+/refs/heads/main/Source/core/css/html.css
+ * 所有 import "core/mweb-base.scss" 的文件都应该同时导入此变量文件。
+ */
+/* color */
+/* font & line */
+/* boxing */
+/* elememts */
+/*
+ * 基准样式，相当于 reset.css，使主题在不同平台下有统一的表现。
+ * 各个属性的默认值为 chrome 的默认样式，见 variables/default.scss。
+ */
+/**
+ * MWeb 包裹 markdown 的容器是 .mweb-default
+ * Typora 中是 #write
+ */
+.mweb-default {
+  line-height: 1.6em;
+  -webkit-text-size-adjust: 100%;
+  margin: 0px auto;
+  padding: 1.6rem 3.2rem;
+  font-family: PingFang SC, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  font-size: 16px;
+  color: black;
+  background-color: white;
+  /* spacing */
+  /* block */
+  /* list */
+  /* inline */
+  /* table */
+  /* svg */
+}
+.mweb-default * {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.mweb-default > *:first-child {
+  margin-top: 0 !important;
+}
+.mweb-default > *:last-child {
+  margin-top: 0 !important;
+}
+.mweb-default p, .mweb-default details, .mweb-default dl, .mweb-default ol, .mweb-default ul, .mweb-default pre, .mweb-default xmp, .mweb-default plaintext, .mweb-default listing, .mweb-default blockquote, .mweb-default table, .mweb-default figure, .mweb-default hr {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+.mweb-default h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  margin-left: 0;
+  margin-right: 0;
+}
+.mweb-default h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  margin-left: 0;
+  margin-right: 0;
+}
+.mweb-default h3 {
+  font-size: 1.17em;
+  font-weight: bold;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  margin-left: 0;
+  margin-right: 0;
+}
+.mweb-default h4 {
+  font-size: 1em;
+  font-weight: bold;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  margin-left: 0;
+  margin-right: 0;
+}
+.mweb-default h5 {
+  font-size: 0.83em;
+  font-weight: bold;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  margin-left: 0;
+  margin-right: 0;
+}
+.mweb-default h6 {
+  font-size: 0.67em;
+  font-weight: bold;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  margin-left: 0;
+  margin-right: 0;
+}
+.mweb-default p {
+  margin-left: 0;
+  margin-right: 0;
+}
+.mweb-default pre, .mweb-default xmp, .mweb-default plaintext, .mweb-default listing {
+  font-family: monospace, Menlo-Regular, Menlo, Monaco, Consolas, "Courier New";
+}
+.mweb-default blockquote > :first-child {
+  margin-top: 0;
+}
+.mweb-default blockquote > :last-child {
+  margin-bottom: 0;
+}
+.mweb-default hr {
+  border-style: inset;
+  border-width: 1px;
+}
+.mweb-default img {
+  max-width: 100%;
+  height: auto;
+}
+.mweb-default li {
+  word-wrap: break-all;
+}
+.mweb-default li + li {
+  margin-top: 0.25em;
+}
+.mweb-default ul ul, .mweb-default ol ul, .mweb-default ul ol, .mweb-default ol ol {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.mweb-default .task-list-item {
+  list-style-type: none;
+}
+.mweb-default a {
+  color: -webkit-link;
+  text-decoration: underline;
+}
+.mweb-default a img {
+  border: none;
+}
+.mweb-default b, .mweb-default strong {
+  font-weight: bold;
+}
+.mweb-default i, .mweb-default cite, .mweb-default em, .mweb-default var, .mweb-default address, .mweb-default dfn {
+  font-style: italic;
+}
+.mweb-default code, .mweb-default kbd, .mweb-default tt, .mweb-default samp {
+  font-family: monospace, Menlo-Regular, Menlo, Monaco, Consolas, "Courier New";
+}
+.mweb-default mark {
+  padding: 0.2em 0;
+  background-color: yellow;
+}
+.mweb-default del, .mweb-default s {
+  color: inherit;
+}
+.mweb-default table {
+  color: black;
+  border-collapse: collapse;
+  background-color: white;
+  border-spacing: 2px;
+  font-size: 1em;
+}
+.mweb-default th, .mweb-default td {
+  border-color: gray;
+  border-width: 1px;
+  border-style: solid;
+}
+.mweb-default th {
+  padding: 4px 8px;
+  font-size: 1em;
+  font-weight: bold;
+}
+.mweb-default td {
+  padding: 4px 8px;
+  font-size: 1em;
+  font-weight: normal;
+}
+.mweb-default div[id^=mweb-chart-ele] svg {
+  background-color: white;
+}
+
+.mweb-default .task-list-item + .task-list-item {
+  margin-top: 3px;
+}
+.mweb-default .task-list-item input {
+  margin: 0.3em 0 0.25em -1.6em;
+}

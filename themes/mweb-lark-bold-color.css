@@ -1,0 +1,331 @@
+/*
+ * Default theme，适用于 core/mweb-base.scss。
+ * 取值参考 chrome 默认样式：
+ * https://chromium.googlesource.com/chromium/blink/+/refs/heads/main/Source/core/css/html.css
+ * 所有 import "core/mweb-base.scss" 的文件都应该同时导入此变量文件。
+ */
+/* color */
+/* font & line */
+/* boxing */
+/* elememts */
+/* color */
+/* prism & pre */
+/* font */
+/* header */
+/* spacing */
+/* table */
+/*
+ * 基准样式，相当于 reset.css，使主题在不同平台下有统一的表现。
+ * 各个属性的默认值为 chrome 的默认样式，见 variables/default.scss。
+ */
+/**
+ * MWeb 包裹 markdown 的容器是 .mweb-lark-bold-color
+ * Typora 中是 #write
+ */
+.mweb-lark-bold-color {
+  line-height: 1.68;
+  -webkit-text-size-adjust: 100%;
+  margin: 0px auto;
+  padding: 1.6rem 3.2rem;
+  font-family: -apple-system, BlinkMacSystemFont, Helvetica Neue, Arial, Segoe UI, PingFang SC, Microsoft Yahei, Hiragino Sans GB, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+  font-size: 16px;
+  color: #1f2329;
+  background-color: white;
+  /* spacing */
+  /* block */
+  /* list */
+  /* inline */
+  /* table */
+  /* svg */
+}
+.mweb-lark-bold-color * {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.mweb-lark-bold-color > *:first-child {
+  margin-top: 0 !important;
+}
+.mweb-lark-bold-color > *:last-child {
+  margin-top: 0 !important;
+}
+.mweb-lark-bold-color p, .mweb-lark-bold-color details, .mweb-lark-bold-color dl, .mweb-lark-bold-color ol, .mweb-lark-bold-color ul, .mweb-lark-bold-color pre, .mweb-lark-bold-color xmp, .mweb-lark-bold-color plaintext, .mweb-lark-bold-color listing, .mweb-lark-bold-color blockquote, .mweb-lark-bold-color table, .mweb-lark-bold-color figure, .mweb-lark-bold-color hr {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+.mweb-lark-bold-color h1 {
+  font-size: 26px;
+  font-weight: bold;
+  margin-top: 26px;
+  margin-bottom: 10px;
+  margin-left: 0;
+  margin-right: 0;
+}
+.mweb-lark-bold-color h2 {
+  font-size: 22px;
+  font-weight: bold;
+  margin-top: 22px;
+  margin-bottom: 8px;
+  margin-left: 0;
+  margin-right: 0;
+}
+.mweb-lark-bold-color h3 {
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  margin-left: 0;
+  margin-right: 0;
+}
+.mweb-lark-bold-color h4 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 18px;
+  margin-bottom: 8px;
+  margin-left: 0;
+  margin-right: 0;
+}
+.mweb-lark-bold-color h5 {
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  margin-left: 0;
+  margin-right: 0;
+}
+.mweb-lark-bold-color h6 {
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  margin-left: 0;
+  margin-right: 0;
+}
+.mweb-lark-bold-color p {
+  margin-left: 0;
+  margin-right: 0;
+}
+.mweb-lark-bold-color pre, .mweb-lark-bold-color xmp, .mweb-lark-bold-color plaintext, .mweb-lark-bold-color listing {
+  font-family: monospace, Menlo-Regular, Menlo, Monaco, Consolas, "Courier New";
+}
+.mweb-lark-bold-color blockquote > :first-child {
+  margin-top: 0;
+}
+.mweb-lark-bold-color blockquote > :last-child {
+  margin-bottom: 0;
+}
+.mweb-lark-bold-color hr {
+  border-style: inset;
+  border-width: 1px;
+}
+.mweb-lark-bold-color img {
+  max-width: 100%;
+  height: auto;
+}
+.mweb-lark-bold-color li {
+  word-wrap: break-all;
+}
+.mweb-lark-bold-color li + li {
+  margin-top: 4px;
+}
+.mweb-lark-bold-color ul ul, .mweb-lark-bold-color ol ul, .mweb-lark-bold-color ul ol, .mweb-lark-bold-color ol ol {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.mweb-lark-bold-color .task-list-item {
+  list-style-type: none;
+}
+.mweb-lark-bold-color a {
+  color: #3370ff;
+  text-decoration: underline;
+}
+.mweb-lark-bold-color a img {
+  border: none;
+}
+.mweb-lark-bold-color b, .mweb-lark-bold-color strong {
+  font-weight: bold;
+}
+.mweb-lark-bold-color i, .mweb-lark-bold-color cite, .mweb-lark-bold-color em, .mweb-lark-bold-color var, .mweb-lark-bold-color address, .mweb-lark-bold-color dfn {
+  font-style: italic;
+}
+.mweb-lark-bold-color code, .mweb-lark-bold-color kbd, .mweb-lark-bold-color tt, .mweb-lark-bold-color samp {
+  font-family: monospace, Menlo-Regular, Menlo, Monaco, Consolas, "Courier New";
+}
+.mweb-lark-bold-color mark {
+  padding: 0.2em 0;
+  background-color: rgba(255, 246, 122, 0.8);
+}
+.mweb-lark-bold-color del, .mweb-lark-bold-color s {
+  color: inherit;
+}
+.mweb-lark-bold-color table {
+  color: black;
+  border-collapse: collapse;
+  background-color: white;
+  border-spacing: 2px;
+  font-size: 1em;
+}
+.mweb-lark-bold-color th, .mweb-lark-bold-color td {
+  border-color: #dee0e3;
+  border-width: 1px;
+  border-style: solid;
+}
+.mweb-lark-bold-color th {
+  padding: 8px 8px;
+  font-size: 1em;
+  font-weight: 500;
+}
+.mweb-lark-bold-color td {
+  padding: 8px 8px;
+  font-size: 1em;
+  font-weight: normal;
+}
+.mweb-lark-bold-color div[id^=mweb-chart-ele] svg {
+  background-color: white;
+}
+
+.mweb-lark-bold-color * {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.mweb-lark-bold-color h1, .mweb-lark-bold-color h2, .mweb-lark-bold-color h3, .mweb-lark-bold-color h4, .mweb-lark-bold-color h5, .mweb-lark-bold-color h6 {
+  line-height: 1.4;
+  font-weight: 500;
+  margin-top: 1em;
+  margin-bottom: 0.37em;
+}
+.mweb-lark-bold-color blockquote {
+  display: block;
+  margin-left: 0;
+  padding-left: 14px;
+  border-left: 2px solid #3370ff;
+  color: rgba(31, 35, 41, 0.7);
+}
+.mweb-lark-bold-color a {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  hyphens: auto;
+  word-break: break-word;
+  color: #3370ff;
+  text-decoration: none;
+}
+.mweb-lark-bold-color a:hover {
+  text-decoration: underline;
+}
+.mweb-lark-bold-color hr {
+  margin: 13px 0 12px;
+  border: 0px;
+  height: 1px;
+  background-origin: content-box;
+  background-image: linear-gradient(90deg, rgb(187, 191, 196), rgb(187, 191, 196));
+  background-repeat: no-repeat;
+}
+.mweb-lark-bold-color ul > li:not([class*=task-list-item]) {
+  word-wrap: break-all;
+  padding-left: 12px;
+}
+.mweb-lark-bold-color ul > li:not([class*=task-list-item])::marker {
+  color: #3370ff;
+}
+.mweb-lark-bold-color ol > li:not([class*=task-list-item]) {
+  word-wrap: break-all;
+  padding-left: 12px;
+}
+.mweb-lark-bold-color ol > li:not([class*=task-list-item])::marker {
+  color: #3370ff;
+}
+.mweb-lark-bold-color li + li, .mweb-lark-bold-color ul ul, .mweb-lark-bold-color ol ul, .mweb-lark-bold-color ul ol, .mweb-lark-bold-color ol ol, .mweb-lark-bold-color li ul, .mweb-lark-bold-color li ol {
+  margin-top: 4px;
+}
+.mweb-lark-bold-color .task-list-item {
+  padding-left: 28px;
+  margin-left: -6px;
+  list-style: none;
+  word-wrap: break-all;
+}
+.mweb-lark-bold-color .task-list-item input {
+  margin: 0 !important;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.mweb-lark-bold-color .task-list-item input:before {
+  content: " ";
+  display: inline-block;
+  position: relative;
+  line-height: normal;
+  font-size: 16px;
+  top: 2px;
+  border-radius: 2px;
+  border: 1px solid #2b2f36;
+  background-position: 50%;
+  white-space: normal;
+  width: 14px;
+  height: 14px;
+  margin-left: -22px;
+  margin-right: 6px;
+}
+.mweb-lark-bold-color .task-list-item input:checked:before {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iMTQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEwLjU4OSAzLjkwM2wuODA4LjgwOGEuMzUuMzUgMCAwIDEgMCAuNDk1TDYuMTggMTAuNDI1YS4zNS4zNSAwIDAgMS0uNDk1IDBMMi43MDMgNy40NDRhLjM1LjM1IDAgMCAxIDAtLjQ5NWwuODA4LS44MDhhLjM1LjM1IDAgMCAxIC40OTUgMGwxLjkyNSAxLjkyNCA0LjE2My00LjE2M2EuMzUuMzUgMCAwIDEgLjQ5NSAweiIgZmlsbD0iIzMzNzBGRiIvPjwvc3ZnPg==);
+  background-size: contain;
+}
+.mweb-lark-bold-color .footnotes hr {
+  margin-top: 4em;
+  margin-bottom: 0.5em;
+}
+.mweb-lark-bold-color code {
+  border-radius: 4px;
+  margin-left: 2px;
+  margin-right: 2px;
+  border: 1px solid #dee0e3;
+  background-color: #f5f6f7;
+  word-spacing: normal;
+  line-height: 1.6em;
+  padding: 0 2px;
+}
+.mweb-lark-bold-color section {
+  display: flex;
+  overflow: auto;
+  border: 1px solid #dee0e3;
+  background-color: #f5f6f7;
+}
+.mweb-lark-bold-color section pre {
+  margin: 0;
+  display: block;
+  padding: 1em;
+  overflow-x: auto;
+}
+.mweb-lark-bold-color section pre code {
+  border: none;
+  font-size: 1em;
+  line-height: 1.8em;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.mweb-lark-bold-color section ul {
+  counter-reset: line;
+  margin: 0;
+  padding: 1em 0 1em 1em;
+  white-space: normal;
+  width: fit-content;
+}
+.mweb-lark-bold-color section ul > li {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  display: list-item;
+  text-align: right;
+  line-height: 1.8em;
+  font-size: 1em;
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  padding: 0;
+  list-style-type: none;
+  color: #ff502c;
+}
+.mweb-lark-bold-color section ul > li::marker {
+  content: none;
+}
+
+.mweb-lark-bold-color strong {
+  color: rgb(36, 91, 219);
+}

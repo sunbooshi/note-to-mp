@@ -2,22 +2,38 @@ import { Token, Tokens, Marked, options} from "marked";
 import { markedHighlight } from "marked-highlight";
 import hljs from "highlight.js";
 
+export interface ParseOptions {
+    lineNumber: boolean;
+	linkStyle: 'footnote' | 'inline';
+}
+
+let AllLinks:string[] = [];
+const parseOptions:ParseOptions = {
+    lineNumber: true,
+	linkStyle: 'footnote'
+}
+
 function code(code: string, infostring: string | undefined): string {
     const lang = (infostring || '').match(/^\S*/)?.[0];
-
     code = code.replace(/\n$/, '') + '\n';
-    const lines = code.split('\n');
-    
-    let liItems = '';
-    let count = 1;
-    while (count < lines.length) {
-        liItems = liItems + `<li>${count}</li>`;
-        count = count + 1;
-    }
-    
-    const codeSection='<section class="code-section"><ul>'
-        + liItems
-        + '</ul>';
+
+	let codeSection = '';
+	if (parseOptions.lineNumber) {
+		const lines = code.split('\n');
+		
+		let liItems = '';
+		let count = 1;
+		while (count < lines.length) {
+			liItems = liItems + `<li>${count}</li>`;
+			count = count + 1;
+		}
+    	codeSection='<section class="code-section"><ul>'
+        	+ liItems
+        	+ '</ul>';
+	}
+	else {
+    	codeSection='<section class="code-section">';
+	}
         
     if (!lang) {
       return codeSection + '<pre><code>'
@@ -39,14 +55,35 @@ function codeRender(codeToken:Tokens.Code) {
 
 function walkTokens(token:Token) {
 	if (token.type == 'link') {
-		if (token.text.indexOf(token.href) === -1 && token.href.indexOf('mailto:') === -1) {
-			token.text = token.text + '[' + token.href + ']';
-			token.tokens = this.Lexer.lexInline(token.text)
+		const link = token as Tokens.Link;
+		if (token.text.indexOf(token.href) === -1) {
+			AllLinks.push(link.href);
+			if (parseOptions.linkStyle == 'footnote') {
+				const txtToken:Tokens.Text = {type: 'text', raw: link.text, text: link.text};
+				token.tokens = [txtToken, ... this.Lexer.lexInline(`<sup>[${AllLinks.length}]</sup>`)];
+			}
+			else {
+				for (const t of link.tokens) {
+					if (t.type == 'text') {
+						t.text = link.text + '[' + link.href + ']';
+					}
+				}
+			}
 		}
 	}
 }
 
-export async function markedParse(content:string)  {
+function footnoteLinks() {
+	const links = AllLinks.map((href, i) => {
+		return `<li>${href}&nbsp;↩</li>`;
+	});
+	return `<seciton class="footnotes"><hr><ol>${links.join('\n')}</ol></section>`;
+}
+
+export async function markedParse(content:string, op:ParseOptions)  {
+	parseOptions.lineNumber = op.lineNumber;
+	parseOptions.linkStyle = op.linkStyle;
+
 	const m = new Marked(
 	    markedHighlight({
 	    langPrefix: 'hljs language-',
@@ -67,6 +104,7 @@ export async function markedParse(content:string)  {
 	    }
 	  })
 	);
+	AllLinks = [];
 	m.use({walkTokens});
 	m.use({
 		extensions: [{
@@ -77,5 +115,9 @@ export async function markedParse(content:string)  {
 			},
 		}]
 	});
-	return await m.parse(content);
+	const html = await m.parse(content);
+	if (parseOptions.linkStyle == 'footnote') {
+	    return html + footnoteLinks();
+	}
+	return html;
 }

@@ -1,0 +1,593 @@
+:root {
+  --side-bar-bg-color: #fff;
+  --control-text-color: #777;
+}
+
+/* cyrillic-ext */
+@font-face {
+  font-family: "Roboto Mono";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Roboto Mono"), local("RobotoMono-Regular"), url("vue/L0x5DF4xlVMF-BfR8bXMIjhGq3-cXbKDO1w.woff2") format("woff2");
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: "Roboto Mono";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Roboto Mono"), local("RobotoMono-Regular"), url("vue/L0x5DF4xlVMF-BfR8bXMIjhPq3-cXbKDO1w.woff2") format("woff2");
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: "Roboto Mono";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Roboto Mono"), local("RobotoMono-Regular"), url("vue/L0x5DF4xlVMF-BfR8bXMIjhHq3-cXbKDO1w.woff2") format("woff2");
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: "Roboto Mono";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Roboto Mono"), local("RobotoMono-Regular"), url("vue/L0x5DF4xlVMF-BfR8bXMIjhIq3-cXbKDO1w.woff2") format("woff2");
+  unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: "Roboto Mono";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Roboto Mono"), local("RobotoMono-Regular"), url("vue/L0x5DF4xlVMF-BfR8bXMIjhEq3-cXbKDO1w.woff2") format("woff2");
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: "Roboto Mono";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Roboto Mono"), local("RobotoMono-Regular"), url("vue/L0x5DF4xlVMF-BfR8bXMIjhFq3-cXbKDO1w.woff2") format("woff2");
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: "Roboto Mono";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Roboto Mono"), local("RobotoMono-Regular"), url("vue/L0x5DF4xlVMF-BfR8bXMIjhLq3-cXbKD.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 300;
+  src: local("Source Sans Pro Light"), local("SourceSansPro-Light"), url("vue/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwmhduz8A.woff2") format("woff2");
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 300;
+  src: local("Source Sans Pro Light"), local("SourceSansPro-Light"), url("vue/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwkxduz8A.woff2") format("woff2");
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 300;
+  src: local("Source Sans Pro Light"), local("SourceSansPro-Light"), url("vue/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwmxduz8A.woff2") format("woff2");
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 300;
+  src: local("Source Sans Pro Light"), local("SourceSansPro-Light"), url("vue/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwlBduz8A.woff2") format("woff2");
+  unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 300;
+  src: local("Source Sans Pro Light"), local("SourceSansPro-Light"), url("vue/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwmBduz8A.woff2") format("woff2");
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 300;
+  src: local("Source Sans Pro Light"), local("SourceSansPro-Light"), url("vue/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwmRduz8A.woff2") format("woff2");
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 300;
+  src: local("Source Sans Pro Light"), local("SourceSansPro-Light"), url("vue/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwlxdu.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Source Sans Pro Regular"), local("SourceSansPro-Regular"), url("vue/6xK3dSBYKcSV-LCoeQqfX1RYOo3qNa7lqDY.woff2") format("woff2");
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Source Sans Pro Regular"), local("SourceSansPro-Regular"), url("vue/6xK3dSBYKcSV-LCoeQqfX1RYOo3qPK7lqDY.woff2") format("woff2");
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Source Sans Pro Regular"), local("SourceSansPro-Regular"), url("vue/6xK3dSBYKcSV-LCoeQqfX1RYOo3qNK7lqDY.woff2") format("woff2");
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Source Sans Pro Regular"), local("SourceSansPro-Regular"), url("vue/6xK3dSBYKcSV-LCoeQqfX1RYOo3qO67lqDY.woff2") format("woff2");
+  unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Source Sans Pro Regular"), local("SourceSansPro-Regular"), url("vue/6xK3dSBYKcSV-LCoeQqfX1RYOo3qN67lqDY.woff2") format("woff2");
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Source Sans Pro Regular"), local("SourceSansPro-Regular"), url("vue/6xK3dSBYKcSV-LCoeQqfX1RYOo3qNq7lqDY.woff2") format("woff2");
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Source Sans Pro Regular"), local("SourceSansPro-Regular"), url("vue/6xK3dSBYKcSV-LCoeQqfX1RYOo3qOK7l.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 600;
+  src: local("Source Sans Pro SemiBold"), local("SourceSansPro-SemiBold"), url("vue/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwmhduz8A.woff2") format("woff2");
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 600;
+  src: local("Source Sans Pro SemiBold"), local("SourceSansPro-SemiBold"), url("vue/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwkxduz8A.woff2") format("woff2");
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 600;
+  src: local("Source Sans Pro SemiBold"), local("SourceSansPro-SemiBold"), url("vue/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwmxduz8A.woff2") format("woff2");
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 600;
+  src: local("Source Sans Pro SemiBold"), local("SourceSansPro-SemiBold"), url("vue/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwlBduz8A.woff2") format("woff2");
+  unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 600;
+  src: local("Source Sans Pro SemiBold"), local("SourceSansPro-SemiBold"), url("vue/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwmBduz8A.woff2") format("woff2");
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 600;
+  src: local("Source Sans Pro SemiBold"), local("SourceSansPro-SemiBold"), url("vue/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwmRduz8A.woff2") format("woff2");
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 600;
+  src: local("Source Sans Pro SemiBold"), local("SourceSansPro-SemiBold"), url("vue/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwlxdu.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+.mweb-vue {
+  font-size: 16px;
+  font-family: Source Sans Pro, Helvetica Neue, Arial, sans-serif !important;
+  color: #34495e;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6rem;
+  letter-spacing: 0;
+  margin: 0;
+  overflow-x: hidden;
+  padding: 2em;
+  /** focus mode */
+  /* MWeb：代码块高亮 */
+}
+.mweb-vue .task-list-item {
+  list-style-type: none;
+  text-indent: -1.5em;
+}
+.mweb-vue .task-list-item:before {
+  content: "";
+  display: static;
+  margin-right: 0px;
+}
+.mweb-vue .task-list-item > input[type=checkbox] {
+  text-indent: -1.7em;
+}
+.mweb-vue > *:first-child {
+  margin-top: 0 !important;
+}
+.mweb-vue > *:last-child {
+  margin-bottom: 0 !important;
+}
+.mweb-vue img {
+  max-width: 100%;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.mweb-vue a {
+  color: #42b983;
+  font-weight: 600;
+  padding: 0 2px;
+  text-decoration: none;
+}
+.mweb-vue h1,
+.mweb-vue h2,
+.mweb-vue h3,
+.mweb-vue h4,
+.mweb-vue h5,
+.mweb-vue h6 {
+  position: relative;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  line-height: 1.4;
+  cursor: text;
+}
+.mweb-vue h1:hover a.anchor,
+.mweb-vue h2:hover a.anchor,
+.mweb-vue h3:hover a.anchor,
+.mweb-vue h4:hover a.anchor,
+.mweb-vue h5:hover a.anchor,
+.mweb-vue h6:hover a.anchor {
+  text-decoration: none;
+}
+.mweb-vue h1 tt,
+.mweb-vue h1 code {
+  font-size: inherit !important;
+}
+.mweb-vue h2 tt,
+.mweb-vue h2 code {
+  font-size: inherit !important;
+}
+.mweb-vue h3 tt,
+.mweb-vue h3 code {
+  font-size: inherit !important;
+}
+.mweb-vue h4 tt,
+.mweb-vue h4 code {
+  font-size: inherit !important;
+}
+.mweb-vue h5 tt,
+.mweb-vue h5 code {
+  font-size: inherit !important;
+}
+.mweb-vue h6 tt,
+.mweb-vue h6 code {
+  font-size: inherit !important;
+}
+.mweb-vue h2 a,
+.mweb-vue h3 a {
+  color: #34495e;
+}
+.mweb-vue h1 {
+  padding-bottom: 0.4rem;
+  font-size: 2.2rem;
+  line-height: 1.3;
+}
+.mweb-vue h2 {
+  font-size: 1.75rem;
+  line-height: 1.225;
+  margin: 35px 0 15px;
+  padding-bottom: 0.5em;
+  border-bottom: 1px solid #ddd;
+}
+.mweb-vue h3 {
+  font-size: 1.4rem;
+  line-height: 1.43;
+  margin: 20px 0 7px;
+}
+.mweb-vue h4 {
+  font-size: 1.2rem;
+}
+.mweb-vue h5 {
+  font-size: 1rem;
+}
+.mweb-vue h6 {
+  font-size: 1rem;
+  color: #777;
+}
+.mweb-vue p,
+.mweb-vue blockquote,
+.mweb-vue ul,
+.mweb-vue ol,
+.mweb-vue dl,
+.mweb-vue table {
+  margin: 0.8em 0;
+}
+.mweb-vue li > ol,
+.mweb-vue li > ul {
+  margin: 0 0;
+}
+.mweb-vue hr {
+  height: 2px;
+  padding: 0;
+  margin: 16px 0;
+  background-color: #e7e7e7;
+  border: 0 none;
+  overflow: hidden;
+  box-sizing: content-box;
+}
+.mweb-vue > h2:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+.mweb-vue > h1:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+.mweb-vue > h1:first-child + h2 {
+  margin-top: 0;
+  padding-top: 0;
+}
+.mweb-vue > h3:first-child,
+.mweb-vue > h4:first-child,
+.mweb-vue > h5:first-child,
+.mweb-vue > h6:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+.mweb-vue a:first-child h1,
+.mweb-vue a:first-child h2,
+.mweb-vue a:first-child h3,
+.mweb-vue a:first-child h4,
+.mweb-vue a:first-child h5,
+.mweb-vue a:first-child h6 {
+  margin-top: 0;
+  padding-top: 0;
+}
+.mweb-vue h1 p,
+.mweb-vue h2 p,
+.mweb-vue h3 p,
+.mweb-vue h4 p,
+.mweb-vue h5 p,
+.mweb-vue h6 p {
+  margin-top: 0;
+}
+.mweb-vue li p.first {
+  display: inline-block;
+}
+.mweb-vue ul,
+.mweb-vue ol {
+  padding-left: 30px;
+}
+.mweb-vue ul:first-child,
+.mweb-vue ol:first-child {
+  margin-top: 0;
+}
+.mweb-vue ul:last-child,
+.mweb-vue ol:last-child {
+  margin-bottom: 0;
+}
+.mweb-vue blockquote {
+  border-left: 4px solid #42b983;
+  padding: 10px 15px;
+  color: #777;
+  background-color: rgba(66, 185, 131, 0.1);
+}
+.mweb-vue table {
+  padding: 0;
+  word-break: initial;
+  border-collapse: collapse;
+}
+.mweb-vue table tr {
+  border-top: 1px solid #dfe2e5;
+  margin: 0;
+  padding: 0;
+}
+.mweb-vue table tr:nth-child(2n),
+.mweb-vue thead {
+  background-color: #fafafa;
+}
+.mweb-vue table tr th {
+  font-weight: bold;
+  border: 1px solid #dfe2e5;
+  border-bottom: 0;
+  text-align: left;
+  margin: 0;
+  padding: 6px 13px;
+}
+.mweb-vue table tr td {
+  border: 1px solid #dfe2e5;
+  text-align: left;
+  margin: 0;
+  padding: 6px 13px;
+}
+.mweb-vue table tr th:first-child,
+.mweb-vue table tr td:first-child {
+  margin-top: 0;
+}
+.mweb-vue table tr th:last-child,
+.mweb-vue table tr td:last-child {
+  margin-bottom: 0;
+}
+.mweb-vue .cm-s-inner .cm-link,
+.mweb-vue .cm-s-inner.cm-link {
+  color: #22a2c9;
+}
+.mweb-vue .cm-s-inner .cm-string {
+  color: #22a2c9;
+}
+.mweb-vue .md-task-list-item > input {
+  margin-left: -1.3em;
+}
+.mweb-vue .md-fences {
+  background-color: #f8f8f8;
+}
+.mweb-vue .mathjax-block > .code-tooltip {
+  bottom: 0.375rem;
+}
+.mweb-vue .md-image > .md-meta {
+  border-radius: 3px;
+  font-family: Consolas, "Liberation Mono", Courier, monospace;
+  padding: 2px 0 0 4px;
+  font-size: 0.9em;
+  color: inherit;
+}
+.mweb-vue .md-tag {
+  color: inherit;
+}
+.mweb-vue .md-toc {
+  margin-top: 20px;
+  padding-bottom: 20px;
+}
+.mweb-vue .sidebar-tabs {
+  border-bottom: none;
+}
+.mweb-vue #typora-quick-open {
+  border: 1px solid #ddd;
+  background-color: #f8f8f8;
+}
+.mweb-vue #typora-quick-open-item {
+  background-color: #fafafa;
+  border-color: #fefefe #e5e5e5 #e5e5e5 #eee;
+  border-style: solid;
+  border-width: 1px;
+}
+.mweb-vue #md-notification:before {
+  top: 10px;
+}
+.mweb-vue .on-focus-mode blockquote {
+  border-left-color: rgba(85, 85, 85, 0.12);
+}
+.mweb-vue .file-node-content:hover .file-node-icon,
+.mweb-vue .file-node-content:hover .file-node-open-state {
+  visibility: visible;
+}
+.mweb-vue .mac-seamless-mode #typora-sidebar {
+  background-color: var(--side-bar-bg-color);
+}
+.mweb-vue .md-lang {
+  color: #b4654d;
+}
+.mweb-vue .html-for-mac .context-menu {
+  --item-hover-bg-color: #e6f0fe;
+}
+.mweb-vue .footnotes hr {
+  margin-top: 4em;
+  margin-bottom: 0.5em;
+}
+.mweb-vue code,
+.mweb-vue tt,
+.mweb-vue pre {
+  border-radius: 2px;
+  font-family: Roboto Mono, Source Sans Pro, Monaco, courier, monospace !important;
+  font-size: 0.92rem;
+  color: #e96900;
+  overflow-x: auto;
+  background-color: #f8f8f8;
+}
+.mweb-vue code {
+  margin: 0 2px;
+  padding: 2px 4px;
+}
+.mweb-vue pre code {
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+.mweb-vue pre {
+  padding: 0.7em 1em;
+}
+.mweb-vue section {
+  display: flex;
+  overflow: auto;
+  background: #f8f8f8;
+  border-radius: 2px;
+}
+.mweb-vue section pre {
+  margin: 0;
+  display: block;
+  padding: 1em;
+  font-size: 1em;
+  overflow-x: auto;
+}
+.mweb-vue section pre code {
+  border: none;
+  font-size: 1em;
+  line-height: 1.6em;
+  padding: 0 !important;
+  margin: 0 !important;
+  text-wrap: nowrap;
+}
+.mweb-vue section ul {
+  counter-reset: line;
+  margin: 0;
+  padding: 1em 0 1em 1em;
+  white-space: normal;
+  width: fit-content;
+}
+.mweb-vue section ul > li {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  display: list-item;
+  text-align: right;
+  line-height: 1.6em;
+  font-size: 1em;
+  padding: 0;
+  list-style-type: none;
+  font-family: Roboto Mono, Source Sans Pro, Monaco, courier, monospace !important;
+}
+.mweb-vue section ul > li::marker {
+  content: none;
+}

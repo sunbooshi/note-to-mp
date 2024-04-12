@@ -1,18 +1,25 @@
-import { Plugin, WorkspaceLeaf } from 'obsidian';
+import { Plugin, WorkspaceLeaf, App, PluginManifest } from 'obsidian';
 import { NotePreview, VIEW_TYPE_NOTE_PREVIEW } from 'note-preview';
 import { PreviewSetting } from 'settings';
 import { NoteToMpSettingTab } from 'setting-tab';
+import ThemesManager from 'themes';
 
 
 export default class NoteToMpPlugin extends Plugin {
 	settings: PreviewSetting;
+	themesManager: ThemesManager;
+	constructor(app: App, manifest: PluginManifest) {
+	    super(app, manifest);
+	    this.themesManager = new ThemesManager(app);
+	}
 
 	async onload() {
 		console.log('Loading Note to MP');
 		await this.loadSettings();
+		await this.themesManager.loadThemes();
 		this.registerView(
 			VIEW_TYPE_NOTE_PREVIEW,
-			(leaf) => new NotePreview(leaf, this.settings)
+			(leaf) => new NotePreview(leaf, this.settings, this.themesManager)
 		);
 
 		const ribbonIconEl = this.addRibbonIcon('clipboard-paste', '复制到公众号', (evt: MouseEvent) => {
@@ -37,7 +44,6 @@ export default class NoteToMpPlugin extends Plugin {
 
 	async loadSettings() {
 		this.settings = new PreviewSetting(this.app);
-		await this.settings.loadStyles();
 		this.settings.loadSetting(await this.loadData());
 	}
 
