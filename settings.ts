@@ -1,49 +1,40 @@
-import { App, Notice } from 'obsidian';
+import { App } from 'obsidian';
 
-export interface CSSStyle {
-    name: string
-    className: string
-    desc: string
-    author: string
-}
 
 export class PreviewSetting {
     defaultStyle: string;
-    styles: CSSStyle[];
+    linkStyle: string;
+    lineNumber: boolean;
     app: App;
 
     constructor(app: App) {
         this.app = app;
-        this.defaultStyle = '';
+        this.defaultStyle = 'obsidian-light';
+        this.linkStyle = 'inline'
+        this.lineNumber = true;
     }
 
     loadSetting(data: any) {
         if (!data) {
             return
         }
-        const { defaultStyle } = data;
+        const { defaultStyle, linkStyle, lineNumber } = data;
         if (defaultStyle) {
             this.defaultStyle = defaultStyle;
+        }
+        if (linkStyle) {
+            this.linkStyle = linkStyle;
+        }
+        if (lineNumber !== undefined) {
+            this.lineNumber = lineNumber;
         }
     }
 
     allSettings() {
         return {
-            'defaultStyle': this.defaultStyle
-        }
-    }
-
-    async loadStyles() {
-        try {
-          const data = await this.app.vault.adapter.read('.obsidian/plugins/note-to-mp/styles.json');
-          if (data) {
-            this.styles = JSON.parse(data);
-            if (this.styles.length > 0) {
-                this.defaultStyle = this.styles[0].className;
-            }
-          }
-        } catch (error) {
-          new Notice('styles.json解析失败！');
+            'defaultStyle': this.defaultStyle,
+            'linkStyle': this.linkStyle,
+            'lineNumber': this.lineNumber,
         }
     }
 }

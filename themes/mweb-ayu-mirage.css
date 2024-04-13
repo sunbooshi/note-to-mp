@@ -1,0 +1,254 @@
+/*
+ * PrismJS default theme
+ * 这个文件只应该包含变量
+ */
+/*
+ * Default bear theme，适用于 core/mweb-bear.scss。
+ * 所有 bear 主题，只需 import 这个文件，然后修改配色方案即可。
+ */
+/* font */
+/* container */
+/*  spacing */
+/* color */
+/* other */
+/**
+ * 在 bear 的主题中，某些变量的取值和其他变量是绑定的。
+ * 统一写在这里，这个文件应该在变量文件的最后被引入。
+ */
+/**
+ * Bear 的默认样式表。通过调整各个颜色变量的取值，就可以得到不同的 bear 主题。
+ * Bear 的配色方案位于 src/themes/bear-palettes 目录下。
+ */
+.mweb-ayu-mirage {
+  font-family: AvenirNext-Regular, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  font-size: 16px;
+  color: rgb(217, 215, 209);
+  background-color: rgb(31, 35, 47);
+  line-height: 1.6em;
+  -webkit-text-size-adjust: 100%;
+  margin: 0px 0px;
+  padding: 1.6em 3.2em;
+  /* 代码块 */
+}
+.mweb-ayu-mirage * {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.mweb-ayu-mirage > *:first-child {
+  margin-top: 0 !important;
+}
+.mweb-ayu-mirage > *:last-child {
+  margin-top: 0 !important;
+}
+.mweb-ayu-mirage p, .mweb-ayu-mirage pre, .mweb-ayu-mirage dl, .mweb-ayu-mirage form, .mweb-ayu-mirage details, .mweb-ayu-mirage dl, .mweb-ayu-mirage blockquote, .mweb-ayu-mirage table, .mweb-ayu-mirage xmp, .mweb-ayu-mirage plaintext, .mweb-ayu-mirage listing, .mweb-ayu-mirage figure {
+  margin: 0.75em 0 0.45em;
+}
+.mweb-ayu-mirage hr {
+  margin: 0.75em auto;
+}
+.mweb-ayu-mirage h1, .mweb-ayu-mirage h2, .mweb-ayu-mirage h3, .mweb-ayu-mirage h4, .mweb-ayu-mirage h5, .mweb-ayu-mirage h6 {
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  margin-left: 0;
+  margin-right: 0;
+  font-family: AvenirNext-Medium;
+  font-weight: 500;
+  line-height: 1.5em;
+  color: rgb(159, 170, 185);
+}
+.mweb-ayu-mirage h1 {
+  font-size: 1.5em;
+}
+.mweb-ayu-mirage h2 {
+  font-size: 1.3em;
+}
+.mweb-ayu-mirage h3 {
+  font-size: 1.1em;
+}
+.mweb-ayu-mirage h4 {
+  font-size: 1em;
+}
+.mweb-ayu-mirage h5 {
+  font-size: 1em;
+}
+.mweb-ayu-mirage h6 {
+  font-size: 1em;
+}
+.mweb-ayu-mirage hr {
+  height: 1px;
+  border: 0;
+  background-color: rgb(60, 66, 84);
+  border-style: inset;
+  border-width: 1px;
+}
+.mweb-ayu-mirage p {
+  margin-left: 0;
+  margin-right: 0;
+}
+.mweb-ayu-mirage pre, .mweb-ayu-mirage pre[class*=language-] {
+  padding: 0;
+  border: 0;
+}
+.mweb-ayu-mirage blockquote {
+  display: block;
+  padding-left: 0.8em;
+  border-left: 0.2em solid rgb(254, 203, 102);
+  color: rgb(217, 215, 209);
+}
+.mweb-ayu-mirage blockquote > :first-child {
+  margin-top: 0;
+}
+.mweb-ayu-mirage blockquote > :last-child {
+  margin-bottom: 0;
+}
+.mweb-ayu-mirage li {
+  word-wrap: break-all;
+}
+.mweb-ayu-mirage ul {
+  margin-left: 1.3em;
+  padding: 0;
+}
+.mweb-ayu-mirage li::marker {
+  color: rgb(254, 203, 102);
+}
+.mweb-ayu-mirage li > p {
+  margin: 0;
+}
+.mweb-ayu-mirage ol {
+  margin-left: 1.3em;
+  padding: 0;
+  list-style-type: decimal;
+}
+.mweb-ayu-mirage .task-list-item {
+  list-style-type: none;
+  text-indent: -1.5em;
+}
+.mweb-ayu-mirage .task-list-item:before {
+  content: "";
+  display: static;
+  margin-right: 0px;
+}
+.mweb-ayu-mirage .task-list-item > input[type=checkbox] {
+  text-indent: -1.7em;
+}
+.mweb-ayu-mirage img {
+  max-width: 100%;
+  height: auto;
+}
+.mweb-ayu-mirage u {
+  text-decoration: none;
+  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 50%, rgb(254, 203, 102) 50%);
+  background-repeat: repeat-x;
+  background-size: 2px 2px;
+  background-position: 0 1em;
+}
+.mweb-ayu-mirage a {
+  color: rgb(254, 203, 102);
+  text-decoration: none;
+}
+.mweb-ayu-mirage a:hover, .mweb-ayu-mirage a:focus, .mweb-ayu-mirage a:active {
+  text-decoration: underline;
+}
+.mweb-ayu-mirage a img {
+  border: none;
+}
+.mweb-ayu-mirage b, .mweb-ayu-mirage strong {
+  font-weight: bold;
+}
+.mweb-ayu-mirage i, .mweb-ayu-mirage cite, .mweb-ayu-mirage em, .mweb-ayu-mirage var, .mweb-ayu-mirage address, .mweb-ayu-mirage dfn {
+  font-style: italic;
+}
+.mweb-ayu-mirage del, .mweb-ayu-mirage s {
+  color: rgb(120, 126, 140);
+}
+.mweb-ayu-mirage pre, .mweb-ayu-mirage xmp, .mweb-ayu-mirage plaintext, .mweb-ayu-mirage listing, .mweb-ayu-mirage code, .mweb-ayu-mirage kbd, .mweb-ayu-mirage tt, .mweb-ayu-mirage samp {
+  font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+.mweb-ayu-mirage mark {
+  color: inherit;
+  display: inline;
+  padding: 0.2em 0.5em;
+  background-color: rgb(17, 110, 84);
+}
+.mweb-ayu-mirage figcaption {
+  text-align: center;
+}
+.mweb-ayu-mirage table {
+  color: rgb(207, 208, 203);
+  border-collapse: collapse;
+  background-color: rgb(24, 28, 37);
+  border-spacing: 2px;
+  font-size: 1em;
+  border: 1px;
+  border-spacing: 0;
+}
+.mweb-ayu-mirage th, .mweb-ayu-mirage td {
+  padding: 0.7em 1em;
+  font-size: 0.9em;
+  border: 1px solid rgb(60, 66, 84);
+}
+.mweb-ayu-mirage caption, .mweb-ayu-mirage th, .mweb-ayu-mirage td {
+  text-align: left;
+  font-weight: normal;
+  vertical-align: middle;
+}
+.mweb-ayu-mirage div[id^=mweb-chart-ele] svg {
+  background-color: white;
+}
+.mweb-ayu-mirage .footnotes > ol li {
+  text-indent: 0;
+}
+.mweb-ayu-mirage .footnotes > ol li::before {
+  float: left;
+}
+.mweb-ayu-mirage .footnotes hr {
+  margin-top: 4em;
+  margin-bottom: 0.5em;
+}
+.mweb-ayu-mirage code {
+  display: inline;
+  color: rgb(207, 208, 203);
+}
+.mweb-ayu-mirage pre code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  overflow-x: auto;
+  text-wrap: nowrap;
+}
+.mweb-ayu-mirage section {
+  display: flex;
+  overflow: auto;
+  border: solid 1px rgb(60, 66, 84);
+  background-color: rgb(24, 28, 37);
+}
+.mweb-ayu-mirage section pre {
+  margin: 0;
+}
+.mweb-ayu-mirage section ul {
+  counter-reset: line;
+  margin: 0;
+  padding: 0.9em 0 0.9em 0.9em;
+  white-space: normal;
+  width: fit-content;
+}
+.mweb-ayu-mirage section ul > li {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  display: list-item;
+  text-align: right;
+  line-height: 1.6em;
+  font-size: 0.9em;
+  font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+  padding: 0;
+  list-style-type: none;
+  color: rgb(217, 215, 209);
+}
+.mweb-ayu-mirage section ul > li::marker {
+  content: none;
+}

@@ -1,0 +1,254 @@
+/*
+ * PrismJS default theme
+ * 这个文件只应该包含变量
+ */
+/*
+ * Default bear theme，适用于 core/mweb-bear.scss。
+ * 所有 bear 主题，只需 import 这个文件，然后修改配色方案即可。
+ */
+/* font */
+/* container */
+/*  spacing */
+/* color */
+/* other */
+/**
+ * 在 bear 的主题中，某些变量的取值和其他变量是绑定的。
+ * 统一写在这里，这个文件应该在变量文件的最后被引入。
+ */
+/**
+ * Bear 的默认样式表。通过调整各个颜色变量的取值，就可以得到不同的 bear 主题。
+ * Bear 的配色方案位于 src/themes/bear-palettes 目录下。
+ */
+.mweb-olive-dunk {
+  font-family: AvenirNext-Regular, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  font-size: 16px;
+  color: rgb(66, 63, 55);
+  background-color: rgb(251, 250, 240);
+  line-height: 1.6em;
+  -webkit-text-size-adjust: 100%;
+  margin: 0px 0px;
+  padding: 1.6em 3.2em;
+  /* 代码块 */
+}
+.mweb-olive-dunk * {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.mweb-olive-dunk > *:first-child {
+  margin-top: 0 !important;
+}
+.mweb-olive-dunk > *:last-child {
+  margin-top: 0 !important;
+}
+.mweb-olive-dunk p, .mweb-olive-dunk pre, .mweb-olive-dunk dl, .mweb-olive-dunk form, .mweb-olive-dunk details, .mweb-olive-dunk dl, .mweb-olive-dunk blockquote, .mweb-olive-dunk table, .mweb-olive-dunk xmp, .mweb-olive-dunk plaintext, .mweb-olive-dunk listing, .mweb-olive-dunk figure {
+  margin: 0.75em 0 0.45em;
+}
+.mweb-olive-dunk hr {
+  margin: 0.75em auto;
+}
+.mweb-olive-dunk h1, .mweb-olive-dunk h2, .mweb-olive-dunk h3, .mweb-olive-dunk h4, .mweb-olive-dunk h5, .mweb-olive-dunk h6 {
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  margin-left: 0;
+  margin-right: 0;
+  font-family: AvenirNext-Medium;
+  font-weight: 500;
+  line-height: 1.5em;
+  color: rgb(43, 100, 81);
+}
+.mweb-olive-dunk h1 {
+  font-size: 1.5em;
+}
+.mweb-olive-dunk h2 {
+  font-size: 1.3em;
+}
+.mweb-olive-dunk h3 {
+  font-size: 1.1em;
+}
+.mweb-olive-dunk h4 {
+  font-size: 1em;
+}
+.mweb-olive-dunk h5 {
+  font-size: 1em;
+}
+.mweb-olive-dunk h6 {
+  font-size: 1em;
+}
+.mweb-olive-dunk hr {
+  height: 1px;
+  border: 0;
+  background-color: rgb(221, 219, 214);
+  border-style: inset;
+  border-width: 1px;
+}
+.mweb-olive-dunk p {
+  margin-left: 0;
+  margin-right: 0;
+}
+.mweb-olive-dunk pre, .mweb-olive-dunk pre[class*=language-] {
+  padding: 0;
+  border: 0;
+}
+.mweb-olive-dunk blockquote {
+  display: block;
+  padding-left: 0.8em;
+  border-left: 0.2em solid rgb(149, 175, 163);
+  color: rgb(66, 63, 55);
+}
+.mweb-olive-dunk blockquote > :first-child {
+  margin-top: 0;
+}
+.mweb-olive-dunk blockquote > :last-child {
+  margin-bottom: 0;
+}
+.mweb-olive-dunk li {
+  word-wrap: break-all;
+}
+.mweb-olive-dunk ul {
+  margin-left: 1.3em;
+  padding: 0;
+}
+.mweb-olive-dunk li::marker {
+  color: rgb(149, 175, 163);
+}
+.mweb-olive-dunk li > p {
+  margin: 0;
+}
+.mweb-olive-dunk ol {
+  margin-left: 1.3em;
+  padding: 0;
+  list-style-type: decimal;
+}
+.mweb-olive-dunk .task-list-item {
+  list-style-type: none;
+  text-indent: -1.5em;
+}
+.mweb-olive-dunk .task-list-item:before {
+  content: "";
+  display: static;
+  margin-right: 0px;
+}
+.mweb-olive-dunk .task-list-item > input[type=checkbox] {
+  text-indent: -1.7em;
+}
+.mweb-olive-dunk img {
+  max-width: 100%;
+  height: auto;
+}
+.mweb-olive-dunk u {
+  text-decoration: none;
+  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 50%, rgb(149, 175, 163) 50%);
+  background-repeat: repeat-x;
+  background-size: 2px 2px;
+  background-position: 0 1em;
+}
+.mweb-olive-dunk a {
+  color: rgb(33, 95, 79);
+  text-decoration: none;
+}
+.mweb-olive-dunk a:hover, .mweb-olive-dunk a:focus, .mweb-olive-dunk a:active {
+  text-decoration: underline;
+}
+.mweb-olive-dunk a img {
+  border: none;
+}
+.mweb-olive-dunk b, .mweb-olive-dunk strong {
+  font-weight: bold;
+}
+.mweb-olive-dunk i, .mweb-olive-dunk cite, .mweb-olive-dunk em, .mweb-olive-dunk var, .mweb-olive-dunk address, .mweb-olive-dunk dfn {
+  font-style: italic;
+}
+.mweb-olive-dunk del, .mweb-olive-dunk s {
+  color: rgb(126, 150, 143);
+}
+.mweb-olive-dunk pre, .mweb-olive-dunk xmp, .mweb-olive-dunk plaintext, .mweb-olive-dunk listing, .mweb-olive-dunk code, .mweb-olive-dunk kbd, .mweb-olive-dunk tt, .mweb-olive-dunk samp {
+  font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+.mweb-olive-dunk mark {
+  color: inherit;
+  display: inline;
+  padding: 0.2em 0.5em;
+  background-color: rgb(249, 220, 175);
+}
+.mweb-olive-dunk figcaption {
+  text-align: center;
+}
+.mweb-olive-dunk table {
+  color: rgb(89, 88, 82);
+  border-collapse: collapse;
+  background-color: rgb(254, 254, 248);
+  border-spacing: 2px;
+  font-size: 1em;
+  border: 1px;
+  border-spacing: 0;
+}
+.mweb-olive-dunk th, .mweb-olive-dunk td {
+  padding: 0.7em 1em;
+  font-size: 0.9em;
+  border: 1px solid rgb(221, 219, 214);
+}
+.mweb-olive-dunk caption, .mweb-olive-dunk th, .mweb-olive-dunk td {
+  text-align: left;
+  font-weight: normal;
+  vertical-align: middle;
+}
+.mweb-olive-dunk div[id^=mweb-chart-ele] svg {
+  background-color: white;
+}
+.mweb-olive-dunk .footnotes > ol li {
+  text-indent: 0;
+}
+.mweb-olive-dunk .footnotes > ol li::before {
+  float: left;
+}
+.mweb-olive-dunk .footnotes hr {
+  margin-top: 4em;
+  margin-bottom: 0.5em;
+}
+.mweb-olive-dunk code {
+  display: inline;
+  color: rgb(89, 88, 82);
+}
+.mweb-olive-dunk pre code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  overflow-x: auto;
+  text-wrap: nowrap;
+}
+.mweb-olive-dunk section {
+  display: flex;
+  overflow: auto;
+  border: solid 1px rgb(221, 219, 214);
+  background-color: rgb(254, 254, 248);
+}
+.mweb-olive-dunk section pre {
+  margin: 0;
+}
+.mweb-olive-dunk section ul {
+  counter-reset: line;
+  margin: 0;
+  padding: 0.9em 0 0.9em 0.9em;
+  white-space: normal;
+  width: fit-content;
+}
+.mweb-olive-dunk section ul > li {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  display: list-item;
+  text-align: right;
+  line-height: 1.6em;
+  font-size: 0.9em;
+  font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+  padding: 0;
+  list-style-type: none;
+  color: rgb(66, 63, 55);
+}
+.mweb-olive-dunk section ul > li::marker {
+  content: none;
+}

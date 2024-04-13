@@ -1,7 +1,8 @@
 import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice } from 'obsidian';
 import { copy } from 'clipboard';
-import { markedParse } from 'utils';
+import { markedParse, ParseOptions } from 'utils';
 import { PreviewSetting } from 'settings';
+import ThemesManager from 'themes';
 
 export const VIEW_TYPE_NOTE_PREVIEW = 'note-preview';
 
@@ -14,14 +15,19 @@ export class NotePreview extends ItemView {
     toolbar: HTMLDivElement;
     renderDiv: HTMLDivElement;
     renderSection: HTMLElement;
+    styleEl: HTMLElement;
     listeners: EventRef[];
     container: Element;
     settings: PreviewSetting;
+    themeManager: ThemesManager;
+    currentTheme: string;
 
-    constructor(leaf: WorkspaceLeaf, settings: PreviewSetting) {
+    constructor(leaf: WorkspaceLeaf, settings: PreviewSetting, themeManager: ThemesManager) {
         super(leaf);
         this.workspace = this.app.workspace;
         this.settings = settings
+        this.themeManager = themeManager;
+        this.currentTheme = this.settings.defaultStyle;
     }
 
     getViewType() {
@@ -53,22 +59,47 @@ export class NotePreview extends ItemView {
         this.renderMarkdown();
     }
 
-    async renderMarkdown() {
-        const af = this.app.workspace.getActiveFile();
-        let title = '';
-        let md = '';
-        if (af) {
-            md = await this.app.vault.adapter.read(af.path);
-            title = af.name.replace('.md', '');
-        }
-        else {
-            md = '没有可渲染的笔记';
-        }
-        if (md.startsWith('---')) {
-            md = md.replace(FRONT_MATTER_REGEX, '');
-        }
+    errorContent(error: any) {
+        return '<h1>渲染失败!</h1><br/>'
+        + '如需帮助请前往&nbsp;&nbsp;<a href="https://github.com/sunbooshi/note-to-mp/issues">https://github.com/sunbooshi/note-to-mp/issues</a>&nbsp;&nbsp;反馈<br/><br/>'
+        + '如果方便，请提供引发错误的完整Markdown内容。<br/><br/>'
+        + '错误信息：<br/>'
+        + `${error}`;
+    }
 
-        this.renderSection.innerHTML = await markedParse(md);
+    async renderMarkdown() {
+        try {
+            const af = this.app.workspace.getActiveFile();
+            let md = '';
+            if (af) {
+                md = await this.app.vault.adapter.read(af.path);
+            }
+            else {
+                md = '没有可渲染的笔记';
+            }
+            if (md.startsWith('---')) {
+                md = md.replace(FRONT_MATTER_REGEX, '');
+            }
+            this.styleEl.innerHTML = this.getCSS();
+            const op: ParseOptions = {
+                lineNumber: this.settings.lineNumber,
+                linkStyle: this.settings.linkStyle as 'footnote' | 'inline',
+            }
+            this.renderSection.innerHTML = await markedParse(md, op);
+        }
+        catch (e) {
+            console.error(e);
+            this.renderSection.innerHTML = this.errorContent(e);
+        }
+    }
+
+    getCSS() {
+        for (let s of this.themeManager.themes) {
+            if (s.className == this.currentTheme) {
+                return s.css;
+            }
+        }
+        return '';
     }
 
     buildToolbar(parent: HTMLDivElement) {
@@ -103,7 +134,7 @@ export class NotePreview extends ItemView {
             this.updateStyle(selectBtn.value);
         }
 
-        for (let s of this.settings.styles) {
+        for (let s of this.themeManager.themes) {
             const op = selectBtn.createEl('option');
             op.value = s.className;
             op.text = s.name;
@@ -122,6 +153,8 @@ export class NotePreview extends ItemView {
         this.renderDiv = this.mainDiv.createDiv({cls: 'render-div'});
         this.renderDiv.id = 'render-div';
         this.renderDiv.setAttribute('style', '-webkit-user-select: text; user-select: text;')
+        this.styleEl = this.renderDiv.createEl('style');
+
         // 加入两个高度为0的section，确保复制到公众号编辑器中是section元素，这样才能把背景颜色带过去
         let dummySection = this.renderDiv.createEl('section');
         dummySection.innerHTML="&nbsp;&nbsp;"
@@ -133,6 +166,8 @@ export class NotePreview extends ItemView {
     }
 
     updateStyle(styleName: string) {
+        this.currentTheme = styleName;
+        this.styleEl.innerHTML = this.getCSS();
         this.renderSection.setAttribute('class', styleName);
     }
 }
