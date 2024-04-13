@@ -420,6 +420,7 @@
   line-height: 1.8em;
   padding: 0 !important;
   margin: 0 !important;
+  text-wrap: nowrap;
 }
 .mweb-typo section ul {
   counter-reset: line;
@@ -439,6 +440,7 @@
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   padding: 0;
   list-style-type: none;
+  text-wrap: nowrap;
 }
 .mweb-typo section ul > li::marker {
   content: none;

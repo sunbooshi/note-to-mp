@@ -301,6 +301,7 @@
   line-height: 1.8em;
   padding: 0 !important;
   margin: 0 !important;
+  text-wrap: nowrap;
 }
 .mweb-lark section ul {
   counter-reset: line;
@@ -321,6 +322,7 @@
   padding: 0;
   list-style-type: none;
   color: #ff502c;
+  text-wrap: nowrap;
 }
 .mweb-lark section ul > li::marker {
   content: none;
