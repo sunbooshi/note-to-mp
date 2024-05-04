@@ -10,7 +10,7 @@ export default class NoteToMpPlugin extends Plugin {
 	themesManager: ThemesManager;
 	constructor(app: App, manifest: PluginManifest) {
 	    super(app, manifest);
-	    this.themesManager = new ThemesManager(app);
+	    this.themesManager = new ThemesManager(app, manifest);
 	}
 
 	async onload() {

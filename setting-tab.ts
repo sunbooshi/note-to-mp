@@ -49,5 +49,23 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 			})
+
+		new Setting(containerEl)
+			.setName('获取更多主题')
+			.addButton(button => {
+			    button.setButtonText('下载');
+				button.onClick(async () => {
+					await this.plugin.themesManager.downloadThemes();
+				});
+			})
+
+		new Setting(containerEl)
+			.setName('清空主题')
+			.addButton(button => {
+			    button.setButtonText('清空');
+				button.onClick(async () => {
+					await this.plugin.themesManager.removeThemes();
+				});
+			})
 	}
 }
