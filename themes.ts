@@ -117,7 +117,6 @@ export default class ThemesManager {
     getThemeURL() {
         const version = this.manifest.version;
         return `https://github.com/sunbooshi/note-to-mp/releases/download/${version}/assets.zip`;
-        // return 'https://github.com/sunbooshi/note-to-mp/releases/download/1.0.3/note-to-mp.zip';
     }
 
     async downloadThemes() {
@@ -131,7 +130,7 @@ export default class ThemesManager {
             const data = res.arrayBuffer;
             console.log('下载成功');
             await this.unzip(new Blob([data]));
-            await this.loadThemes();
+            await this.loadAssets();
             new Notice('主题下载完成！');
         } catch (error) {
             console.log('下载失败');
@@ -154,7 +153,6 @@ export default class ThemesManager {
             }
             else {
                 const filePath = this.assetsPath + entry.filename;
-                console.log(entry.filename);
                 const textWriter = new zip.TextWriter();
                 if (entry.getData) {
                     const data = await entry.getData(textWriter);
@@ -170,7 +168,7 @@ export default class ThemesManager {
         try {
             if (await this.app.vault.adapter.exists(this.assetsPath)) {
                 this.app.vault.adapter.rmdir(this.assetsPath, true);
-                this.loadThemes();
+                this.loadAssets();
             }
             new Notice('清空完成！');
         } catch (error) {

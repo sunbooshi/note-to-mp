@@ -339,6 +339,7 @@ Code
 
 .obsidian-light pre code {
     display: block;
+    text-wrap: nowrap;
 }
 `
 

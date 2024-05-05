@@ -17,6 +17,11 @@ export class PreviewSetting {
         this.lineNumber = true;
     }
 
+    resetStyelAndHighlight() {
+        this.defaultStyle = 'obsidian-light';
+        this.defaultHighlight = '默认';
+    }
+
     loadSetting(data: any) {
         if (!data) {
             return

@@ -69,7 +69,9 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			.addButton(button => {
 			    button.setButtonText('下载');
 				button.onClick(async () => {
+					button.setButtonText('下载中...');
 					await this.plugin.themesManager.downloadThemes();
+					button.setButtonText('下载完成');
 				});
 			})
 
@@ -79,6 +81,8 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			    button.setButtonText('清空');
 				button.onClick(async () => {
 					await this.plugin.themesManager.removeThemes();
+					this.plugin.settings.resetStyelAndHighlight();
+					await this.plugin.saveSettings();
 				});
 			})
 	}
