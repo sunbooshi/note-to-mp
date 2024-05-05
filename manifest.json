@@ -1,7 +1,7 @@
 {
 	"id": "note-to-mp",
 	"name": "Note to MP",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"minAppVersion": "1.4.5",
 	"description": "This plugin is specially optimized for the WeChat MP editor. By copying notes with this plugin, you can perfectly preserve the style, and it supports code highlighting and line number display.",
 	"author": "Sun Booshi",

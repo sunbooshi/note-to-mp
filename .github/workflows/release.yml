@@ -39,4 +39,4 @@ jobs:
 
           gh release create "$tag" \
             --title="$tag" \
-            --draft assets.zip
+            --draft assets.zip main.js manifest.json styles.css
