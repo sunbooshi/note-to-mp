@@ -155,12 +155,9 @@ export class NotePreview extends ItemView {
         this.renderDiv.setAttribute('style', '-webkit-user-select: text; user-select: text;')
         this.styleEl = this.renderDiv.createEl('style');
 
-        // 加入两个高度为0的section，确保复制到公众号编辑器中是section元素，这样才能把背景颜色带过去
-        let dummySection = this.renderDiv.createEl('section');
-        dummySection.innerHTML="&nbsp;&nbsp;"
-        dummySection.setAttr('style', 'height:0px;');
         this.renderSection = this.renderDiv.createEl('section', { cls: this.settings.defaultStyle });
-        dummySection = this.renderDiv.createEl('section');
+        // 加入1个高度为0的section，确保复制到公众号编辑器中是section元素，这样才能把背景颜色带过去
+        let dummySection = this.renderDiv.createEl('section');
         dummySection.innerHTML="&nbsp;&nbsp;"
         dummySection.setAttr('style', 'height:0px;');
     }

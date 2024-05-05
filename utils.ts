@@ -56,7 +56,7 @@ function codeRender(codeToken:Tokens.Code) {
 function walkTokens(token:Token) {
 	if (token.type == 'link') {
 		const link = token as Tokens.Link;
-		if (token.text.indexOf(token.href) === -1) {
+		if (token.text.indexOf(token.href) === -1 && !(token.href.indexOf('https://mp.weixin.qq.com/s/') === 0)) {
 			AllLinks.push(link.href);
 			if (parseOptions.linkStyle == 'footnote') {
 				const txtToken:Tokens.Text = {type: 'text', raw: link.text, text: link.text};
