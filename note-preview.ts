@@ -21,6 +21,7 @@ export class NotePreview extends ItemView {
     settings: PreviewSetting;
     themeManager: ThemesManager;
     currentTheme: string;
+    currentHighlight: string;
 
     constructor(leaf: WorkspaceLeaf, settings: PreviewSetting, themeManager: ThemesManager) {
         super(leaf);
@@ -28,6 +29,7 @@ export class NotePreview extends ItemView {
         this.settings = settings
         this.themeManager = themeManager;
         this.currentTheme = this.settings.defaultStyle;
+        this.currentHighlight = this.settings.defaultHighlight;
     }
 
     getViewType() {
@@ -94,10 +96,13 @@ export class NotePreview extends ItemView {
     }
 
     getCSS() {
-        for (let s of this.themeManager.themes) {
-            if (s.className == this.currentTheme) {
-                return s.css;
-            }
+        try {
+            const theme = this.themeManager.getTheme(this.currentTheme);
+            const highlight = this.themeManager.getHighlight(this.currentHighlight);
+            return `${theme!.css}\n\n${highlight!.css}`;
+        } catch (error) {
+            console.error(error);
+            new Notice(`获取样式失败${this.currentTheme}|${this.currentHighlight}，请检查主题是否正确安装。`);
         }
         return '';
     }
@@ -140,6 +145,25 @@ export class NotePreview extends ItemView {
             op.text = s.name;
             op.selected = s.className == this.settings.defaultStyle;
         }
+
+        const highlightStyle = this.toolbar.createDiv({ cls: 'style-label' });
+        highlightStyle.innerText = '代码高亮:';
+
+        const highlightStyleBtn = this.toolbar.createEl('select', { cls: 'style-select' }, async (sel) => {
+
+        })
+
+        highlightStyleBtn.onchange = async () => {
+            console.log(highlightStyleBtn.value);
+            this.updateHighLight(highlightStyleBtn.value);
+        }
+
+        for (let s of this.themeManager.highlights) {
+            const op = highlightStyleBtn.createEl('option');
+            op.value = s.name;
+            op.text = s.name;
+            op.selected = s.name == this.settings.defaultHighlight;
+        }
     }
 
     async buildUI() {
@@ -167,7 +191,16 @@ export class NotePreview extends ItemView {
 
     updateStyle(styleName: string) {
         this.currentTheme = styleName;
+        this.updateCss();
+    }
+
+    updateHighLight(styleName: string) {
+        this.currentHighlight = styleName;
+        this.updateCss();
+    }
+
+    updateCss() {
         this.styleEl.innerHTML = this.getCSS();
-        this.renderSection.setAttribute('class', styleName);
+        this.renderSection.setAttribute('class', this.currentTheme);
     }
 }

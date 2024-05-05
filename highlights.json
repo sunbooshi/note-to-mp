@@ -1,0 +1,298 @@
+[
+    {
+        "name": "a11y-dark",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/a11y-dark.css"
+    },
+    {
+        "name": "a11y-light",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/a11y-light.css"
+    },
+    {
+        "name": "agate",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/agate.css"
+    },
+    {
+        "name": "an-old-hope",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/an-old-hope.css"
+    },
+    {
+        "name": "androidstudio",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/androidstudio.css"
+    },
+    {
+        "name": "arduino-light",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/arduino-light.css"
+    },
+    {
+        "name": "arta",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/arta.css"
+    },
+    {
+        "name": "ascetic",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/ascetic.css"
+    },
+    {
+        "name": "atom-one-dark",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/atom-one-dark.css"
+    },
+    {
+        "name": "atom-one-dark-reasonable",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/atom-one-dark-reasonable.css"
+    },
+    {
+        "name": "atom-one-light",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/atom-one-light.css"
+    },
+    {
+        "name": "brown-paper",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/brown-paper.css"
+    },
+    {
+        "name": "brown-papersq.png",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/brown-papersq.png.css"
+    },
+    {
+        "name": "codepen-embed",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/codepen-embed.css"
+    },
+    {
+        "name": "color-brewer",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/color-brewer.css"
+    },
+    {
+        "name": "dark",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/dark.css"
+    },
+    {
+        "name": "default",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/default.css"
+    },
+    {
+        "name": "devibeans",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/devibeans.css"
+    },
+    {
+        "name": "docco",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/docco.css"
+    },
+    {
+        "name": "far",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/far.css"
+    },
+    {
+        "name": "felipec",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/felipec.css"
+    },
+    {
+        "name": "foundation",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/foundation.css"
+    },
+    {
+        "name": "github",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.css"
+    },
+    {
+        "name": "github-dark",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.css"
+    },
+    {
+        "name": "github-dark-dimmed",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark-dimmed.css"
+    },
+    {
+        "name": "gml",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/gml.css"
+    },
+    {
+        "name": "googlecode",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/googlecode.css"
+    },
+    {
+        "name": "gradient-dark",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/gradient-dark.css"
+    },
+    {
+        "name": "gradient-light",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/gradient-light.css"
+    },
+    {
+        "name": "grayscale",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/grayscale.css"
+    },
+    {
+        "name": "hybrid",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/hybrid.css"
+    },
+    {
+        "name": "idea",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/idea.css"
+    },
+    {
+        "name": "intellij-light",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/intellij-light.css"
+    },
+    {
+        "name": "ir-black",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/ir-black.css"
+    },
+    {
+        "name": "isbl-editor-dark",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/isbl-editor-dark.css"
+    },
+    {
+        "name": "isbl-editor-light",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/isbl-editor-light.css"
+    },
+    {
+        "name": "kimbie-dark",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/kimbie-dark.css"
+    },
+    {
+        "name": "kimbie-light",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/kimbie-light.css"
+    },
+    {
+        "name": "lightfair",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/lightfair.css"
+    },
+    {
+        "name": "lioshi",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/lioshi.css"
+    },
+    {
+        "name": "magula",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/magula.css"
+    },
+    {
+        "name": "mono-blue",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/mono-blue.css"
+    },
+    {
+        "name": "monokai",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/monokai.css"
+    },
+    {
+        "name": "monokai-sublime",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/monokai-sublime.css"
+    },
+    {
+        "name": "night-owl",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/night-owl.css"
+    },
+    {
+        "name": "nnfx-dark",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/nnfx-dark.css"
+    },
+    {
+        "name": "nnfx-light",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/nnfx-light.css"
+    },
+    {
+        "name": "nord",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/nord.css"
+    },
+    {
+        "name": "obsidian",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/obsidian.css"
+    },
+    {
+        "name": "panda-syntax-dark",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/panda-syntax-dark.css"
+    },
+    {
+        "name": "panda-syntax-light",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/panda-syntax-light.css"
+    },
+    {
+        "name": "paraiso-dark",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/paraiso-dark.css"
+    },
+    {
+        "name": "paraiso-light",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/paraiso-light.css"
+    },
+    {
+        "name": "pojoaque",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/pojoaque.css"
+    },
+    {
+        "name": "pojoaque.jpg",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/pojoaque.jpg.css"
+    },
+    {
+        "name": "purebasic",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/purebasic.css"
+    },
+    {
+        "name": "qtcreator-dark",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/qtcreator-dark.css"
+    },
+    {
+        "name": "qtcreator-light",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/qtcreator-light.css"
+    },
+    {
+        "name": "rainbow",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/rainbow.css"
+    },
+    {
+        "name": "routeros",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/routeros.css"
+    },
+    {
+        "name": "school-book",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/school-book.css"
+    },
+    {
+        "name": "shades-of-purple",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/shades-of-purple.css"
+    },
+    {
+        "name": "srcery",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/srcery.css"
+    },
+    {
+        "name": "stackoverflow-dark",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/stackoverflow-dark.css"
+    },
+    {
+        "name": "stackoverflow-light",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/stackoverflow-light.css"
+    },
+    {
+        "name": "sunburst",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/sunburst.css"
+    },
+    {
+        "name": "tokyo-night-dark",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/tokyo-night-dark.css"
+    },
+    {
+        "name": "tokyo-night-light",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/tokyo-night-light.css"
+    },
+    {
+        "name": "tomorrow-night-blue",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/tomorrow-night-blue.css"
+    },
+    {
+        "name": "tomorrow-night-bright",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/tomorrow-night-bright.css"
+    },
+    {
+        "name": "vs",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/vs.css"
+    },
+    {
+        "name": "vs2015",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/vs2015.css"
+    },
+    {
+        "name": "xcode",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/xcode.css"
+    },
+    {
+        "name": "xt256",
+        "url": "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/xt256.css"
+    }
+]

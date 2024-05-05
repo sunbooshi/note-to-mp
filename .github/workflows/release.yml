@@ -1,6 +1,12 @@
 name: Release Obsidian plugin
 
 on:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Test scenario tags'
+        required: true
+        type: string
   push:
     tags:
       - "*"
@@ -21,6 +27,7 @@ jobs:
         run: |
           npm install
           npm run build
+          npm run download
 
       - name: Create release
         env:
@@ -28,7 +35,7 @@ jobs:
         run: |
           tag="${GITHUB_REF#refs/tags/}"
 
-          zip -r assets.zip themes.json themes/
+          zip -r assets.zip themes.json themes/ highlights.json highlights/
 
           gh release create "$tag" \
             --title="$tag" \

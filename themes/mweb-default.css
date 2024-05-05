@@ -188,3 +188,44 @@
 .mweb-default .task-list-item input {
   margin: 0.3em 0 0.25em -1.6em;
 }
+.mweb-default section {
+  display: flex;
+  overflow: auto;
+  border: 1px solid gray;
+}
+.mweb-default section pre {
+  margin: 0;
+  padding: 0;
+}
+.mweb-default section pre code {
+  font-family: Consolas, ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", "Courier New", monospace;
+  border: none;
+  font-size: 1em;
+  line-height: 1.8em;
+  padding: 1em;
+  display: block;
+  overflow-x: auto;
+}
+.mweb-default section ul {
+  counter-reset: line;
+  margin: 0;
+  padding: 1em 0em 1em 1em;
+  white-space: normal;
+  width: fit-content;
+}
+.mweb-default section ul > li {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  display: list-item;
+  text-align: right;
+  line-height: 1.8em;
+  font-size: 1em;
+  font-family: Consolas, ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", "Courier New", monospace;
+  padding: 0;
+  list-style-type: none;
+  color: #ff502c;
+}
+.mweb-default section ul > li::marker {
+  content: none;
+}

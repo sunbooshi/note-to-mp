@@ -16,7 +16,7 @@ export default class NoteToMpPlugin extends Plugin {
 	async onload() {
 		console.log('Loading Note to MP');
 		await this.loadSettings();
-		await this.themesManager.loadThemes();
+		await this.themesManager.loadAssets();
 		this.registerView(
 			VIEW_TYPE_NOTE_PREVIEW,
 			(leaf) => new NotePreview(leaf, this.settings, this.themesManager)

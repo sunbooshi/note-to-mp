@@ -293,16 +293,11 @@ Images
 Code
 ==================================
 */
-.obsidian-light pre code {
-    padding: 0;
-}
-
 .obsidian-light section {
     display: flex;
     overflow: auto;
     background-color: rgb(250, 250, 250);
     border: rgb(240, 240, 240) 1px solid;
-    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
 }
 
 .obsidian-light section ul {
@@ -314,6 +309,7 @@ Code
 }
 
 .obsidian-light section ul>li {
+    font-family: Consolas, ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", "Courier New", monospace;
     position: relative;
     margin: 0;
     padding: 0;
@@ -328,7 +324,7 @@ Code
 
 .obsidian-light pre {
     margin: 0;
-    padding: 0.875em;
+    padding: 0;
 }
 
 .obsidian-light code {
@@ -338,7 +334,12 @@ Code
     font-size: 0.875em;
     line-height: 1.75em;
     vertical-align: baseline;
+    padding: 1em;
 }    
+
+.obsidian-light pre code {
+    display: block;
+}
 `
 
-export default {name: '默认Obsidian Light', className: 'obsidian-light', desc: '默认主题', author: 'SunBooshi', css:css};
+export default {name: '默认', className: 'obsidian-light', desc: '默认主题', author: 'SunBooshi', css:css};
