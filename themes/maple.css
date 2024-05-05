@@ -268,16 +268,11 @@
   Code
   ==================================
   */
-.maple pre code {
-    padding: 0;
-}
-
 .maple section {
     display: flex;
     overflow: auto;
     background-color: rgb(250, 250, 250);
     border: rgb(240, 240, 240) 1px solid;
-    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
 }
 
 .maple section ul {
@@ -289,6 +284,7 @@
 }
 
 .maple section ul>li {
+    font-family: Consolas, ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", "Courier New", monospace;
     position: relative;
     margin: 0;
     padding: 0;
@@ -303,7 +299,7 @@
 
 .maple pre {
     margin: 0;
-    padding: 0.875em;
+    padding: 0;
 }
 
 .maple code {
@@ -311,5 +307,9 @@
     font-family: Consolas, ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", "Courier New", monospace;
     color: #333;
     font-size: 0.875em;
-    padding: 0;
+    padding: 1em;
+}
+
+.maple pre code {
+    display: block;
 }

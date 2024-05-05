@@ -10,13 +10,13 @@ export default class NoteToMpPlugin extends Plugin {
 	themesManager: ThemesManager;
 	constructor(app: App, manifest: PluginManifest) {
 	    super(app, manifest);
-	    this.themesManager = new ThemesManager(app);
+	    this.themesManager = new ThemesManager(app, manifest);
 	}
 
 	async onload() {
 		console.log('Loading Note to MP');
 		await this.loadSettings();
-		await this.themesManager.loadThemes();
+		await this.themesManager.loadAssets();
 		this.registerView(
 			VIEW_TYPE_NOTE_PREVIEW,
 			(leaf) => new NotePreview(leaf, this.settings, this.themesManager)

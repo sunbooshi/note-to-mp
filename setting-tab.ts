@@ -29,6 +29,20 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
+			.setName('代码高亮')
+			.addDropdown(dropdown => {
+                const styles = this.plugin.themesManager.highlights;
+                for (let s of styles) {
+				    dropdown.addOption(s.name, s.name);
+                }
+				dropdown.setValue(this.plugin.settings.defaultHighlight);
+                dropdown.onChange(async (value) => {
+					this.plugin.settings.defaultHighlight = value;
+					await this.plugin.saveSettings();
+                });
+			});
+
+		new Setting(containerEl)
 			.setName('链接展示样式')
 			.addDropdown(dropdown => {
 				dropdown.addOption('inline', '内嵌');
@@ -47,6 +61,24 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 				toggle.onChange(async (value) => {
 				    this.plugin.settings.lineNumber = value;
 					await this.plugin.saveSettings();
+				});
+			})
+
+		new Setting(containerEl)
+			.setName('获取更多主题')
+			.addButton(button => {
+			    button.setButtonText('下载');
+				button.onClick(async () => {
+					await this.plugin.themesManager.downloadThemes();
+				});
+			})
+
+		new Setting(containerEl)
+			.setName('清空主题')
+			.addButton(button => {
+			    button.setButtonText('清空');
+				button.onClick(async () => {
+					await this.plugin.themesManager.removeThemes();
 				});
 			})
 	}
