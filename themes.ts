@@ -23,13 +23,16 @@ export default class ThemesManager {
     manifest: PluginManifest;
     themes: Theme[];
     highlights: Highlight[];
-    assetsPath = '.obsidian/plugins/note-to-mp/assets/';
-    themesPath = this.assetsPath + 'themes/';
-    hilightPath = this.assetsPath + 'highlights/';
+    assetsPath: string;
+    themesPath: string;
+    hilightPath: string;
 
     constructor(app: App, manifest: PluginManifest) {
         this.app = app;
         this.manifest = manifest;
+        this.assetsPath = this.app.vault.configDir + '/plugins/' + this.manifest.id + '/assets/';
+        this.themesPath = this.assetsPath + 'themes/';
+        this.hilightPath = this.assetsPath + 'highlights/';
     }
 
     async loadAssets() {
@@ -121,19 +124,17 @@ export default class ThemesManager {
 
     async downloadThemes() {
         try {
-            console.log('下载主题');
             if (await this.app.vault.adapter.exists(this.assetsPath)) {
                 new Notice('主题资源已存在！')
                 return;
             }
             const res = await requestUrl(this.getThemeURL());
             const data = res.arrayBuffer;
-            console.log('下载成功');
             await this.unzip(new Blob([data]));
             await this.loadAssets();
             new Notice('主题下载完成！');
         } catch (error) {
-            console.log('下载失败');
+            console.error(error);
             await this.removeThemes();
             new Notice('主题下载失败, 请检查网络！');
         }
