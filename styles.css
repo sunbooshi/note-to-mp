@@ -9,6 +9,7 @@
   align-items: center;
   border-bottom: #e4e4e4 1px solid;
   flex-wrap: wrap;
+  background-color: var(--background-primary);
 }
 
 .copy-button {
