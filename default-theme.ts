@@ -8,6 +8,7 @@ const css = `
     user-select: text;
     -webkit-user-select: text;
     color: #222222;
+    font-size: 16px;
     font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
 }
 
@@ -94,9 +95,8 @@ Paragraphs
 ==================================
     */
 .obsidian-light p {
-    line-height: 2em;
-    margin-top: 1.25em;
-    margin-bottom: 1.25em;
+    line-height: 1.6em;
+    margin: 1em 0;
 }
 
 /*
@@ -293,7 +293,7 @@ Images
 Code
 ==================================
 */
-.obsidian-light section {
+.obsidian-light .code-section {
     display: flex;
     overflow: auto;
     background-color: rgb(250, 250, 250);

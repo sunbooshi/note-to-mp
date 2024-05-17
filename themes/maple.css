@@ -80,8 +80,7 @@
   ==================================
   */
 .maple p {
-    margin-top: 1.25em;
-    margin-bottom: 1.25em;
+    margin: 1em 0;
 }
 
 /*
@@ -268,7 +267,7 @@
   Code
   ==================================
   */
-.maple section {
+.maple .code-section {
     display: flex;
     overflow: auto;
     background-color: rgb(250, 250, 250);

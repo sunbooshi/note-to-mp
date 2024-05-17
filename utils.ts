@@ -1,17 +1,23 @@
-import { Token, Tokens, Marked, options} from "marked";
+import { Token, Tokens, Marked, options, Lexer} from "marked";
 import { markedHighlight } from "marked-highlight";
 import hljs from "highlight.js";
+import GetCallout from "callouts";
+
 
 export interface ParseOptions {
     lineNumber: boolean;
 	linkStyle: 'footnote' | 'inline';
-}
+};
 
 let AllLinks:string[] = [];
 const parseOptions:ParseOptions = {
     lineNumber: true,
 	linkStyle: 'footnote'
-}
+};
+const markedOptiones = {
+    gfm: true,
+    breaks: true,
+};
 
 function code(code: string, infostring: string | undefined): string {
     const lang = (infostring || '').match(/^\S*/)?.[0];
@@ -51,6 +57,42 @@ function code(code: string, infostring: string | undefined): string {
 function codeRender(codeToken:Tokens.Code) {
 	const result = code(codeToken.text, codeToken.lang);
 	return result;
+}
+
+function matchCallouts(text:string) {
+    const regex = /\[\!(.*?)\]/g;
+	let m;
+	if( m = regex.exec(text)) {
+	    return m[1];
+	}
+	return "";
+}
+
+function calloutRender(token: Tokens.Blockquote) {
+	let callout = matchCallouts(token.text);
+	if (callout == '') {
+		const body = this.parser.parse(token.tokens);
+        return `<blockquote>\n${body}</blockquote>\n`;;
+	}
+
+	const info = GetCallout(callout);
+
+	const lexer = new Lexer(markedOptiones);
+	token.text = token.text.replace(`[!${callout}]\n`, '');
+	token.tokens = lexer.lex(token.text);
+	
+	const body = this.parser.parse(token.tokens);
+	callout = callout.charAt(0).toUpperCase() + callout.slice(1)
+	return `
+		<section class="note-callout ${info?.style}">
+			<section class="note-callout-title-wrap">
+				${info?.icon}
+				<span class="note-callout-title">${callout}<span>
+			</section>
+			<section class="note-callout-content">
+				${body}
+			</section>
+		</section>`;
 }
 
 function walkTokens(token:Token) {
@@ -105,6 +147,7 @@ export async function markedParse(content:string, op:ParseOptions)  {
 	  })
 	);
 	AllLinks = [];
+	m.use(markedOptiones);
 	m.use({walkTokens});
 	m.use({
 		extensions: [{
@@ -113,7 +156,14 @@ export async function markedParse(content:string, op:ParseOptions)  {
 			renderer(token) {
 				return codeRender.call(this, token);
 			},
-		}]
+		},
+		{
+			name: 'blockquote',
+			level: 'block',
+			renderer(token) {
+				return calloutRender.call(this, token as Tokens.Blockquote);
+			}, 
+		}],
 	});
 	const html = await m.parse(content);
 	if (parseOptions.linkStyle == 'footnote') {
