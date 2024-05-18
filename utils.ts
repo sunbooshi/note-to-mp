@@ -68,6 +68,17 @@ function matchCallouts(text:string) {
 	return "";
 }
 
+function GetCalloutTitle(callout:string, text:string) {
+	let title = callout.charAt(0).toUpperCase() + callout.slice(1)
+	let start = text.indexOf(']') + 1;
+	let end = text.indexOf('\n');
+	if (end === -1)  end = text.length;
+	if (start >= end)  return title;
+	title = text.slice(start, end).trim();
+	if (title.indexOf('+') == 0 || title.indexOf('-') == 0) title = title.slice(1);
+	return title;
+}
+
 function calloutRender(token: Tokens.Blockquote) {
 	let callout = matchCallouts(token.text);
 	if (callout == '') {
@@ -75,19 +86,22 @@ function calloutRender(token: Tokens.Blockquote) {
         return `<blockquote>\n${body}</blockquote>\n`;;
 	}
 
+	const title = GetCalloutTitle(callout, token.text);
 	const info = GetCallout(callout);
-
 	const lexer = new Lexer(markedOptiones);
-	token.text = token.text.replace(`[!${callout}]\n`, '');
-	token.tokens = lexer.lex(token.text);
+	const index = token.text.indexOf('\n');
+	let body = '';
+	if (index > 0) {
+		token.text = token.text.slice(index+1)
+		token.tokens = lexer.lex(token.text);
+		body = this.parser.parse(token.tokens);
+	} 
 	
-	const body = this.parser.parse(token.tokens);
-	callout = callout.charAt(0).toUpperCase() + callout.slice(1)
 	return `
 		<section class="note-callout ${info?.style}">
 			<section class="note-callout-title-wrap">
 				${info?.icon}
-				<span class="note-callout-title">${callout}<span>
+				<span class="note-callout-title">${title}<span>
 			</section>
 			<section class="note-callout-content">
 				${body}
