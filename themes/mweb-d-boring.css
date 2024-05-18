@@ -55,7 +55,7 @@
   margin-left: 0;
   margin-right: 0;
   font-family: AvenirNext-Medium;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.5em;
   color: rgb(0, 0, 0);
 }
@@ -220,7 +220,7 @@
   overflow-x: auto;
   text-wrap: nowrap;
 }
-.mweb-d-boring section {
+.mweb-d-boring .code-section {
   display: flex;
   overflow: auto;
   border: solid 1px rgb(199, 199, 199);

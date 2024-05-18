@@ -1,10 +1,15 @@
 /* MWeb：增大字体，便于阅读 */
-:root {
-  font-size: 14px;
-}
-
 .mweb-typo {
-  padding: 2rem;
+  font-size: 16px;
+  min-width: 200px;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 1rem;
+  color: #333;
+  background: #fff;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-rendering: optimizelegibility;
   /* 内外边距通常让各个浏览器样式的表现位置不同 */
   /* 重设 HTML5 标签, IE 需要在 js 中 createElement(TAG) */
   /* HTML5 媒体文件跟 img 保持一致 */
@@ -21,11 +26,11 @@
   /* 让链接在 hover 状态下显示下划线 */
   /* 默认不显示下划线，保持页面简洁 */
   /* 专名号：虽然 u 已经重回 html5 Draft，但在所有浏览器中都是可以使用的，
-   * 要做到更好，向后兼容的话，添加 class="typo-u" 来显示专名号
-   * 关于 <u> 标签：http://www.whatwg.org/specs/web-apps/current-work/multipage/text-level-semantics.html#the-u-element
-   * 被放弃的是 4，之前一直搞错 http://www.w3.org/TR/html401/appendix/changes.html#idx-deprecated
-   * 一篇关于 <u> 标签的很好文章：http://html5doctor.com/u-element/
-   */
+  * 要做到更好，向后兼容的话，添加 class="typo-u" 来显示专名号
+  * 关于 <u> 标签：http://www.whatwg.org/specs/web-apps/current-work/multipage/text-level-semantics.html#the-u-element
+  * 被放弃的是 4，之前一直搞错 http://www.w3.org/TR/html401/appendix/changes.html#idx-deprecated
+  * 一篇关于 <u> 标签的很好文章：http://html5doctor.com/u-element/
+  */
   /* 标记，类似于手写的荧光笔的作用 */
   /* 一致化 horizontal rule */
   /* 底部印刷体、版本等标记 */
@@ -171,7 +176,8 @@
 }
 .mweb-typo :root sub,
 .mweb-typo :root sup {
-  vertical-align: baseline; /* for ie9 and other modern browsers */
+  vertical-align: baseline;
+  /* for ie9 and other modern browsers */
 }
 .mweb-typo sup {
   top: -0.5em;
@@ -213,7 +219,8 @@
   margin-bottom: 0.8em;
   height: 10px;
 }
-.mweb-typo small, .mweb-typo .typo-small,
+.mweb-typo small,
+.mweb-typo .typo-small,
 .mweb-typo figcaption {
   font-size: 0.9em;
   color: #888;
@@ -275,7 +282,7 @@
 .mweb-typo h5,
 .mweb-typo h6 {
   font-family: PingFang SC, Verdana, Helvetica Neue, Microsoft Yahei, Hiragino Sans GB, Microsoft Sans Serif, WenQuanYi Micro Hei, sans-serif;
-  font-weight: 100;
+  font-weight: lighter;
   color: #000;
   line-height: 1.35;
 }
@@ -402,7 +409,7 @@
   display: block;
   -webkit-overflow-scrolling: touch;
 }
-.mweb-typo section {
+.mweb-typo .code-section {
   display: flex;
   overflow: auto;
   background: #f8f8f8;

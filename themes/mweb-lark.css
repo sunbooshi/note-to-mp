@@ -173,7 +173,7 @@
 .mweb-lark th {
   padding: 8px 8px;
   font-size: 1em;
-  font-weight: 500;
+  font-weight: 600;
 }
 .mweb-lark td {
   padding: 8px 8px;
@@ -190,7 +190,7 @@
 }
 .mweb-lark h1, .mweb-lark h2, .mweb-lark h3, .mweb-lark h4, .mweb-lark h5, .mweb-lark h6 {
   line-height: 1.4;
-  font-weight: 500;
+  font-weight: 600;
   margin-top: 1em;
   margin-bottom: 0.37em;
 }
@@ -283,7 +283,7 @@
   line-height: 1.6em;
   padding: 0 2px;
 }
-.mweb-lark section {
+.mweb-lark .code-section {
   display: flex;
   overflow: auto;
   border: 1px solid #dee0e3;
