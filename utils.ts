@@ -71,11 +71,13 @@ function matchCallouts(text:string) {
 function GetCalloutTitle(callout:string, text:string) {
 	let title = callout.charAt(0).toUpperCase() + callout.slice(1)
 	let start = text.indexOf(']') + 1;
+	if (text.indexOf(']-') > 0 || text.indexOf(']+') > 0) {
+		start = start + 1;
+	}
 	let end = text.indexOf('\n');
 	if (end === -1)  end = text.length;
 	if (start >= end)  return title;
 	title = text.slice(start, end).trim();
-	if (title.indexOf('+') == 0 || title.indexOf('-') == 0) title = title.slice(1);
 	return title;
 }
 
