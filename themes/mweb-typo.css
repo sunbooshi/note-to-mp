@@ -3,7 +3,6 @@
   font-size: 16px;
   min-width: 200px;
   max-width: 760px;
-  margin: 0 auto;
   padding: 1rem;
   color: #333;
   background: #fff;
@@ -45,6 +44,44 @@
   /* 着重号，只能在少量（少于100个字符）且全是全角字符的情况下使用 */
   /* Responsive images */
   /* 代码片断 */
+}
+.mweb-typo dl,
+.mweb-typo dt,
+.mweb-typo dd,
+.mweb-typo ul,
+.mweb-typo ol,
+.mweb-typo li,
+.mweb-typo h1,
+.mweb-typo h2,
+.mweb-typo h3,
+.mweb-typo h4,
+.mweb-typo h5,
+.mweb-typo h6,
+.mweb-typo pre,
+.mweb-typo code,
+.mweb-typo form,
+.mweb-typo fieldset,
+.mweb-typo legend,
+.mweb-typo input,
+.mweb-typo textarea,
+.mweb-typo p,
+.mweb-typo blockquote,
+.mweb-typo th,
+.mweb-typo td,
+.mweb-typo hr,
+.mweb-typo button,
+.mweb-typo article,
+.mweb-typo aside,
+.mweb-typo details,
+.mweb-typo figcaption,
+.mweb-typo figure,
+.mweb-typo footer,
+.mweb-typo header,
+.mweb-typo menu,
+.mweb-typo nav,
+.mweb-typo section {
+  margin: 0;
+  padding: 0;
 }
 .mweb-typo article,
 .mweb-typo aside,

@@ -3,7 +3,6 @@ const css = `
 /* Obsidian的默认样式                                            */
 /* =========================================================== */
 .obsidian-light {
-    margin: 0 auto;
     padding: 20px 20px;
     user-select: text;
     -webkit-user-select: text;
