@@ -3,11 +3,11 @@ const css = `
 /* Obsidian的默认样式                                            */
 /* =========================================================== */
 .obsidian-light {
-    margin: 0 auto;
     padding: 20px 20px;
     user-select: text;
     -webkit-user-select: text;
     color: #222222;
+    font-size: 16px;
     font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
 }
 
@@ -94,9 +94,8 @@ Paragraphs
 ==================================
     */
 .obsidian-light p {
-    line-height: 2em;
-    margin-top: 1.25em;
-    margin-bottom: 1.25em;
+    line-height: 1.6em;
+    margin: 1em 0;
 }
 
 /*
@@ -293,7 +292,7 @@ Images
 Code
 ==================================
 */
-.obsidian-light section {
+.obsidian-light .code-section {
     display: flex;
     overflow: auto;
     background-color: rgb(250, 250, 250);
@@ -332,14 +331,15 @@ Code
     color: #5c5c5c;
     background-color: #fafafa;
     font-size: 0.875em;
-    line-height: 1.75em;
     vertical-align: baseline;
-    padding: 1em;
+    padding: 0 0.5em;
 }    
 
 .obsidian-light pre code {
     display: block;
     text-wrap: nowrap;
+    line-height: 1.75em;
+    padding: 1em;
 }
 `
 

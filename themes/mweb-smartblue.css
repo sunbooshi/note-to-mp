@@ -42,6 +42,7 @@
   padding: 30px 0;
   margin: 0;
   color: #135ce0;
+  font-weight: 600;
 }
 .mweb-smartblue h1 {
   position: relative;
@@ -150,7 +151,7 @@
   font-size: 0.87em;
   padding: 0.065em 0.4em;
 }
-.mweb-smartblue section {
+.mweb-smartblue .code-section {
   display: flex;
   overflow: auto;
   background: #f8f8f8;

@@ -25,7 +25,7 @@
 .mweb-lark-bold-color {
   line-height: 1.68;
   -webkit-text-size-adjust: 100%;
-  margin: 0px auto;
+  margin: 0px 0px;
   padding: 1.6rem 3.2rem;
   font-family: -apple-system, BlinkMacSystemFont, Helvetica Neue, Arial, Segoe UI, PingFang SC, Microsoft Yahei, Hiragino Sans GB, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
   font-size: 16px;
@@ -173,7 +173,7 @@
 .mweb-lark-bold-color th {
   padding: 8px 8px;
   font-size: 1em;
-  font-weight: 500;
+  font-weight: 600;
 }
 .mweb-lark-bold-color td {
   padding: 8px 8px;
@@ -190,7 +190,7 @@
 }
 .mweb-lark-bold-color h1, .mweb-lark-bold-color h2, .mweb-lark-bold-color h3, .mweb-lark-bold-color h4, .mweb-lark-bold-color h5, .mweb-lark-bold-color h6 {
   line-height: 1.4;
-  font-weight: 500;
+  font-weight: 600;
   margin-top: 1em;
   margin-bottom: 0.37em;
 }
@@ -283,7 +283,7 @@
   line-height: 1.6em;
   padding: 0 2px;
 }
-.mweb-lark-bold-color section {
+.mweb-lark-bold-color .code-section {
   display: flex;
   overflow: auto;
   border: 1px solid #dee0e3;

@@ -2,7 +2,6 @@
 /* 笔记样式 https://github.com/xbmlz/hexo-theme-maple            */
 /* =========================================================== */
 .maple {
-    margin: 0 auto;
     padding: 20px 20px;
     user-select: text;
     -webkit-user-select: text;
@@ -80,8 +79,7 @@
   ==================================
   */
 .maple p {
-    margin-top: 1.25em;
-    margin-bottom: 1.25em;
+    margin: 1em 0;
 }
 
 /*
@@ -268,7 +266,7 @@
   Code
   ==================================
   */
-.maple section {
+.maple .code-section {
     display: flex;
     overflow: auto;
     background-color: rgb(250, 250, 250);
