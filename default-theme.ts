@@ -331,14 +331,15 @@ Code
     color: #5c5c5c;
     background-color: #fafafa;
     font-size: 0.875em;
-    line-height: 1.75em;
     vertical-align: baseline;
-    padding: 1em;
+    padding: 0 0.5em;
 }    
 
 .obsidian-light pre code {
     display: block;
     text-wrap: nowrap;
+    line-height: 1.75em;
+    padding: 1em;
 }
 `
 
