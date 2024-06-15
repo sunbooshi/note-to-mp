@@ -7,6 +7,7 @@ export class PreviewSetting {
     defaultHighlight: string;
     linkStyle: string;
     lineNumber: boolean;
+    authKey: string;
     app: App;
 
     constructor(app: App) {
@@ -15,6 +16,7 @@ export class PreviewSetting {
         this.defaultHighlight = '默认';
         this.linkStyle = 'inline'
         this.lineNumber = true;
+        this.authKey = '';
     }
 
     resetStyelAndHighlight() {
@@ -26,7 +28,7 @@ export class PreviewSetting {
         if (!data) {
             return
         }
-        const { defaultStyle, linkStyle, lineNumber, defaultHighlight } = data;
+        const { defaultStyle, linkStyle, lineNumber, defaultHighlight, authKey } = data;
         if (defaultStyle) {
             this.defaultStyle = defaultStyle;
         }
@@ -39,6 +41,9 @@ export class PreviewSetting {
         if (lineNumber !== undefined) {
             this.lineNumber = lineNumber;
         }
+        if (authKey) {
+            this.authKey = authKey;
+        }
     }
 
     allSettings() {
@@ -47,6 +52,7 @@ export class PreviewSetting {
             'defaultHighlight': this.defaultHighlight,
             'linkStyle': this.linkStyle,
             'lineNumber': this.lineNumber,
+            'authKey': this.authKey,
         }
     }
 }

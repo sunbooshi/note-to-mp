@@ -1,7 +1,9 @@
 import { Token, Tokens, Marked, options, Lexer} from "marked";
 import { markedHighlight } from "marked-highlight";
+import { App } from "obsidian";
 import hljs from "highlight.js";
 import GetCallout from "callouts";
+import { LocalImageExtension } from "img-extension";
 
 
 export interface ParseOptions {
@@ -138,7 +140,7 @@ function footnoteLinks() {
 	return `<seciton class="footnotes"><hr><ol>${links.join('\n')}</ol></section>`;
 }
 
-export async function markedParse(content:string, op:ParseOptions)  {
+export async function markedParse(content:string, op:ParseOptions, app:App)  {
 	parseOptions.lineNumber = op.lineNumber;
 	parseOptions.linkStyle = op.linkStyle;
 
@@ -179,11 +181,74 @@ export async function markedParse(content:string, op:ParseOptions)  {
 			renderer(token) {
 				return calloutRender.call(this, token as Tokens.Blockquote);
 			}, 
-		}],
-	});
+		},
+		LocalImageExtension(app)
+	]});
 	const html = await m.parse(content);
 	if (parseOptions.linkStyle == 'footnote') {
 	    return html + footnoteLinks();
 	}
 	return html;
+}
+
+function getStyleSheet() {
+	for (var i = 0; i < document.styleSheets.length; i++) {
+		var sheet = document.styleSheets[i];
+		if (sheet.title == 'note-to-mp-style') {
+		  return sheet;
+		}
+	}
+}
+
+function applyStyles(element: HTMLElement, styles: CSSStyleDeclaration, computedStyle: CSSStyleDeclaration) {
+	for (let i = 0; i < styles.length; i++) {
+	  const propertyName = styles[i];
+	  const propertyValue = computedStyle.getPropertyValue(propertyName);
+	  element.style.setProperty(propertyName, propertyValue);
+	}
+}
+
+function applyCalloutStyes(element: HTMLElement, computedStyle: CSSStyleDeclaration) {
+	const propertys = ['border', 'padding', 'display', 'flex-direction', 'margin', 'border-radius',
+  					'display', 'flex-direction', 'align-items', 'font-size', 'font-weight', 'color', 'background-color'];
+	for (const p of propertys) {
+	    const propertyValue = computedStyle.getPropertyValue(p);
+	    element.style.setProperty(p, propertyValue);
+	}
+}
+
+function parseAndApplyStyles(element: HTMLElement, sheet:CSSStyleSheet) {
+	try {
+		const computedStyle = getComputedStyle(element);
+		for (let i = 0; i < sheet.cssRules.length; i++) {
+			const rule = sheet.cssRules[i];
+			if (rule instanceof CSSStyleRule && element.matches(rule.selectorText)) {
+			  	applyStyles(element, rule.style, computedStyle);
+			}
+		}
+
+		// 处理callouts
+		if (typeof(element.className) == 'string' && element.className.startsWith('note-callout')) {
+		    applyCalloutStyes(element, computedStyle);
+		}
+	} catch (e) {
+		console.warn("Unable to access stylesheet: " + sheet.href, e);
+	}
+}
+
+function traverse(root: HTMLElement, sheet:CSSStyleSheet) {
+	let element = root.firstElementChild;
+	while (element) {
+	  traverse(element as HTMLElement, sheet);
+	  element = element.nextElementSibling;
+	}
+	parseAndApplyStyles(root, sheet);
+  }
+
+export async function CSSProcess(content: HTMLElement) {
+	// 获取样式表
+	const style = getStyleSheet();
+	if (style) {
+		traverse(content, style);
+	}
 }

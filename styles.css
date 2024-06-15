@@ -1,24 +1,47 @@
 /* =========================================================== */
 /* UI 样式                                                      */
 /* =========================================================== */
-.preview-toolbar {
+.note-preview {
+  min-height: 100%;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
   display: flex;
-  flex-direction: row;
-  min-height: 60px;
-  padding-left: 20px;
-  align-items: center;
+  flex-direction: column;
+}
+
+.render-div {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.preview-toolbar {
+  position: relative;
+  min-height: 100px;
   border-bottom: #e4e4e4 1px solid;
-  flex-wrap: wrap;
   background-color: var(--background-primary);
 }
 
+.toolbar-line {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 10px 20px;
+}
+
 .copy-button {
-  width: 60px;
+  margin-right: 20px;
 }
 
 .refresh-button {
-  width: 60px;
-  margin: 0px 20px;
+  /* width: 60px; */
+  margin-right: 20px;
+}
+
+.upload-input {
+  margin-left: 20px;
+  visibility: hidden;
 }
 
 .style-label {
@@ -30,10 +53,24 @@
   width: 140px;
 }
 
-.note-preview {
-  min-height: 100%;
+.msg-view {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  background-color: #fff;
+  height: 100%;
+  background-color: var(--background-primary);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  z-index: 9999;
+  display: none;
+}
+
+.msg-title {
+  margin-bottom: 20px;
 }
 
 section .note-callout {

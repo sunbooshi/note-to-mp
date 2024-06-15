@@ -85,5 +85,17 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 			})
+		
+		new Setting(containerEl)
+			.setName('注册码')
+			.setDesc('详情请参考：https://f1b9139iu4h.feishu.cn/wiki/F0rgwxEAQi3WiHkfld1c3C37nbc')
+			.addText(text => {
+			    text.setPlaceholder('请输入注册码')
+					.setValue(this.plugin.settings.authKey)
+					.onChange(async (value) => {
+					    this.plugin.settings.authKey = value;
+						await this.plugin.saveSettings();
+					})
+			}).descEl.setAttr('style', '-webkit-user-select: text; user-select: text;');
 	}
 }
