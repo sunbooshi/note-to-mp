@@ -134,6 +134,10 @@ function walkTokens(token:Token) {
 }
 
 function footnoteLinks() {
+	if (AllLinks.length == 0) {
+	    return '';
+	}
+	
 	const links = AllLinks.map((href, i) => {
 		return `<li>${href}&nbsp;↩</li>`;
 	});
@@ -184,6 +188,18 @@ export async function markedParse(content:string, op:ParseOptions, app:App)  {
 		},
 		LocalImageExtension(app)
 	]});
+
+	const renderer = {
+		list(body: string, ordered: boolean, start: number | ''): string {
+			const type = ordered ? 'ol' : 'ul';
+			const startatt = (ordered && start !== 1) ? (' start="' + start + '"') : '';
+			return '<' + type + startatt + '>' + body + '</' + type + '>';
+		},
+		listitem(text: string, task: boolean, checked: boolean): string {
+			return `<li>${text}</li>`;
+		}
+	};
+	m.use({renderer});
 	const html = await m.parse(content);
 	if (parseOptions.linkStyle == 'footnote') {
 	    return html + footnoteLinks();
@@ -202,18 +218,12 @@ function getStyleSheet() {
 
 function applyStyles(element: HTMLElement, styles: CSSStyleDeclaration, computedStyle: CSSStyleDeclaration) {
 	for (let i = 0; i < styles.length; i++) {
-	  const propertyName = styles[i];
-	  const propertyValue = computedStyle.getPropertyValue(propertyName);
-	  element.style.setProperty(propertyName, propertyValue);
-	}
-}
-
-function applyCalloutStyes(element: HTMLElement, computedStyle: CSSStyleDeclaration) {
-	const propertys = ['border', 'padding', 'display', 'flex-direction', 'margin', 'border-radius',
-  					'display', 'flex-direction', 'align-items', 'font-size', 'font-weight', 'color', 'background-color'];
-	for (const p of propertys) {
-	    const propertyValue = computedStyle.getPropertyValue(p);
-	    element.style.setProperty(p, propertyValue);
+		const propertyName = styles[i];
+		let propertyValue = computedStyle.getPropertyValue(propertyName);
+		if (propertyName == 'width' && styles.getPropertyValue(propertyName) == 'fit-content') {
+			propertyValue = 'fit-content';
+		}
+		element.style.setProperty(propertyName, propertyValue);
 	}
 }
 
@@ -226,11 +236,6 @@ function parseAndApplyStyles(element: HTMLElement, sheet:CSSStyleSheet) {
 			  	applyStyles(element, rule.style, computedStyle);
 			}
 		}
-
-		// 处理callouts
-		if (typeof(element.className) == 'string' && element.className.startsWith('note-callout')) {
-		    applyCalloutStyes(element, computedStyle);
-		}
 	} catch (e) {
 		console.warn("Unable to access stylesheet: " + sheet.href, e);
 	}
@@ -239,11 +244,11 @@ function parseAndApplyStyles(element: HTMLElement, sheet:CSSStyleSheet) {
 function traverse(root: HTMLElement, sheet:CSSStyleSheet) {
 	let element = root.firstElementChild;
 	while (element) {
-	  traverse(element as HTMLElement, sheet);
-	  element = element.nextElementSibling;
+	  	traverse(element as HTMLElement, sheet);
+	  	element = element.nextElementSibling;
 	}
 	parseAndApplyStyles(root, sheet);
-  }
+}
 
 export async function CSSProcess(content: HTMLElement) {
 	// 获取样式表

@@ -3,6 +3,7 @@ import { copy } from 'clipboard';
 import { CSSProcess, markedParse, ParseOptions } from 'utils';
 import { PreviewSetting } from 'settings';
 import ThemesManager from 'themes';
+import CalloutsCSS from 'callouts-css';
 import { uploadLocalImage, replaceImages, uploadCover } from 'img-extension';
 import { wxGetToken, wxAddDraft, wxBatchGetMaterial } from 'weixin-api';
 
@@ -107,7 +108,7 @@ export class NotePreview extends ItemView {
         try {
             const theme = this.themeManager.getTheme(this.currentTheme);
             const highlight = this.themeManager.getHighlight(this.currentHighlight);
-            return `${theme!.css}\n\n${highlight!.css}`;
+            return `${theme!.css}\n\n${highlight!.css}\n\n${CalloutsCSS}`;
         } catch (error) {
             console.error(error);
             new Notice(`获取样式失败${this.currentTheme}|${this.currentHighlight}，请检查主题是否正确安装。`);
@@ -309,6 +310,7 @@ export class NotePreview extends ItemView {
     }
 
     updateCss() {
+        console.log('updateCss');
         this.styleEl.innerHTML = this.getCSS();
         this.renderSection.setAttribute('class', this.currentTheme);
     }
@@ -336,7 +338,7 @@ export class NotePreview extends ItemView {
 
     async uploadImages() {
         if (!this.settings.authKey) {
-            this.showMsg('请先设置授权key');
+            this.showMsg('请先设置注册码（AuthKey）');
             return;
         }
         this.showLoading('上传图片中...');
@@ -353,7 +355,7 @@ export class NotePreview extends ItemView {
 
     async postArticle() {
         if (!this.settings.authKey) {
-            this.showMsg('请先设置授权key');
+            this.showMsg('请先设置注册码（AuthKey）');
             return;
         }
         this.showLoading('上传中...');
@@ -363,7 +365,7 @@ export class NotePreview extends ItemView {
         //上传图片
         await uploadLocalImage(this.app.vault, token);
         // 替换图片链接
-        this.renderDiv.innerHTML = replaceImages(this.renderDiv.innerHTML);
+        this.renderSection.innerHTML = replaceImages(this.renderSection.innerHTML);
         // 上传封面
         let mediaId = '';
         if (this.useLocalCover.checked) {
@@ -378,10 +380,12 @@ export class NotePreview extends ItemView {
             return;
         }
 
-        const originContent = this.renderDiv.innerHTML;
-        CSSProcess(this.renderDiv);
-        const content = this.renderDiv.innerHTML;
-        this.renderDiv.innerHTML = originContent;
+        const originContent = this.renderSection.innerHTML;
+        CSSProcess(this.renderSection);
+        let content = this.renderSection.innerHTML;
+        this.renderSection.innerHTML = originContent;
+        // content = content.replace(/<ol /g, '<ol class=" list-paddingleft-1" ');
+        console.log(content);
 
         // 创建草稿
         const draft = await wxAddDraft(token, {
@@ -391,6 +395,7 @@ export class NotePreview extends ItemView {
         });
 
         if (draft.media_id) {
+            console.log('draft', draft.media_id);
             this.showMsg('发布成功!');
         }
         else {

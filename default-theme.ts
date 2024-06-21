@@ -294,7 +294,6 @@ Code
 */
 .obsidian-light .code-section {
     display: flex;
-    overflow: auto;
     background-color: rgb(250, 250, 250);
     border: rgb(240, 240, 240) 1px solid;
 }
