@@ -17,7 +17,7 @@ export class NotePreview extends ItemView {
     mainDiv: HTMLDivElement;
     toolbar: HTMLDivElement;
     renderDiv: HTMLDivElement;
-    renderSection: HTMLElement;
+    articleDiv: HTMLDivElement;
     styleEl: HTMLElement;
     coverEl: HTMLInputElement;
     useDefaultCover: HTMLInputElement;
@@ -96,12 +96,31 @@ export class NotePreview extends ItemView {
                 lineNumber: this.settings.lineNumber,
                 linkStyle: this.settings.linkStyle as 'footnote' | 'inline',
             }
-            this.renderSection.innerHTML = await markedParse(md, op, this.app);
+            this.setArticle(await markedParse(md, op, this.app));
         }
         catch (e) {
             console.error(e);
-            this.renderSection.innerHTML = this.errorContent(e);
+            this.setArticle(this.errorContent(e));
         }
+    }
+
+    setArticle(article: string) {
+        this.articleDiv.empty();
+        const section = this.articleDiv.createEl('section', { cls: this.settings.defaultStyle });
+        section.id = "article-section";
+        section.innerHTML = article;
+    }
+
+    getArticleSection() {
+        return this.articleDiv.querySelector('#article-section') as HTMLElement;
+    }
+
+    getArticleContent() {
+        const originContent = this.articleDiv.innerHTML;
+        CSSProcess(this.articleDiv);
+        const content = this.articleDiv.innerHTML;
+        this.articleDiv.innerHTML = originContent;
+        return content;
     }
 
     getCSS() {
@@ -157,7 +176,7 @@ export class NotePreview extends ItemView {
         })
 
         copyBtn.onclick = async () => {
-            copy(this.renderDiv);
+            this.copyArticle();
             new Notice('复制成功，请到公众号编辑器粘贴。');
         }
 
@@ -245,7 +264,6 @@ export class NotePreview extends ItemView {
         })
 
         selectBtn.onchange = async () => {
-            console.log(selectBtn.value);
             this.updateStyle(selectBtn.value);
         }
 
@@ -264,7 +282,6 @@ export class NotePreview extends ItemView {
         })
 
         highlightStyleBtn.onchange = async () => {
-            console.log(highlightStyleBtn.value);
             this.updateHighLight(highlightStyleBtn.value);
         }
 
@@ -291,12 +308,7 @@ export class NotePreview extends ItemView {
         this.renderDiv.setAttribute('style', '-webkit-user-select: text; user-select: text;')
         this.styleEl = this.renderDiv.createEl('style');
         this.styleEl.setAttr('title', 'note-to-mp-style');
-
-        this.renderSection = this.renderDiv.createEl('section', { cls: this.settings.defaultStyle });
-        // 加入1个高度为0的section，确保复制到公众号编辑器中是section元素，这样才能把背景颜色带过去
-        let dummySection = this.renderDiv.createEl('section');
-        dummySection.innerHTML="&nbsp;&nbsp;"
-        dummySection.setAttr('style', 'height:0px;');
+        this.articleDiv = this.renderDiv.createEl('div');
     }
 
     updateStyle(styleName: string) {
@@ -310,9 +322,8 @@ export class NotePreview extends ItemView {
     }
 
     updateCss() {
-        console.log('updateCss');
         this.styleEl.innerHTML = this.getCSS();
-        this.renderSection.setAttribute('class', this.currentTheme);
+        this.getArticleSection().setAttribute('class', this.currentTheme);
     }
 
     async uploadLocalCover(token: string) {
@@ -349,8 +360,15 @@ export class NotePreview extends ItemView {
         // 替换图片链接
         this.renderDiv.innerHTML = replaceImages(this.renderDiv.innerHTML);
 
-        copy(this.renderDiv);
+        this.copyArticle();
         this.showMsg('图片已上传，并且已复制，请到公众号编辑器粘贴。');
+    }
+
+    copyArticle() {
+        const content = this.getArticleContent();
+        navigator.clipboard.write([new ClipboardItem({
+            'text/html': new Blob([content], {type: 'text/html'})
+        })])
     }
 
     async postArticle() {
@@ -365,7 +383,7 @@ export class NotePreview extends ItemView {
         //上传图片
         await uploadLocalImage(this.app.vault, token);
         // 替换图片链接
-        this.renderSection.innerHTML = replaceImages(this.renderSection.innerHTML);
+        this.articleDiv.innerHTML = replaceImages(this.articleDiv.innerHTML);
         // 上传封面
         let mediaId = '';
         if (this.useLocalCover.checked) {
@@ -380,12 +398,7 @@ export class NotePreview extends ItemView {
             return;
         }
 
-        const originContent = this.renderSection.innerHTML;
-        CSSProcess(this.renderSection);
-        let content = this.renderSection.innerHTML;
-        this.renderSection.innerHTML = originContent;
-        // content = content.replace(/<ol /g, '<ol class=" list-paddingleft-1" ');
-        console.log(content);
+        const content = this.getArticleContent();
 
         // 创建草稿
         const draft = await wxAddDraft(token, {
@@ -395,7 +408,6 @@ export class NotePreview extends ItemView {
         });
 
         if (draft.media_id) {
-            console.log('draft', draft.media_id);
             this.showMsg('发布成功!');
         }
         else {

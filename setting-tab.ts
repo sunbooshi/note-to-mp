@@ -88,7 +88,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 		
 		new Setting(containerEl)
 			.setName('注册码（AuthKey）')
-			.setDesc('详情请参考：https://f1b9139iu4h.feishu.cn/wiki/F0rgwxEAQi3WiHkfld1c3C37nbc')
+			.setDesc('详情请参考：https://doc.booshi.tech/info.html')
 			.addText(text => {
 			    text.setPlaceholder('请输入注册码')
 					.setValue(this.plugin.settings.authKey)

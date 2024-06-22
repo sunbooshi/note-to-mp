@@ -190,6 +190,13 @@ export async function markedParse(content:string, op:ParseOptions, app:App)  {
 	]});
 
 	const renderer = {
+		heading(text: string, level: number, raw: string): string {
+			// ignore IDs
+			return `<h${level}>${text}</h${level}>`;
+		},
+		hr(): string {
+			return '<hr>';
+		},
 		list(body: string, ordered: boolean, start: number | ''): string {
 			const type = ordered ? 'ol' : 'ul';
 			const startatt = (ordered && start !== 1) ? (' start="' + start + '"') : '';
@@ -222,6 +229,9 @@ function applyStyles(element: HTMLElement, styles: CSSStyleDeclaration, computed
 		let propertyValue = computedStyle.getPropertyValue(propertyName);
 		if (propertyName == 'width' && styles.getPropertyValue(propertyName) == 'fit-content') {
 			propertyValue = 'fit-content';
+		}
+		if (propertyName.indexOf('margin') >= 0 && styles.getPropertyValue(propertyName).indexOf('auto') >= 0) {
+		    propertyValue = styles.getPropertyValue(propertyName);
 		}
 		element.style.setProperty(propertyName, propertyValue);
 	}

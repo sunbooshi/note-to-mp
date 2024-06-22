@@ -77,7 +77,6 @@ export function LocalImageExtension(app: App) {
         },
         renderer(img: Tokens.Image) {
             // 渲染本地图片
-            console.log('渲染本地图片:', img.href);
             const imgPath = getImgPath(img.href, app.vault);
             return `<img src="${imgPath}" alt="${img.text}" />`;
         }
