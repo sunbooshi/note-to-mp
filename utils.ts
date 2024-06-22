@@ -141,7 +141,7 @@ function footnoteLinks() {
 	const links = AllLinks.map((href, i) => {
 		return `<li>${href}&nbsp;↩</li>`;
 	});
-	return `<seciton class="footnotes"><hr><ol>${links.join('\n')}</ol></section>`;
+	return `<seciton class="footnotes"><hr><ol>${links.join('')}</ol></section>`;
 }
 
 export async function markedParse(content:string, op:ParseOptions, app:App)  {
