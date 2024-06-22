@@ -43,13 +43,29 @@
 .mweb-dark-graphite > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-dark-graphite p, .mweb-dark-graphite pre, .mweb-dark-graphite dl, .mweb-dark-graphite form, .mweb-dark-graphite details, .mweb-dark-graphite dl, .mweb-dark-graphite blockquote, .mweb-dark-graphite table, .mweb-dark-graphite xmp, .mweb-dark-graphite plaintext, .mweb-dark-graphite listing, .mweb-dark-graphite figure {
+.mweb-dark-graphite p,
+.mweb-dark-graphite pre,
+.mweb-dark-graphite dl,
+.mweb-dark-graphite form,
+.mweb-dark-graphite details,
+.mweb-dark-graphite dl,
+.mweb-dark-graphite blockquote,
+.mweb-dark-graphite table,
+.mweb-dark-graphite xmp,
+.mweb-dark-graphite plaintext,
+.mweb-dark-graphite listing,
+.mweb-dark-graphite figure {
   margin: 0.75em 0 0.45em;
 }
 .mweb-dark-graphite hr {
   margin: 0.75em auto;
 }
-.mweb-dark-graphite h1, .mweb-dark-graphite h2, .mweb-dark-graphite h3, .mweb-dark-graphite h4, .mweb-dark-graphite h5, .mweb-dark-graphite h6 {
+.mweb-dark-graphite h1,
+.mweb-dark-graphite h2,
+.mweb-dark-graphite h3,
+.mweb-dark-graphite h4,
+.mweb-dark-graphite h5,
+.mweb-dark-graphite h6 {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   margin-left: 0;
@@ -88,7 +104,8 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-dark-graphite pre, .mweb-dark-graphite pre[class*=language-] {
+.mweb-dark-graphite pre,
+.mweb-dark-graphite pre[class*=language-] {
   padding: 0;
   border: 0;
 }
@@ -155,16 +172,30 @@
 .mweb-dark-graphite a img {
   border: none;
 }
-.mweb-dark-graphite b, .mweb-dark-graphite strong {
+.mweb-dark-graphite b,
+.mweb-dark-graphite strong {
   font-weight: bold;
 }
-.mweb-dark-graphite i, .mweb-dark-graphite cite, .mweb-dark-graphite em, .mweb-dark-graphite var, .mweb-dark-graphite address, .mweb-dark-graphite dfn {
+.mweb-dark-graphite i,
+.mweb-dark-graphite cite,
+.mweb-dark-graphite em,
+.mweb-dark-graphite var,
+.mweb-dark-graphite address,
+.mweb-dark-graphite dfn {
   font-style: italic;
 }
-.mweb-dark-graphite del, .mweb-dark-graphite s {
+.mweb-dark-graphite del,
+.mweb-dark-graphite s {
   color: rgb(111, 115, 115);
 }
-.mweb-dark-graphite pre, .mweb-dark-graphite xmp, .mweb-dark-graphite plaintext, .mweb-dark-graphite listing, .mweb-dark-graphite code, .mweb-dark-graphite kbd, .mweb-dark-graphite tt, .mweb-dark-graphite samp {
+.mweb-dark-graphite pre,
+.mweb-dark-graphite xmp,
+.mweb-dark-graphite plaintext,
+.mweb-dark-graphite listing,
+.mweb-dark-graphite code,
+.mweb-dark-graphite kbd,
+.mweb-dark-graphite tt,
+.mweb-dark-graphite samp {
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 .mweb-dark-graphite mark {
@@ -185,12 +216,15 @@
   border: 1px;
   border-spacing: 0;
 }
-.mweb-dark-graphite th, .mweb-dark-graphite td {
+.mweb-dark-graphite th,
+.mweb-dark-graphite td {
   padding: 0.7em 1em;
   font-size: 0.9em;
   border: 1px solid rgb(87, 87, 87);
 }
-.mweb-dark-graphite caption, .mweb-dark-graphite th, .mweb-dark-graphite td {
+.mweb-dark-graphite caption,
+.mweb-dark-graphite th,
+.mweb-dark-graphite td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
@@ -212,24 +246,24 @@
   display: inline;
   color: rgb(255, 254, 255);
 }
-.mweb-dark-graphite pre code {
-  display: block;
-  padding: 0.9em;
-  font-size: 0.9em;
-  line-height: 1.6em;
-  overflow-x: auto;
-  text-wrap: nowrap;
-}
 .mweb-dark-graphite .code-section {
   display: flex;
-  overflow: auto;
   border: solid 1px rgb(87, 87, 87);
   background-color: rgb(36, 36, 36);
 }
 .mweb-dark-graphite section pre {
   margin: 0;
+  overflow-x: auto;
+}
+.mweb-dark-graphite section code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  text-wrap: nowrap;
 }
 .mweb-dark-graphite section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 0.9em 0 0.9em 0.9em;
@@ -242,6 +276,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.6em;
   font-size: 0.9em;
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;

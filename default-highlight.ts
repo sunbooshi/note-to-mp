@@ -1,11 +1,6 @@
 export default `
 pre code.hljs {
   display: block;
-  overflow-x: auto;
-  padding: 1em
-}
-code.hljs {
-  padding: 3px 5px
 }
 /*
 

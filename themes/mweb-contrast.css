@@ -43,13 +43,29 @@
 .mweb-contrast > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-contrast p, .mweb-contrast pre, .mweb-contrast dl, .mweb-contrast form, .mweb-contrast details, .mweb-contrast dl, .mweb-contrast blockquote, .mweb-contrast table, .mweb-contrast xmp, .mweb-contrast plaintext, .mweb-contrast listing, .mweb-contrast figure {
+.mweb-contrast p,
+.mweb-contrast pre,
+.mweb-contrast dl,
+.mweb-contrast form,
+.mweb-contrast details,
+.mweb-contrast dl,
+.mweb-contrast blockquote,
+.mweb-contrast table,
+.mweb-contrast xmp,
+.mweb-contrast plaintext,
+.mweb-contrast listing,
+.mweb-contrast figure {
   margin: 0.75em 0 0.45em;
 }
 .mweb-contrast hr {
   margin: 0.75em auto;
 }
-.mweb-contrast h1, .mweb-contrast h2, .mweb-contrast h3, .mweb-contrast h4, .mweb-contrast h5, .mweb-contrast h6 {
+.mweb-contrast h1,
+.mweb-contrast h2,
+.mweb-contrast h3,
+.mweb-contrast h4,
+.mweb-contrast h5,
+.mweb-contrast h6 {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   margin-left: 0;
@@ -88,7 +104,8 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-contrast pre, .mweb-contrast pre[class*=language-] {
+.mweb-contrast pre,
+.mweb-contrast pre[class*=language-] {
   padding: 0;
   border: 0;
 }
@@ -155,16 +172,30 @@
 .mweb-contrast a img {
   border: none;
 }
-.mweb-contrast b, .mweb-contrast strong {
+.mweb-contrast b,
+.mweb-contrast strong {
   font-weight: bold;
 }
-.mweb-contrast i, .mweb-contrast cite, .mweb-contrast em, .mweb-contrast var, .mweb-contrast address, .mweb-contrast dfn {
+.mweb-contrast i,
+.mweb-contrast cite,
+.mweb-contrast em,
+.mweb-contrast var,
+.mweb-contrast address,
+.mweb-contrast dfn {
   font-style: italic;
 }
-.mweb-contrast del, .mweb-contrast s {
+.mweb-contrast del,
+.mweb-contrast s {
   color: #525252;
 }
-.mweb-contrast pre, .mweb-contrast xmp, .mweb-contrast plaintext, .mweb-contrast listing, .mweb-contrast code, .mweb-contrast kbd, .mweb-contrast tt, .mweb-contrast samp {
+.mweb-contrast pre,
+.mweb-contrast xmp,
+.mweb-contrast plaintext,
+.mweb-contrast listing,
+.mweb-contrast code,
+.mweb-contrast kbd,
+.mweb-contrast tt,
+.mweb-contrast samp {
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 .mweb-contrast mark {
@@ -185,12 +216,15 @@
   border: 1px;
   border-spacing: 0;
 }
-.mweb-contrast th, .mweb-contrast td {
+.mweb-contrast th,
+.mweb-contrast td {
   padding: 0.7em 1em;
   font-size: 0.9em;
   border: 1px solid #bfbfbf;
 }
-.mweb-contrast caption, .mweb-contrast th, .mweb-contrast td {
+.mweb-contrast caption,
+.mweb-contrast th,
+.mweb-contrast td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
@@ -212,24 +246,24 @@
   display: inline;
   color: #424242;
 }
-.mweb-contrast pre code {
-  display: block;
-  padding: 0.9em;
-  font-size: 0.9em;
-  line-height: 1.6em;
-  overflow-x: auto;
-  text-wrap: nowrap;
-}
 .mweb-contrast .code-section {
   display: flex;
-  overflow: auto;
   border: solid 1px #bfbfbf;
   background-color: white;
 }
 .mweb-contrast section pre {
   margin: 0;
+  overflow-x: auto;
+}
+.mweb-contrast section code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  text-wrap: nowrap;
 }
 .mweb-contrast section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 0.9em 0 0.9em 0.9em;
@@ -242,6 +276,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.6em;
   font-size: 0.9em;
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;

@@ -43,13 +43,29 @@
 .mweb-dieci > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-dieci p, .mweb-dieci pre, .mweb-dieci dl, .mweb-dieci form, .mweb-dieci details, .mweb-dieci dl, .mweb-dieci blockquote, .mweb-dieci table, .mweb-dieci xmp, .mweb-dieci plaintext, .mweb-dieci listing, .mweb-dieci figure {
+.mweb-dieci p,
+.mweb-dieci pre,
+.mweb-dieci dl,
+.mweb-dieci form,
+.mweb-dieci details,
+.mweb-dieci dl,
+.mweb-dieci blockquote,
+.mweb-dieci table,
+.mweb-dieci xmp,
+.mweb-dieci plaintext,
+.mweb-dieci listing,
+.mweb-dieci figure {
   margin: 0.75em 0 0.45em;
 }
 .mweb-dieci hr {
   margin: 0.75em auto;
 }
-.mweb-dieci h1, .mweb-dieci h2, .mweb-dieci h3, .mweb-dieci h4, .mweb-dieci h5, .mweb-dieci h6 {
+.mweb-dieci h1,
+.mweb-dieci h2,
+.mweb-dieci h3,
+.mweb-dieci h4,
+.mweb-dieci h5,
+.mweb-dieci h6 {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   margin-left: 0;
@@ -88,7 +104,8 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-dieci pre, .mweb-dieci pre[class*=language-] {
+.mweb-dieci pre,
+.mweb-dieci pre[class*=language-] {
   padding: 0;
   border: 0;
 }
@@ -155,16 +172,30 @@
 .mweb-dieci a img {
   border: none;
 }
-.mweb-dieci b, .mweb-dieci strong {
+.mweb-dieci b,
+.mweb-dieci strong {
   font-weight: bold;
 }
-.mweb-dieci i, .mweb-dieci cite, .mweb-dieci em, .mweb-dieci var, .mweb-dieci address, .mweb-dieci dfn {
+.mweb-dieci i,
+.mweb-dieci cite,
+.mweb-dieci em,
+.mweb-dieci var,
+.mweb-dieci address,
+.mweb-dieci dfn {
   font-style: italic;
 }
-.mweb-dieci del, .mweb-dieci s {
+.mweb-dieci del,
+.mweb-dieci s {
   color: rgb(146, 147, 146);
 }
-.mweb-dieci pre, .mweb-dieci xmp, .mweb-dieci plaintext, .mweb-dieci listing, .mweb-dieci code, .mweb-dieci kbd, .mweb-dieci tt, .mweb-dieci samp {
+.mweb-dieci pre,
+.mweb-dieci xmp,
+.mweb-dieci plaintext,
+.mweb-dieci listing,
+.mweb-dieci code,
+.mweb-dieci kbd,
+.mweb-dieci tt,
+.mweb-dieci samp {
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 .mweb-dieci mark {
@@ -185,12 +216,15 @@
   border: 1px;
   border-spacing: 0;
 }
-.mweb-dieci th, .mweb-dieci td {
+.mweb-dieci th,
+.mweb-dieci td {
   padding: 0.7em 1em;
   font-size: 0.9em;
   border: 1px solid rgb(29, 29, 29);
 }
-.mweb-dieci caption, .mweb-dieci th, .mweb-dieci td {
+.mweb-dieci caption,
+.mweb-dieci th,
+.mweb-dieci td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
@@ -212,24 +246,24 @@
   display: inline;
   color: rgb(229, 227, 229);
 }
-.mweb-dieci pre code {
-  display: block;
-  padding: 0.9em;
-  font-size: 0.9em;
-  line-height: 1.6em;
-  overflow-x: auto;
-  text-wrap: nowrap;
-}
 .mweb-dieci .code-section {
   display: flex;
-  overflow: auto;
   border: solid 1px rgb(29, 29, 29);
   background-color: rgb(16, 16, 16);
 }
 .mweb-dieci section pre {
   margin: 0;
+  overflow-x: auto;
+}
+.mweb-dieci section code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  text-wrap: nowrap;
 }
 .mweb-dieci section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 0.9em 0 0.9em 0.9em;
@@ -242,6 +276,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.6em;
   font-size: 0.9em;
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;

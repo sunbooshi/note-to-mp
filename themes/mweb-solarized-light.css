@@ -43,13 +43,29 @@
 .mweb-solarized-light > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-solarized-light p, .mweb-solarized-light pre, .mweb-solarized-light dl, .mweb-solarized-light form, .mweb-solarized-light details, .mweb-solarized-light dl, .mweb-solarized-light blockquote, .mweb-solarized-light table, .mweb-solarized-light xmp, .mweb-solarized-light plaintext, .mweb-solarized-light listing, .mweb-solarized-light figure {
+.mweb-solarized-light p,
+.mweb-solarized-light pre,
+.mweb-solarized-light dl,
+.mweb-solarized-light form,
+.mweb-solarized-light details,
+.mweb-solarized-light dl,
+.mweb-solarized-light blockquote,
+.mweb-solarized-light table,
+.mweb-solarized-light xmp,
+.mweb-solarized-light plaintext,
+.mweb-solarized-light listing,
+.mweb-solarized-light figure {
   margin: 0.75em 0 0.45em;
 }
 .mweb-solarized-light hr {
   margin: 0.75em auto;
 }
-.mweb-solarized-light h1, .mweb-solarized-light h2, .mweb-solarized-light h3, .mweb-solarized-light h4, .mweb-solarized-light h5, .mweb-solarized-light h6 {
+.mweb-solarized-light h1,
+.mweb-solarized-light h2,
+.mweb-solarized-light h3,
+.mweb-solarized-light h4,
+.mweb-solarized-light h5,
+.mweb-solarized-light h6 {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   margin-left: 0;
@@ -88,7 +104,8 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-solarized-light pre, .mweb-solarized-light pre[class*=language-] {
+.mweb-solarized-light pre,
+.mweb-solarized-light pre[class*=language-] {
   padding: 0;
   border: 0;
 }
@@ -155,16 +172,30 @@
 .mweb-solarized-light a img {
   border: none;
 }
-.mweb-solarized-light b, .mweb-solarized-light strong {
+.mweb-solarized-light b,
+.mweb-solarized-light strong {
   font-weight: bold;
 }
-.mweb-solarized-light i, .mweb-solarized-light cite, .mweb-solarized-light em, .mweb-solarized-light var, .mweb-solarized-light address, .mweb-solarized-light dfn {
+.mweb-solarized-light i,
+.mweb-solarized-light cite,
+.mweb-solarized-light em,
+.mweb-solarized-light var,
+.mweb-solarized-light address,
+.mweb-solarized-light dfn {
   font-style: italic;
 }
-.mweb-solarized-light del, .mweb-solarized-light s {
+.mweb-solarized-light del,
+.mweb-solarized-light s {
   color: rgb(113, 127, 125);
 }
-.mweb-solarized-light pre, .mweb-solarized-light xmp, .mweb-solarized-light plaintext, .mweb-solarized-light listing, .mweb-solarized-light code, .mweb-solarized-light kbd, .mweb-solarized-light tt, .mweb-solarized-light samp {
+.mweb-solarized-light pre,
+.mweb-solarized-light xmp,
+.mweb-solarized-light plaintext,
+.mweb-solarized-light listing,
+.mweb-solarized-light code,
+.mweb-solarized-light kbd,
+.mweb-solarized-light tt,
+.mweb-solarized-light samp {
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 .mweb-solarized-light mark {
@@ -185,12 +216,15 @@
   border: 1px;
   border-spacing: 0;
 }
-.mweb-solarized-light th, .mweb-solarized-light td {
+.mweb-solarized-light th,
+.mweb-solarized-light td {
   padding: 0.7em 1em;
   font-size: 0.9em;
   border: 1px solid rgba(147, 161, 161, 0.5);
 }
-.mweb-solarized-light caption, .mweb-solarized-light th, .mweb-solarized-light td {
+.mweb-solarized-light caption,
+.mweb-solarized-light th,
+.mweb-solarized-light td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
@@ -212,24 +246,24 @@
   display: inline;
   color: rgb(101, 123, 131);
 }
-.mweb-solarized-light pre code {
-  display: block;
-  padding: 0.9em;
-  font-size: 0.9em;
-  line-height: 1.6em;
-  overflow-x: auto;
-  text-wrap: nowrap;
-}
 .mweb-solarized-light .code-section {
   display: flex;
-  overflow: auto;
   border: solid 1px rgba(147, 161, 161, 0.5);
   background-color: rgb(252, 244, 220);
 }
 .mweb-solarized-light section pre {
   margin: 0;
+  overflow-x: auto;
+}
+.mweb-solarized-light section code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  text-wrap: nowrap;
 }
 .mweb-solarized-light section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 0.9em 0 0.9em 0.9em;
@@ -242,6 +276,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.6em;
   font-size: 0.9em;
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;

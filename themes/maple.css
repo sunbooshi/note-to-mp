@@ -268,12 +268,12 @@
   */
 .maple .code-section {
     display: flex;
-    overflow: auto;
     background-color: rgb(250, 250, 250);
     border: rgb(240, 240, 240) 1px solid;
 }
 
 .maple section ul {
+    flex-shrink: 0;
     counter-reset: line;
     margin: 0;
     padding: 0.875em 0 0.875em 0.875em;

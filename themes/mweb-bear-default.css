@@ -43,13 +43,29 @@
 .mweb-bear-default > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-bear-default p, .mweb-bear-default pre, .mweb-bear-default dl, .mweb-bear-default form, .mweb-bear-default details, .mweb-bear-default dl, .mweb-bear-default blockquote, .mweb-bear-default table, .mweb-bear-default xmp, .mweb-bear-default plaintext, .mweb-bear-default listing, .mweb-bear-default figure {
+.mweb-bear-default p,
+.mweb-bear-default pre,
+.mweb-bear-default dl,
+.mweb-bear-default form,
+.mweb-bear-default details,
+.mweb-bear-default dl,
+.mweb-bear-default blockquote,
+.mweb-bear-default table,
+.mweb-bear-default xmp,
+.mweb-bear-default plaintext,
+.mweb-bear-default listing,
+.mweb-bear-default figure {
   margin: 0.75em 0 0.45em;
 }
 .mweb-bear-default hr {
   margin: 0.75em auto;
 }
-.mweb-bear-default h1, .mweb-bear-default h2, .mweb-bear-default h3, .mweb-bear-default h4, .mweb-bear-default h5, .mweb-bear-default h6 {
+.mweb-bear-default h1,
+.mweb-bear-default h2,
+.mweb-bear-default h3,
+.mweb-bear-default h4,
+.mweb-bear-default h5,
+.mweb-bear-default h6 {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   margin-left: 0;
@@ -88,7 +104,8 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-bear-default pre, .mweb-bear-default pre[class*=language-] {
+.mweb-bear-default pre,
+.mweb-bear-default pre[class*=language-] {
   padding: 0;
   border: 0;
 }
@@ -155,16 +172,30 @@
 .mweb-bear-default a img {
   border: none;
 }
-.mweb-bear-default b, .mweb-bear-default strong {
+.mweb-bear-default b,
+.mweb-bear-default strong {
   font-weight: bold;
 }
-.mweb-bear-default i, .mweb-bear-default cite, .mweb-bear-default em, .mweb-bear-default var, .mweb-bear-default address, .mweb-bear-default dfn {
+.mweb-bear-default i,
+.mweb-bear-default cite,
+.mweb-bear-default em,
+.mweb-bear-default var,
+.mweb-bear-default address,
+.mweb-bear-default dfn {
   font-style: italic;
 }
-.mweb-bear-default del, .mweb-bear-default s {
+.mweb-bear-default del,
+.mweb-bear-default s {
   color: #525252;
 }
-.mweb-bear-default pre, .mweb-bear-default xmp, .mweb-bear-default plaintext, .mweb-bear-default listing, .mweb-bear-default code, .mweb-bear-default kbd, .mweb-bear-default tt, .mweb-bear-default samp {
+.mweb-bear-default pre,
+.mweb-bear-default xmp,
+.mweb-bear-default plaintext,
+.mweb-bear-default listing,
+.mweb-bear-default code,
+.mweb-bear-default kbd,
+.mweb-bear-default tt,
+.mweb-bear-default samp {
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 .mweb-bear-default mark {
@@ -185,12 +216,15 @@
   border: 1px;
   border-spacing: 0;
 }
-.mweb-bear-default th, .mweb-bear-default td {
+.mweb-bear-default th,
+.mweb-bear-default td {
   padding: 0.7em 1em;
   font-size: 0.9em;
   border: 1px solid #bfbfbf;
 }
-.mweb-bear-default caption, .mweb-bear-default th, .mweb-bear-default td {
+.mweb-bear-default caption,
+.mweb-bear-default th,
+.mweb-bear-default td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
@@ -212,24 +246,24 @@
   display: inline;
   color: #424242;
 }
-.mweb-bear-default pre code {
-  display: block;
-  padding: 0.9em;
-  font-size: 0.9em;
-  line-height: 1.6em;
-  overflow-x: auto;
-  text-wrap: nowrap;
-}
 .mweb-bear-default .code-section {
   display: flex;
-  overflow: auto;
   border: solid 1px #bfbfbf;
   background-color: white;
 }
 .mweb-bear-default section pre {
   margin: 0;
+  overflow-x: auto;
+}
+.mweb-bear-default section code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  text-wrap: nowrap;
 }
 .mweb-bear-default section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 0.9em 0 0.9em 0.9em;
@@ -242,6 +276,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.6em;
   font-size: 0.9em;
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;

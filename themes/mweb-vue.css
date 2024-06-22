@@ -326,7 +326,6 @@
 }
 .mweb-vue .code-section {
   display: flex;
-  overflow: auto;
   background: #f8f8f8;
   border-radius: 2px;
 }
@@ -346,6 +345,7 @@
   text-wrap: nowrap;
 }
 .mweb-vue section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 1em 0 1em 1em;
@@ -358,6 +358,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.6em;
   font-size: 1em;
   padding: 0;

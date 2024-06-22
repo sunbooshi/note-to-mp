@@ -376,6 +376,7 @@
   margin: 0;
 }
 .mweb-jzman section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 1em 0 1em 1em;

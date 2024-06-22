@@ -43,13 +43,29 @@
 .mweb-charcoal > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-charcoal p, .mweb-charcoal pre, .mweb-charcoal dl, .mweb-charcoal form, .mweb-charcoal details, .mweb-charcoal dl, .mweb-charcoal blockquote, .mweb-charcoal table, .mweb-charcoal xmp, .mweb-charcoal plaintext, .mweb-charcoal listing, .mweb-charcoal figure {
+.mweb-charcoal p,
+.mweb-charcoal pre,
+.mweb-charcoal dl,
+.mweb-charcoal form,
+.mweb-charcoal details,
+.mweb-charcoal dl,
+.mweb-charcoal blockquote,
+.mweb-charcoal table,
+.mweb-charcoal xmp,
+.mweb-charcoal plaintext,
+.mweb-charcoal listing,
+.mweb-charcoal figure {
   margin: 0.75em 0 0.45em;
 }
 .mweb-charcoal hr {
   margin: 0.75em auto;
 }
-.mweb-charcoal h1, .mweb-charcoal h2, .mweb-charcoal h3, .mweb-charcoal h4, .mweb-charcoal h5, .mweb-charcoal h6 {
+.mweb-charcoal h1,
+.mweb-charcoal h2,
+.mweb-charcoal h3,
+.mweb-charcoal h4,
+.mweb-charcoal h5,
+.mweb-charcoal h6 {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   margin-left: 0;
@@ -88,7 +104,8 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-charcoal pre, .mweb-charcoal pre[class*=language-] {
+.mweb-charcoal pre,
+.mweb-charcoal pre[class*=language-] {
   padding: 0;
   border: 0;
 }
@@ -155,16 +172,30 @@
 .mweb-charcoal a img {
   border: none;
 }
-.mweb-charcoal b, .mweb-charcoal strong {
+.mweb-charcoal b,
+.mweb-charcoal strong {
   font-weight: bold;
 }
-.mweb-charcoal i, .mweb-charcoal cite, .mweb-charcoal em, .mweb-charcoal var, .mweb-charcoal address, .mweb-charcoal dfn {
+.mweb-charcoal i,
+.mweb-charcoal cite,
+.mweb-charcoal em,
+.mweb-charcoal var,
+.mweb-charcoal address,
+.mweb-charcoal dfn {
   font-style: italic;
 }
-.mweb-charcoal del, .mweb-charcoal s {
+.mweb-charcoal del,
+.mweb-charcoal s {
   color: rgb(122, 122, 122);
 }
-.mweb-charcoal pre, .mweb-charcoal xmp, .mweb-charcoal plaintext, .mweb-charcoal listing, .mweb-charcoal code, .mweb-charcoal kbd, .mweb-charcoal tt, .mweb-charcoal samp {
+.mweb-charcoal pre,
+.mweb-charcoal xmp,
+.mweb-charcoal plaintext,
+.mweb-charcoal listing,
+.mweb-charcoal code,
+.mweb-charcoal kbd,
+.mweb-charcoal tt,
+.mweb-charcoal samp {
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 .mweb-charcoal mark {
@@ -185,12 +216,15 @@
   border: 1px;
   border-spacing: 0;
 }
-.mweb-charcoal th, .mweb-charcoal td {
+.mweb-charcoal th,
+.mweb-charcoal td {
   padding: 0.7em 1em;
   font-size: 0.9em;
   border: 1px solid rgb(62, 67, 72);
 }
-.mweb-charcoal caption, .mweb-charcoal th, .mweb-charcoal td {
+.mweb-charcoal caption,
+.mweb-charcoal th,
+.mweb-charcoal td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
@@ -212,24 +246,24 @@
   display: inline;
   color: rgb(153, 153, 153);
 }
-.mweb-charcoal pre code {
-  display: block;
-  padding: 0.9em;
-  font-size: 0.9em;
-  line-height: 1.6em;
-  overflow-x: auto;
-  text-wrap: nowrap;
-}
 .mweb-charcoal .code-section {
   display: flex;
-  overflow: auto;
   border: solid 1px rgb(62, 67, 72);
   background-color: rgb(47, 51, 55);
 }
 .mweb-charcoal section pre {
   margin: 0;
+  overflow-x: auto;
+}
+.mweb-charcoal section code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  text-wrap: nowrap;
 }
 .mweb-charcoal section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 0.9em 0 0.9em 0.9em;
@@ -242,6 +276,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.6em;
   font-size: 0.9em;
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;

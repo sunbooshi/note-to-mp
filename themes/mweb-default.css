@@ -190,12 +190,12 @@
 }
 .mweb-default .code-section {
   display: flex;
-  overflow: auto;
   border: 1px solid gray;
 }
 .mweb-default section pre {
   margin: 0;
   padding: 0;
+  overflow-x: auto;
 }
 .mweb-default section pre code {
   font-family: Consolas, ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", "Courier New", monospace;
@@ -204,10 +204,10 @@
   line-height: 1.8em;
   padding: 1em;
   display: block;
-  overflow-x: auto;
   text-wrap: nowrap;
 }
 .mweb-default section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 1em 0em 1em 1em;
@@ -220,6 +220,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.8em;
   font-size: 1em;
   font-family: Consolas, ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", "Courier New", monospace;

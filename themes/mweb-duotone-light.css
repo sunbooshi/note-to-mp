@@ -43,13 +43,29 @@
 .mweb-duotone-light > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-duotone-light p, .mweb-duotone-light pre, .mweb-duotone-light dl, .mweb-duotone-light form, .mweb-duotone-light details, .mweb-duotone-light dl, .mweb-duotone-light blockquote, .mweb-duotone-light table, .mweb-duotone-light xmp, .mweb-duotone-light plaintext, .mweb-duotone-light listing, .mweb-duotone-light figure {
+.mweb-duotone-light p,
+.mweb-duotone-light pre,
+.mweb-duotone-light dl,
+.mweb-duotone-light form,
+.mweb-duotone-light details,
+.mweb-duotone-light dl,
+.mweb-duotone-light blockquote,
+.mweb-duotone-light table,
+.mweb-duotone-light xmp,
+.mweb-duotone-light plaintext,
+.mweb-duotone-light listing,
+.mweb-duotone-light figure {
   margin: 0.75em 0 0.45em;
 }
 .mweb-duotone-light hr {
   margin: 0.75em auto;
 }
-.mweb-duotone-light h1, .mweb-duotone-light h2, .mweb-duotone-light h3, .mweb-duotone-light h4, .mweb-duotone-light h5, .mweb-duotone-light h6 {
+.mweb-duotone-light h1,
+.mweb-duotone-light h2,
+.mweb-duotone-light h3,
+.mweb-duotone-light h4,
+.mweb-duotone-light h5,
+.mweb-duotone-light h6 {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   margin-left: 0;
@@ -88,7 +104,8 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-duotone-light pre, .mweb-duotone-light pre[class*=language-] {
+.mweb-duotone-light pre,
+.mweb-duotone-light pre[class*=language-] {
   padding: 0;
   border: 0;
 }
@@ -155,16 +172,30 @@
 .mweb-duotone-light a img {
   border: none;
 }
-.mweb-duotone-light b, .mweb-duotone-light strong {
+.mweb-duotone-light b,
+.mweb-duotone-light strong {
   font-weight: bold;
 }
-.mweb-duotone-light i, .mweb-duotone-light cite, .mweb-duotone-light em, .mweb-duotone-light var, .mweb-duotone-light address, .mweb-duotone-light dfn {
+.mweb-duotone-light i,
+.mweb-duotone-light cite,
+.mweb-duotone-light em,
+.mweb-duotone-light var,
+.mweb-duotone-light address,
+.mweb-duotone-light dfn {
   font-style: italic;
 }
-.mweb-duotone-light del, .mweb-duotone-light s {
+.mweb-duotone-light del,
+.mweb-duotone-light s {
   color: rgb(136, 102, 42);
 }
-.mweb-duotone-light pre, .mweb-duotone-light xmp, .mweb-duotone-light plaintext, .mweb-duotone-light listing, .mweb-duotone-light code, .mweb-duotone-light kbd, .mweb-duotone-light tt, .mweb-duotone-light samp {
+.mweb-duotone-light pre,
+.mweb-duotone-light xmp,
+.mweb-duotone-light plaintext,
+.mweb-duotone-light listing,
+.mweb-duotone-light code,
+.mweb-duotone-light kbd,
+.mweb-duotone-light tt,
+.mweb-duotone-light samp {
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 .mweb-duotone-light mark {
@@ -185,12 +216,15 @@
   border: 1px;
   border-spacing: 0;
 }
-.mweb-duotone-light th, .mweb-duotone-light td {
+.mweb-duotone-light th,
+.mweb-duotone-light td {
   padding: 0.7em 1em;
   font-size: 0.9em;
   border: 1px solid rgba(182, 173, 155, 0.3);
 }
-.mweb-duotone-light caption, .mweb-duotone-light th, .mweb-duotone-light td {
+.mweb-duotone-light caption,
+.mweb-duotone-light th,
+.mweb-duotone-light td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
@@ -212,24 +246,24 @@
   display: inline;
   color: rgb(66, 66, 66);
 }
-.mweb-duotone-light pre code {
-  display: block;
-  padding: 0.9em;
-  font-size: 0.9em;
-  line-height: 1.6em;
-  overflow-x: auto;
-  text-wrap: nowrap;
-}
 .mweb-duotone-light .code-section {
   display: flex;
-  overflow: auto;
   border: solid 1px rgba(182, 173, 155, 0.3);
   background-color: rgb(255, 252, 249);
 }
 .mweb-duotone-light section pre {
   margin: 0;
+  overflow-x: auto;
+}
+.mweb-duotone-light section code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  text-wrap: nowrap;
 }
 .mweb-duotone-light section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 0.9em 0 0.9em 0.9em;
@@ -242,6 +276,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.6em;
   font-size: 0.9em;
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;

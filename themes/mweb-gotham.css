@@ -43,13 +43,29 @@
 .mweb-gotham > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-gotham p, .mweb-gotham pre, .mweb-gotham dl, .mweb-gotham form, .mweb-gotham details, .mweb-gotham dl, .mweb-gotham blockquote, .mweb-gotham table, .mweb-gotham xmp, .mweb-gotham plaintext, .mweb-gotham listing, .mweb-gotham figure {
+.mweb-gotham p,
+.mweb-gotham pre,
+.mweb-gotham dl,
+.mweb-gotham form,
+.mweb-gotham details,
+.mweb-gotham dl,
+.mweb-gotham blockquote,
+.mweb-gotham table,
+.mweb-gotham xmp,
+.mweb-gotham plaintext,
+.mweb-gotham listing,
+.mweb-gotham figure {
   margin: 0.75em 0 0.45em;
 }
 .mweb-gotham hr {
   margin: 0.75em auto;
 }
-.mweb-gotham h1, .mweb-gotham h2, .mweb-gotham h3, .mweb-gotham h4, .mweb-gotham h5, .mweb-gotham h6 {
+.mweb-gotham h1,
+.mweb-gotham h2,
+.mweb-gotham h3,
+.mweb-gotham h4,
+.mweb-gotham h5,
+.mweb-gotham h6 {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   margin-left: 0;
@@ -88,7 +104,8 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-gotham pre, .mweb-gotham pre[class*=language-] {
+.mweb-gotham pre,
+.mweb-gotham pre[class*=language-] {
   padding: 0;
   border: 0;
 }
@@ -155,16 +172,30 @@
 .mweb-gotham a img {
   border: none;
 }
-.mweb-gotham b, .mweb-gotham strong {
+.mweb-gotham b,
+.mweb-gotham strong {
   font-weight: bold;
 }
-.mweb-gotham i, .mweb-gotham cite, .mweb-gotham em, .mweb-gotham var, .mweb-gotham address, .mweb-gotham dfn {
+.mweb-gotham i,
+.mweb-gotham cite,
+.mweb-gotham em,
+.mweb-gotham var,
+.mweb-gotham address,
+.mweb-gotham dfn {
   font-style: italic;
 }
-.mweb-gotham del, .mweb-gotham s {
+.mweb-gotham del,
+.mweb-gotham s {
   color: rgba(89, 156, 171, 0.7);
 }
-.mweb-gotham pre, .mweb-gotham xmp, .mweb-gotham plaintext, .mweb-gotham listing, .mweb-gotham code, .mweb-gotham kbd, .mweb-gotham tt, .mweb-gotham samp {
+.mweb-gotham pre,
+.mweb-gotham xmp,
+.mweb-gotham plaintext,
+.mweb-gotham listing,
+.mweb-gotham code,
+.mweb-gotham kbd,
+.mweb-gotham tt,
+.mweb-gotham samp {
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 .mweb-gotham mark {
@@ -185,12 +216,15 @@
   border: 1px;
   border-spacing: 0;
 }
-.mweb-gotham th, .mweb-gotham td {
+.mweb-gotham th,
+.mweb-gotham td {
   padding: 0.7em 1em;
   font-size: 0.9em;
   border: 1px solid rgb(18, 42, 63);
 }
-.mweb-gotham caption, .mweb-gotham th, .mweb-gotham td {
+.mweb-gotham caption,
+.mweb-gotham th,
+.mweb-gotham td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
@@ -212,24 +246,24 @@
   display: inline;
   color: rgb(89, 156, 171);
 }
-.mweb-gotham pre code {
-  display: block;
-  padding: 0.9em;
-  font-size: 0.9em;
-  line-height: 1.6em;
-  overflow-x: auto;
-  text-wrap: nowrap;
-}
 .mweb-gotham .code-section {
   display: flex;
-  overflow: auto;
   border: solid 1px rgb(18, 42, 63);
   background-color: rgb(10, 23, 34);
 }
 .mweb-gotham section pre {
   margin: 0;
+  overflow-x: auto;
+}
+.mweb-gotham section code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  text-wrap: nowrap;
 }
 .mweb-gotham section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 0.9em 0 0.9em 0.9em;
@@ -242,6 +276,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.6em;
   font-size: 0.9em;
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;

@@ -236,7 +236,6 @@
 }
 .mweb-v-green .code-section {
   display: flex;
-  overflow: auto;
   background: #f8f8f8;
   border-radius: 6px;
   border: 2px solid #3eaf7c;
@@ -256,6 +255,7 @@
   text-wrap: nowrap;
 }
 .mweb-v-green section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 1em 0 1em 1em;

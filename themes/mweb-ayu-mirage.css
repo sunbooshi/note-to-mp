@@ -43,13 +43,29 @@
 .mweb-ayu-mirage > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-ayu-mirage p, .mweb-ayu-mirage pre, .mweb-ayu-mirage dl, .mweb-ayu-mirage form, .mweb-ayu-mirage details, .mweb-ayu-mirage dl, .mweb-ayu-mirage blockquote, .mweb-ayu-mirage table, .mweb-ayu-mirage xmp, .mweb-ayu-mirage plaintext, .mweb-ayu-mirage listing, .mweb-ayu-mirage figure {
+.mweb-ayu-mirage p,
+.mweb-ayu-mirage pre,
+.mweb-ayu-mirage dl,
+.mweb-ayu-mirage form,
+.mweb-ayu-mirage details,
+.mweb-ayu-mirage dl,
+.mweb-ayu-mirage blockquote,
+.mweb-ayu-mirage table,
+.mweb-ayu-mirage xmp,
+.mweb-ayu-mirage plaintext,
+.mweb-ayu-mirage listing,
+.mweb-ayu-mirage figure {
   margin: 0.75em 0 0.45em;
 }
 .mweb-ayu-mirage hr {
   margin: 0.75em auto;
 }
-.mweb-ayu-mirage h1, .mweb-ayu-mirage h2, .mweb-ayu-mirage h3, .mweb-ayu-mirage h4, .mweb-ayu-mirage h5, .mweb-ayu-mirage h6 {
+.mweb-ayu-mirage h1,
+.mweb-ayu-mirage h2,
+.mweb-ayu-mirage h3,
+.mweb-ayu-mirage h4,
+.mweb-ayu-mirage h5,
+.mweb-ayu-mirage h6 {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   margin-left: 0;
@@ -88,7 +104,8 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-ayu-mirage pre, .mweb-ayu-mirage pre[class*=language-] {
+.mweb-ayu-mirage pre,
+.mweb-ayu-mirage pre[class*=language-] {
   padding: 0;
   border: 0;
 }
@@ -155,16 +172,30 @@
 .mweb-ayu-mirage a img {
   border: none;
 }
-.mweb-ayu-mirage b, .mweb-ayu-mirage strong {
+.mweb-ayu-mirage b,
+.mweb-ayu-mirage strong {
   font-weight: bold;
 }
-.mweb-ayu-mirage i, .mweb-ayu-mirage cite, .mweb-ayu-mirage em, .mweb-ayu-mirage var, .mweb-ayu-mirage address, .mweb-ayu-mirage dfn {
+.mweb-ayu-mirage i,
+.mweb-ayu-mirage cite,
+.mweb-ayu-mirage em,
+.mweb-ayu-mirage var,
+.mweb-ayu-mirage address,
+.mweb-ayu-mirage dfn {
   font-style: italic;
 }
-.mweb-ayu-mirage del, .mweb-ayu-mirage s {
+.mweb-ayu-mirage del,
+.mweb-ayu-mirage s {
   color: rgb(120, 126, 140);
 }
-.mweb-ayu-mirage pre, .mweb-ayu-mirage xmp, .mweb-ayu-mirage plaintext, .mweb-ayu-mirage listing, .mweb-ayu-mirage code, .mweb-ayu-mirage kbd, .mweb-ayu-mirage tt, .mweb-ayu-mirage samp {
+.mweb-ayu-mirage pre,
+.mweb-ayu-mirage xmp,
+.mweb-ayu-mirage plaintext,
+.mweb-ayu-mirage listing,
+.mweb-ayu-mirage code,
+.mweb-ayu-mirage kbd,
+.mweb-ayu-mirage tt,
+.mweb-ayu-mirage samp {
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 .mweb-ayu-mirage mark {
@@ -185,12 +216,15 @@
   border: 1px;
   border-spacing: 0;
 }
-.mweb-ayu-mirage th, .mweb-ayu-mirage td {
+.mweb-ayu-mirage th,
+.mweb-ayu-mirage td {
   padding: 0.7em 1em;
   font-size: 0.9em;
   border: 1px solid rgb(60, 66, 84);
 }
-.mweb-ayu-mirage caption, .mweb-ayu-mirage th, .mweb-ayu-mirage td {
+.mweb-ayu-mirage caption,
+.mweb-ayu-mirage th,
+.mweb-ayu-mirage td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
@@ -212,24 +246,24 @@
   display: inline;
   color: rgb(207, 208, 203);
 }
-.mweb-ayu-mirage pre code {
-  display: block;
-  padding: 0.9em;
-  font-size: 0.9em;
-  line-height: 1.6em;
-  overflow-x: auto;
-  text-wrap: nowrap;
-}
 .mweb-ayu-mirage .code-section {
   display: flex;
-  overflow: auto;
   border: solid 1px rgb(60, 66, 84);
   background-color: rgb(24, 28, 37);
 }
 .mweb-ayu-mirage section pre {
   margin: 0;
+  overflow-x: auto;
+}
+.mweb-ayu-mirage section code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  text-wrap: nowrap;
 }
 .mweb-ayu-mirage section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 0.9em 0 0.9em 0.9em;
@@ -242,6 +276,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.6em;
   font-size: 0.9em;
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;

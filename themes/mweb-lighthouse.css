@@ -43,13 +43,29 @@
 .mweb-lighthouse > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-lighthouse p, .mweb-lighthouse pre, .mweb-lighthouse dl, .mweb-lighthouse form, .mweb-lighthouse details, .mweb-lighthouse dl, .mweb-lighthouse blockquote, .mweb-lighthouse table, .mweb-lighthouse xmp, .mweb-lighthouse plaintext, .mweb-lighthouse listing, .mweb-lighthouse figure {
+.mweb-lighthouse p,
+.mweb-lighthouse pre,
+.mweb-lighthouse dl,
+.mweb-lighthouse form,
+.mweb-lighthouse details,
+.mweb-lighthouse dl,
+.mweb-lighthouse blockquote,
+.mweb-lighthouse table,
+.mweb-lighthouse xmp,
+.mweb-lighthouse plaintext,
+.mweb-lighthouse listing,
+.mweb-lighthouse figure {
   margin: 0.75em 0 0.45em;
 }
 .mweb-lighthouse hr {
   margin: 0.75em auto;
 }
-.mweb-lighthouse h1, .mweb-lighthouse h2, .mweb-lighthouse h3, .mweb-lighthouse h4, .mweb-lighthouse h5, .mweb-lighthouse h6 {
+.mweb-lighthouse h1,
+.mweb-lighthouse h2,
+.mweb-lighthouse h3,
+.mweb-lighthouse h4,
+.mweb-lighthouse h5,
+.mweb-lighthouse h6 {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   margin-left: 0;
@@ -88,7 +104,8 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-lighthouse pre, .mweb-lighthouse pre[class*=language-] {
+.mweb-lighthouse pre,
+.mweb-lighthouse pre[class*=language-] {
   padding: 0;
   border: 0;
 }
@@ -155,16 +172,30 @@
 .mweb-lighthouse a img {
   border: none;
 }
-.mweb-lighthouse b, .mweb-lighthouse strong {
+.mweb-lighthouse b,
+.mweb-lighthouse strong {
   font-weight: bold;
 }
-.mweb-lighthouse i, .mweb-lighthouse cite, .mweb-lighthouse em, .mweb-lighthouse var, .mweb-lighthouse address, .mweb-lighthouse dfn {
+.mweb-lighthouse i,
+.mweb-lighthouse cite,
+.mweb-lighthouse em,
+.mweb-lighthouse var,
+.mweb-lighthouse address,
+.mweb-lighthouse dfn {
   font-style: italic;
 }
-.mweb-lighthouse del, .mweb-lighthouse s {
+.mweb-lighthouse del,
+.mweb-lighthouse s {
   color: rgb(204, 204, 204);
 }
-.mweb-lighthouse pre, .mweb-lighthouse xmp, .mweb-lighthouse plaintext, .mweb-lighthouse listing, .mweb-lighthouse code, .mweb-lighthouse kbd, .mweb-lighthouse tt, .mweb-lighthouse samp {
+.mweb-lighthouse pre,
+.mweb-lighthouse xmp,
+.mweb-lighthouse plaintext,
+.mweb-lighthouse listing,
+.mweb-lighthouse code,
+.mweb-lighthouse kbd,
+.mweb-lighthouse tt,
+.mweb-lighthouse samp {
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 .mweb-lighthouse mark {
@@ -185,12 +216,15 @@
   border: 1px;
   border-spacing: 0;
 }
-.mweb-lighthouse th, .mweb-lighthouse td {
+.mweb-lighthouse th,
+.mweb-lighthouse td {
   padding: 0.7em 1em;
   font-size: 0.9em;
   border: 1px solid rgb(100, 176, 119);
 }
-.mweb-lighthouse caption, .mweb-lighthouse th, .mweb-lighthouse td {
+.mweb-lighthouse caption,
+.mweb-lighthouse th,
+.mweb-lighthouse td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
@@ -212,24 +246,24 @@
   display: inline;
   color: rgb(204, 203, 204);
 }
-.mweb-lighthouse pre code {
-  display: block;
-  padding: 0.9em;
-  font-size: 0.9em;
-  line-height: 1.6em;
-  overflow-x: auto;
-  text-wrap: nowrap;
-}
 .mweb-lighthouse .code-section {
   display: flex;
-  overflow: auto;
   border: solid 1px rgb(100, 176, 119);
   background-color: rgb(27, 26, 34);
 }
 .mweb-lighthouse section pre {
   margin: 0;
+  overflow-x: auto;
+}
+.mweb-lighthouse section code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  text-wrap: nowrap;
 }
 .mweb-lighthouse section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 0.9em 0 0.9em 0.9em;
@@ -242,6 +276,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.6em;
   font-size: 0.9em;
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
