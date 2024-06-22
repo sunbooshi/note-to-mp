@@ -43,13 +43,29 @@
 .mweb-gandalf > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-gandalf p, .mweb-gandalf pre, .mweb-gandalf dl, .mweb-gandalf form, .mweb-gandalf details, .mweb-gandalf dl, .mweb-gandalf blockquote, .mweb-gandalf table, .mweb-gandalf xmp, .mweb-gandalf plaintext, .mweb-gandalf listing, .mweb-gandalf figure {
+.mweb-gandalf p,
+.mweb-gandalf pre,
+.mweb-gandalf dl,
+.mweb-gandalf form,
+.mweb-gandalf details,
+.mweb-gandalf dl,
+.mweb-gandalf blockquote,
+.mweb-gandalf table,
+.mweb-gandalf xmp,
+.mweb-gandalf plaintext,
+.mweb-gandalf listing,
+.mweb-gandalf figure {
   margin: 0.75em 0 0.45em;
 }
 .mweb-gandalf hr {
   margin: 0.75em auto;
 }
-.mweb-gandalf h1, .mweb-gandalf h2, .mweb-gandalf h3, .mweb-gandalf h4, .mweb-gandalf h5, .mweb-gandalf h6 {
+.mweb-gandalf h1,
+.mweb-gandalf h2,
+.mweb-gandalf h3,
+.mweb-gandalf h4,
+.mweb-gandalf h5,
+.mweb-gandalf h6 {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   margin-left: 0;
@@ -88,7 +104,8 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-gandalf pre, .mweb-gandalf pre[class*=language-] {
+.mweb-gandalf pre,
+.mweb-gandalf pre[class*=language-] {
   padding: 0;
   border: 0;
 }
@@ -155,16 +172,30 @@
 .mweb-gandalf a img {
   border: none;
 }
-.mweb-gandalf b, .mweb-gandalf strong {
+.mweb-gandalf b,
+.mweb-gandalf strong {
   font-weight: bold;
 }
-.mweb-gandalf i, .mweb-gandalf cite, .mweb-gandalf em, .mweb-gandalf var, .mweb-gandalf address, .mweb-gandalf dfn {
+.mweb-gandalf i,
+.mweb-gandalf cite,
+.mweb-gandalf em,
+.mweb-gandalf var,
+.mweb-gandalf address,
+.mweb-gandalf dfn {
   font-style: italic;
 }
-.mweb-gandalf del, .mweb-gandalf s {
+.mweb-gandalf del,
+.mweb-gandalf s {
   color: rgba(69, 82, 96, 0.7);
 }
-.mweb-gandalf pre, .mweb-gandalf xmp, .mweb-gandalf plaintext, .mweb-gandalf listing, .mweb-gandalf code, .mweb-gandalf kbd, .mweb-gandalf tt, .mweb-gandalf samp {
+.mweb-gandalf pre,
+.mweb-gandalf xmp,
+.mweb-gandalf plaintext,
+.mweb-gandalf listing,
+.mweb-gandalf code,
+.mweb-gandalf kbd,
+.mweb-gandalf tt,
+.mweb-gandalf samp {
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 .mweb-gandalf mark {
@@ -185,12 +216,15 @@
   border: 1px;
   border-spacing: 0;
 }
-.mweb-gandalf th, .mweb-gandalf td {
+.mweb-gandalf th,
+.mweb-gandalf td {
   padding: 0.7em 1em;
   font-size: 0.9em;
   border: 1px solid rgb(200, 205, 218);
 }
-.mweb-gandalf caption, .mweb-gandalf th, .mweb-gandalf td {
+.mweb-gandalf caption,
+.mweb-gandalf th,
+.mweb-gandalf td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
@@ -212,24 +246,24 @@
   display: inline;
   color: rgb(62, 74, 98);
 }
-.mweb-gandalf pre code {
-  display: block;
-  padding: 0.9em;
-  font-size: 0.9em;
-  line-height: 1.6em;
-  overflow-x: auto;
-  text-wrap: nowrap;
-}
 .mweb-gandalf .code-section {
   display: flex;
-  overflow: auto;
   border: solid 1px rgb(200, 205, 218);
   background-color: rgb(248, 247, 249);
 }
 .mweb-gandalf section pre {
   margin: 0;
+  overflow-x: auto;
+}
+.mweb-gandalf section code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  text-wrap: nowrap;
 }
 .mweb-gandalf section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 0.9em 0 0.9em 0.9em;
@@ -242,6 +276,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.6em;
   font-size: 0.9em;
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;

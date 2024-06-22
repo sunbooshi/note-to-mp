@@ -43,13 +43,29 @@
 .mweb-dracula > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-dracula p, .mweb-dracula pre, .mweb-dracula dl, .mweb-dracula form, .mweb-dracula details, .mweb-dracula dl, .mweb-dracula blockquote, .mweb-dracula table, .mweb-dracula xmp, .mweb-dracula plaintext, .mweb-dracula listing, .mweb-dracula figure {
+.mweb-dracula p,
+.mweb-dracula pre,
+.mweb-dracula dl,
+.mweb-dracula form,
+.mweb-dracula details,
+.mweb-dracula dl,
+.mweb-dracula blockquote,
+.mweb-dracula table,
+.mweb-dracula xmp,
+.mweb-dracula plaintext,
+.mweb-dracula listing,
+.mweb-dracula figure {
   margin: 0.75em 0 0.45em;
 }
 .mweb-dracula hr {
   margin: 0.75em auto;
 }
-.mweb-dracula h1, .mweb-dracula h2, .mweb-dracula h3, .mweb-dracula h4, .mweb-dracula h5, .mweb-dracula h6 {
+.mweb-dracula h1,
+.mweb-dracula h2,
+.mweb-dracula h3,
+.mweb-dracula h4,
+.mweb-dracula h5,
+.mweb-dracula h6 {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   margin-left: 0;
@@ -88,7 +104,8 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-dracula pre, .mweb-dracula pre[class*=language-] {
+.mweb-dracula pre,
+.mweb-dracula pre[class*=language-] {
   padding: 0;
   border: 0;
 }
@@ -155,16 +172,30 @@
 .mweb-dracula a img {
   border: none;
 }
-.mweb-dracula b, .mweb-dracula strong {
+.mweb-dracula b,
+.mweb-dracula strong {
   font-weight: bold;
 }
-.mweb-dracula i, .mweb-dracula cite, .mweb-dracula em, .mweb-dracula var, .mweb-dracula address, .mweb-dracula dfn {
+.mweb-dracula i,
+.mweb-dracula cite,
+.mweb-dracula em,
+.mweb-dracula var,
+.mweb-dracula address,
+.mweb-dracula dfn {
   font-style: italic;
 }
-.mweb-dracula del, .mweb-dracula s {
+.mweb-dracula del,
+.mweb-dracula s {
   color: rgb(178, 184, 163);
 }
-.mweb-dracula pre, .mweb-dracula xmp, .mweb-dracula plaintext, .mweb-dracula listing, .mweb-dracula code, .mweb-dracula kbd, .mweb-dracula tt, .mweb-dracula samp {
+.mweb-dracula pre,
+.mweb-dracula xmp,
+.mweb-dracula plaintext,
+.mweb-dracula listing,
+.mweb-dracula code,
+.mweb-dracula kbd,
+.mweb-dracula tt,
+.mweb-dracula samp {
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 .mweb-dracula mark {
@@ -185,12 +216,15 @@
   border: 1px;
   border-spacing: 0;
 }
-.mweb-dracula th, .mweb-dracula td {
+.mweb-dracula th,
+.mweb-dracula td {
   padding: 0.7em 1em;
   font-size: 0.9em;
   border: 1px solid rgba(187, 145, 248, 0.4);
 }
-.mweb-dracula caption, .mweb-dracula th, .mweb-dracula td {
+.mweb-dracula caption,
+.mweb-dracula th,
+.mweb-dracula td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
@@ -212,24 +246,24 @@
   display: inline;
   color: rgb(249, 249, 245);
 }
-.mweb-dracula pre code {
-  display: block;
-  padding: 0.9em;
-  font-size: 0.9em;
-  line-height: 1.6em;
-  overflow-x: auto;
-  text-wrap: nowrap;
-}
 .mweb-dracula .code-section {
   display: flex;
-  overflow: auto;
   border: solid 1px rgba(187, 145, 248, 0.4);
   background-color: rgb(31, 32, 42);
 }
 .mweb-dracula section pre {
   margin: 0;
+  overflow-x: auto;
+}
+.mweb-dracula section code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  text-wrap: nowrap;
 }
 .mweb-dracula section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 0.9em 0 0.9em 0.9em;
@@ -242,6 +276,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.6em;
   font-size: 0.9em;
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;

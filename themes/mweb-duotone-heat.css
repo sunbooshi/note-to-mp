@@ -43,13 +43,29 @@
 .mweb-duotone-heat > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-duotone-heat p, .mweb-duotone-heat pre, .mweb-duotone-heat dl, .mweb-duotone-heat form, .mweb-duotone-heat details, .mweb-duotone-heat dl, .mweb-duotone-heat blockquote, .mweb-duotone-heat table, .mweb-duotone-heat xmp, .mweb-duotone-heat plaintext, .mweb-duotone-heat listing, .mweb-duotone-heat figure {
+.mweb-duotone-heat p,
+.mweb-duotone-heat pre,
+.mweb-duotone-heat dl,
+.mweb-duotone-heat form,
+.mweb-duotone-heat details,
+.mweb-duotone-heat dl,
+.mweb-duotone-heat blockquote,
+.mweb-duotone-heat table,
+.mweb-duotone-heat xmp,
+.mweb-duotone-heat plaintext,
+.mweb-duotone-heat listing,
+.mweb-duotone-heat figure {
   margin: 0.75em 0 0.45em;
 }
 .mweb-duotone-heat hr {
   margin: 0.75em auto;
 }
-.mweb-duotone-heat h1, .mweb-duotone-heat h2, .mweb-duotone-heat h3, .mweb-duotone-heat h4, .mweb-duotone-heat h5, .mweb-duotone-heat h6 {
+.mweb-duotone-heat h1,
+.mweb-duotone-heat h2,
+.mweb-duotone-heat h3,
+.mweb-duotone-heat h4,
+.mweb-duotone-heat h5,
+.mweb-duotone-heat h6 {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   margin-left: 0;
@@ -88,7 +104,8 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-duotone-heat pre, .mweb-duotone-heat pre[class*=language-] {
+.mweb-duotone-heat pre,
+.mweb-duotone-heat pre[class*=language-] {
   padding: 0;
   border: 0;
 }
@@ -155,16 +172,30 @@
 .mweb-duotone-heat a img {
   border: none;
 }
-.mweb-duotone-heat b, .mweb-duotone-heat strong {
+.mweb-duotone-heat b,
+.mweb-duotone-heat strong {
   font-weight: bold;
 }
-.mweb-duotone-heat i, .mweb-duotone-heat cite, .mweb-duotone-heat em, .mweb-duotone-heat var, .mweb-duotone-heat address, .mweb-duotone-heat dfn {
+.mweb-duotone-heat i,
+.mweb-duotone-heat cite,
+.mweb-duotone-heat em,
+.mweb-duotone-heat var,
+.mweb-duotone-heat address,
+.mweb-duotone-heat dfn {
   font-style: italic;
 }
-.mweb-duotone-heat del, .mweb-duotone-heat s {
+.mweb-duotone-heat del,
+.mweb-duotone-heat s {
   color: rgb(146, 142, 147);
 }
-.mweb-duotone-heat pre, .mweb-duotone-heat xmp, .mweb-duotone-heat plaintext, .mweb-duotone-heat listing, .mweb-duotone-heat code, .mweb-duotone-heat kbd, .mweb-duotone-heat tt, .mweb-duotone-heat samp {
+.mweb-duotone-heat pre,
+.mweb-duotone-heat xmp,
+.mweb-duotone-heat plaintext,
+.mweb-duotone-heat listing,
+.mweb-duotone-heat code,
+.mweb-duotone-heat kbd,
+.mweb-duotone-heat tt,
+.mweb-duotone-heat samp {
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 .mweb-duotone-heat mark {
@@ -185,12 +216,15 @@
   border: 1px;
   border-spacing: 0;
 }
-.mweb-duotone-heat th, .mweb-duotone-heat td {
+.mweb-duotone-heat th,
+.mweb-duotone-heat td {
   padding: 0.7em 1em;
   font-size: 0.9em;
   border: 1px solid rgb(211, 197, 211);
 }
-.mweb-duotone-heat caption, .mweb-duotone-heat th, .mweb-duotone-heat td {
+.mweb-duotone-heat caption,
+.mweb-duotone-heat th,
+.mweb-duotone-heat td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
@@ -212,24 +246,24 @@
   display: inline;
   color: rgb(89, 84, 89);
 }
-.mweb-duotone-heat pre code {
-  display: block;
-  padding: 0.9em;
-  font-size: 0.9em;
-  line-height: 1.6em;
-  overflow-x: auto;
-  text-wrap: nowrap;
-}
 .mweb-duotone-heat .code-section {
   display: flex;
-  overflow: auto;
   border: solid 1px rgb(211, 197, 211);
   background-color: rgb(255, 253, 253);
 }
 .mweb-duotone-heat section pre {
   margin: 0;
+  overflow-x: auto;
+}
+.mweb-duotone-heat section code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  text-wrap: nowrap;
 }
 .mweb-duotone-heat section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 0.9em 0 0.9em 0.9em;
@@ -242,6 +276,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.6em;
   font-size: 0.9em;
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;

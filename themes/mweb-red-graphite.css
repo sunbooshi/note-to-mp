@@ -43,13 +43,29 @@
 .mweb-red-graphite > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-red-graphite p, .mweb-red-graphite pre, .mweb-red-graphite dl, .mweb-red-graphite form, .mweb-red-graphite details, .mweb-red-graphite dl, .mweb-red-graphite blockquote, .mweb-red-graphite table, .mweb-red-graphite xmp, .mweb-red-graphite plaintext, .mweb-red-graphite listing, .mweb-red-graphite figure {
+.mweb-red-graphite p,
+.mweb-red-graphite pre,
+.mweb-red-graphite dl,
+.mweb-red-graphite form,
+.mweb-red-graphite details,
+.mweb-red-graphite dl,
+.mweb-red-graphite blockquote,
+.mweb-red-graphite table,
+.mweb-red-graphite xmp,
+.mweb-red-graphite plaintext,
+.mweb-red-graphite listing,
+.mweb-red-graphite figure {
   margin: 0.75em 0 0.45em;
 }
 .mweb-red-graphite hr {
   margin: 0.75em auto;
 }
-.mweb-red-graphite h1, .mweb-red-graphite h2, .mweb-red-graphite h3, .mweb-red-graphite h4, .mweb-red-graphite h5, .mweb-red-graphite h6 {
+.mweb-red-graphite h1,
+.mweb-red-graphite h2,
+.mweb-red-graphite h3,
+.mweb-red-graphite h4,
+.mweb-red-graphite h5,
+.mweb-red-graphite h6 {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   margin-left: 0;
@@ -88,7 +104,8 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-red-graphite pre, .mweb-red-graphite pre[class*=language-] {
+.mweb-red-graphite pre,
+.mweb-red-graphite pre[class*=language-] {
   padding: 0;
   border: 0;
 }
@@ -155,16 +172,30 @@
 .mweb-red-graphite a img {
   border: none;
 }
-.mweb-red-graphite b, .mweb-red-graphite strong {
+.mweb-red-graphite b,
+.mweb-red-graphite strong {
   font-weight: bold;
 }
-.mweb-red-graphite i, .mweb-red-graphite cite, .mweb-red-graphite em, .mweb-red-graphite var, .mweb-red-graphite address, .mweb-red-graphite dfn {
+.mweb-red-graphite i,
+.mweb-red-graphite cite,
+.mweb-red-graphite em,
+.mweb-red-graphite var,
+.mweb-red-graphite address,
+.mweb-red-graphite dfn {
   font-style: italic;
 }
-.mweb-red-graphite del, .mweb-red-graphite s {
+.mweb-red-graphite del,
+.mweb-red-graphite s {
   color: #525252;
 }
-.mweb-red-graphite pre, .mweb-red-graphite xmp, .mweb-red-graphite plaintext, .mweb-red-graphite listing, .mweb-red-graphite code, .mweb-red-graphite kbd, .mweb-red-graphite tt, .mweb-red-graphite samp {
+.mweb-red-graphite pre,
+.mweb-red-graphite xmp,
+.mweb-red-graphite plaintext,
+.mweb-red-graphite listing,
+.mweb-red-graphite code,
+.mweb-red-graphite kbd,
+.mweb-red-graphite tt,
+.mweb-red-graphite samp {
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 .mweb-red-graphite mark {
@@ -185,12 +216,15 @@
   border: 1px;
   border-spacing: 0;
 }
-.mweb-red-graphite th, .mweb-red-graphite td {
+.mweb-red-graphite th,
+.mweb-red-graphite td {
   padding: 0.7em 1em;
   font-size: 0.9em;
   border: 1px solid #bfbfbf;
 }
-.mweb-red-graphite caption, .mweb-red-graphite th, .mweb-red-graphite td {
+.mweb-red-graphite caption,
+.mweb-red-graphite th,
+.mweb-red-graphite td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
@@ -212,24 +246,24 @@
   display: inline;
   color: #424242;
 }
-.mweb-red-graphite pre code {
-  display: block;
-  padding: 0.9em;
-  font-size: 0.9em;
-  line-height: 1.6em;
-  overflow-x: auto;
-  text-wrap: nowrap;
-}
 .mweb-red-graphite .code-section {
   display: flex;
-  overflow: auto;
   border: solid 1px #bfbfbf;
   background-color: white;
 }
 .mweb-red-graphite section pre {
   margin: 0;
+  overflow-x: auto;
+}
+.mweb-red-graphite section code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  text-wrap: nowrap;
 }
 .mweb-red-graphite section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 0.9em 0 0.9em 0.9em;
@@ -242,6 +276,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.6em;
   font-size: 0.9em;
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;

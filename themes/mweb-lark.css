@@ -285,7 +285,6 @@
 }
 .mweb-lark .code-section {
   display: flex;
-  overflow: auto;
   border: 1px solid #dee0e3;
   background-color: #f5f6f7;
 }
@@ -304,6 +303,7 @@
   text-wrap: nowrap;
 }
 .mweb-lark section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 1em 0 1em 1em;
@@ -316,13 +316,13 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.8em;
   font-size: 1em;
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   padding: 0;
   list-style-type: none;
   color: #ff502c;
-  text-wrap: nowrap;
 }
 .mweb-lark section ul > li::marker {
   content: none;

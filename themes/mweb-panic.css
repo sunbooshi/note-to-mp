@@ -43,13 +43,29 @@
 .mweb-panic > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-panic p, .mweb-panic pre, .mweb-panic dl, .mweb-panic form, .mweb-panic details, .mweb-panic dl, .mweb-panic blockquote, .mweb-panic table, .mweb-panic xmp, .mweb-panic plaintext, .mweb-panic listing, .mweb-panic figure {
+.mweb-panic p,
+.mweb-panic pre,
+.mweb-panic dl,
+.mweb-panic form,
+.mweb-panic details,
+.mweb-panic dl,
+.mweb-panic blockquote,
+.mweb-panic table,
+.mweb-panic xmp,
+.mweb-panic plaintext,
+.mweb-panic listing,
+.mweb-panic figure {
   margin: 0.75em 0 0.45em;
 }
 .mweb-panic hr {
   margin: 0.75em auto;
 }
-.mweb-panic h1, .mweb-panic h2, .mweb-panic h3, .mweb-panic h4, .mweb-panic h5, .mweb-panic h6 {
+.mweb-panic h1,
+.mweb-panic h2,
+.mweb-panic h3,
+.mweb-panic h4,
+.mweb-panic h5,
+.mweb-panic h6 {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   margin-left: 0;
@@ -88,7 +104,8 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-panic pre, .mweb-panic pre[class*=language-] {
+.mweb-panic pre,
+.mweb-panic pre[class*=language-] {
   padding: 0;
   border: 0;
 }
@@ -155,16 +172,30 @@
 .mweb-panic a img {
   border: none;
 }
-.mweb-panic b, .mweb-panic strong {
+.mweb-panic b,
+.mweb-panic strong {
   font-weight: bold;
 }
-.mweb-panic i, .mweb-panic cite, .mweb-panic em, .mweb-panic var, .mweb-panic address, .mweb-panic dfn {
+.mweb-panic i,
+.mweb-panic cite,
+.mweb-panic em,
+.mweb-panic var,
+.mweb-panic address,
+.mweb-panic dfn {
   font-style: italic;
 }
-.mweb-panic del, .mweb-panic s {
+.mweb-panic del,
+.mweb-panic s {
   color: rgb(176, 176, 176);
 }
-.mweb-panic pre, .mweb-panic xmp, .mweb-panic plaintext, .mweb-panic listing, .mweb-panic code, .mweb-panic kbd, .mweb-panic tt, .mweb-panic samp {
+.mweb-panic pre,
+.mweb-panic xmp,
+.mweb-panic plaintext,
+.mweb-panic listing,
+.mweb-panic code,
+.mweb-panic kbd,
+.mweb-panic tt,
+.mweb-panic samp {
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 .mweb-panic mark {
@@ -185,12 +216,15 @@
   border: 1px;
   border-spacing: 0;
 }
-.mweb-panic th, .mweb-panic td {
+.mweb-panic th,
+.mweb-panic td {
   padding: 0.7em 1em;
   font-size: 0.9em;
   border: 1px solid rgb(45, 69, 98);
 }
-.mweb-panic caption, .mweb-panic th, .mweb-panic td {
+.mweb-panic caption,
+.mweb-panic th,
+.mweb-panic td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
@@ -212,24 +246,24 @@
   display: inline;
   color: rgb(246, 247, 238);
 }
-.mweb-panic pre code {
-  display: block;
-  padding: 0.9em;
-  font-size: 0.9em;
-  line-height: 1.6em;
-  overflow-x: auto;
-  text-wrap: nowrap;
-}
 .mweb-panic .code-section {
   display: flex;
-  overflow: auto;
   border: solid 1px rgb(45, 69, 98);
   background-color: rgb(23, 33, 52);
 }
 .mweb-panic section pre {
   margin: 0;
+  overflow-x: auto;
+}
+.mweb-panic section code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  text-wrap: nowrap;
 }
 .mweb-panic section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 0.9em 0 0.9em 0.9em;
@@ -242,6 +276,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.6em;
   font-size: 0.9em;
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;

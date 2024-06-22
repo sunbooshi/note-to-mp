@@ -43,13 +43,29 @@
 .mweb-olive-dunk > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-olive-dunk p, .mweb-olive-dunk pre, .mweb-olive-dunk dl, .mweb-olive-dunk form, .mweb-olive-dunk details, .mweb-olive-dunk dl, .mweb-olive-dunk blockquote, .mweb-olive-dunk table, .mweb-olive-dunk xmp, .mweb-olive-dunk plaintext, .mweb-olive-dunk listing, .mweb-olive-dunk figure {
+.mweb-olive-dunk p,
+.mweb-olive-dunk pre,
+.mweb-olive-dunk dl,
+.mweb-olive-dunk form,
+.mweb-olive-dunk details,
+.mweb-olive-dunk dl,
+.mweb-olive-dunk blockquote,
+.mweb-olive-dunk table,
+.mweb-olive-dunk xmp,
+.mweb-olive-dunk plaintext,
+.mweb-olive-dunk listing,
+.mweb-olive-dunk figure {
   margin: 0.75em 0 0.45em;
 }
 .mweb-olive-dunk hr {
   margin: 0.75em auto;
 }
-.mweb-olive-dunk h1, .mweb-olive-dunk h2, .mweb-olive-dunk h3, .mweb-olive-dunk h4, .mweb-olive-dunk h5, .mweb-olive-dunk h6 {
+.mweb-olive-dunk h1,
+.mweb-olive-dunk h2,
+.mweb-olive-dunk h3,
+.mweb-olive-dunk h4,
+.mweb-olive-dunk h5,
+.mweb-olive-dunk h6 {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   margin-left: 0;
@@ -88,7 +104,8 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-olive-dunk pre, .mweb-olive-dunk pre[class*=language-] {
+.mweb-olive-dunk pre,
+.mweb-olive-dunk pre[class*=language-] {
   padding: 0;
   border: 0;
 }
@@ -155,16 +172,30 @@
 .mweb-olive-dunk a img {
   border: none;
 }
-.mweb-olive-dunk b, .mweb-olive-dunk strong {
+.mweb-olive-dunk b,
+.mweb-olive-dunk strong {
   font-weight: bold;
 }
-.mweb-olive-dunk i, .mweb-olive-dunk cite, .mweb-olive-dunk em, .mweb-olive-dunk var, .mweb-olive-dunk address, .mweb-olive-dunk dfn {
+.mweb-olive-dunk i,
+.mweb-olive-dunk cite,
+.mweb-olive-dunk em,
+.mweb-olive-dunk var,
+.mweb-olive-dunk address,
+.mweb-olive-dunk dfn {
   font-style: italic;
 }
-.mweb-olive-dunk del, .mweb-olive-dunk s {
+.mweb-olive-dunk del,
+.mweb-olive-dunk s {
   color: rgb(126, 150, 143);
 }
-.mweb-olive-dunk pre, .mweb-olive-dunk xmp, .mweb-olive-dunk plaintext, .mweb-olive-dunk listing, .mweb-olive-dunk code, .mweb-olive-dunk kbd, .mweb-olive-dunk tt, .mweb-olive-dunk samp {
+.mweb-olive-dunk pre,
+.mweb-olive-dunk xmp,
+.mweb-olive-dunk plaintext,
+.mweb-olive-dunk listing,
+.mweb-olive-dunk code,
+.mweb-olive-dunk kbd,
+.mweb-olive-dunk tt,
+.mweb-olive-dunk samp {
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 .mweb-olive-dunk mark {
@@ -185,12 +216,15 @@
   border: 1px;
   border-spacing: 0;
 }
-.mweb-olive-dunk th, .mweb-olive-dunk td {
+.mweb-olive-dunk th,
+.mweb-olive-dunk td {
   padding: 0.7em 1em;
   font-size: 0.9em;
   border: 1px solid rgb(221, 219, 214);
 }
-.mweb-olive-dunk caption, .mweb-olive-dunk th, .mweb-olive-dunk td {
+.mweb-olive-dunk caption,
+.mweb-olive-dunk th,
+.mweb-olive-dunk td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
@@ -212,24 +246,24 @@
   display: inline;
   color: rgb(89, 88, 82);
 }
-.mweb-olive-dunk pre code {
-  display: block;
-  padding: 0.9em;
-  font-size: 0.9em;
-  line-height: 1.6em;
-  overflow-x: auto;
-  text-wrap: nowrap;
-}
 .mweb-olive-dunk .code-section {
   display: flex;
-  overflow: auto;
   border: solid 1px rgb(221, 219, 214);
   background-color: rgb(254, 254, 248);
 }
 .mweb-olive-dunk section pre {
   margin: 0;
+  overflow-x: auto;
+}
+.mweb-olive-dunk section code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  text-wrap: nowrap;
 }
 .mweb-olive-dunk section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 0.9em 0 0.9em 0.9em;
@@ -242,6 +276,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.6em;
   font-size: 0.9em;
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;

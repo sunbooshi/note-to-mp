@@ -153,7 +153,6 @@
 }
 .mweb-smartblue .code-section {
   display: flex;
-  overflow: auto;
   background: #f8f8f8;
 }
 .mweb-smartblue section pre {
@@ -171,6 +170,7 @@
   text-wrap: nowrap;
 }
 .mweb-smartblue section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 1em 0 1em 1em;

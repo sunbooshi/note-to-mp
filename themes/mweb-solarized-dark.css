@@ -43,13 +43,29 @@
 .mweb-solarized-dark > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-solarized-dark p, .mweb-solarized-dark pre, .mweb-solarized-dark dl, .mweb-solarized-dark form, .mweb-solarized-dark details, .mweb-solarized-dark dl, .mweb-solarized-dark blockquote, .mweb-solarized-dark table, .mweb-solarized-dark xmp, .mweb-solarized-dark plaintext, .mweb-solarized-dark listing, .mweb-solarized-dark figure {
+.mweb-solarized-dark p,
+.mweb-solarized-dark pre,
+.mweb-solarized-dark dl,
+.mweb-solarized-dark form,
+.mweb-solarized-dark details,
+.mweb-solarized-dark dl,
+.mweb-solarized-dark blockquote,
+.mweb-solarized-dark table,
+.mweb-solarized-dark xmp,
+.mweb-solarized-dark plaintext,
+.mweb-solarized-dark listing,
+.mweb-solarized-dark figure {
   margin: 0.75em 0 0.45em;
 }
 .mweb-solarized-dark hr {
   margin: 0.75em auto;
 }
-.mweb-solarized-dark h1, .mweb-solarized-dark h2, .mweb-solarized-dark h3, .mweb-solarized-dark h4, .mweb-solarized-dark h5, .mweb-solarized-dark h6 {
+.mweb-solarized-dark h1,
+.mweb-solarized-dark h2,
+.mweb-solarized-dark h3,
+.mweb-solarized-dark h4,
+.mweb-solarized-dark h5,
+.mweb-solarized-dark h6 {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   margin-left: 0;
@@ -88,7 +104,8 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-solarized-dark pre, .mweb-solarized-dark pre[class*=language-] {
+.mweb-solarized-dark pre,
+.mweb-solarized-dark pre[class*=language-] {
   padding: 0;
   border: 0;
 }
@@ -155,16 +172,30 @@
 .mweb-solarized-dark a img {
   border: none;
 }
-.mweb-solarized-dark b, .mweb-solarized-dark strong {
+.mweb-solarized-dark b,
+.mweb-solarized-dark strong {
   font-weight: bold;
 }
-.mweb-solarized-dark i, .mweb-solarized-dark cite, .mweb-solarized-dark em, .mweb-solarized-dark var, .mweb-solarized-dark address, .mweb-solarized-dark dfn {
+.mweb-solarized-dark i,
+.mweb-solarized-dark cite,
+.mweb-solarized-dark em,
+.mweb-solarized-dark var,
+.mweb-solarized-dark address,
+.mweb-solarized-dark dfn {
   font-style: italic;
 }
-.mweb-solarized-dark del, .mweb-solarized-dark s {
+.mweb-solarized-dark del,
+.mweb-solarized-dark s {
   color: rgb(106, 134, 144);
 }
-.mweb-solarized-dark pre, .mweb-solarized-dark xmp, .mweb-solarized-dark plaintext, .mweb-solarized-dark listing, .mweb-solarized-dark code, .mweb-solarized-dark kbd, .mweb-solarized-dark tt, .mweb-solarized-dark samp {
+.mweb-solarized-dark pre,
+.mweb-solarized-dark xmp,
+.mweb-solarized-dark plaintext,
+.mweb-solarized-dark listing,
+.mweb-solarized-dark code,
+.mweb-solarized-dark kbd,
+.mweb-solarized-dark tt,
+.mweb-solarized-dark samp {
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 .mweb-solarized-dark mark {
@@ -185,12 +216,15 @@
   border: 1px;
   border-spacing: 0;
 }
-.mweb-solarized-dark th, .mweb-solarized-dark td {
+.mweb-solarized-dark th,
+.mweb-solarized-dark td {
   padding: 0.7em 1em;
   font-size: 0.9em;
   border: 1px solid rgb(3, 44, 54);
 }
-.mweb-solarized-dark caption, .mweb-solarized-dark th, .mweb-solarized-dark td {
+.mweb-solarized-dark caption,
+.mweb-solarized-dark th,
+.mweb-solarized-dark td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
@@ -212,24 +246,24 @@
   display: inline;
   color: rgb(148, 162, 162);
 }
-.mweb-solarized-dark pre code {
-  display: block;
-  padding: 0.9em;
-  font-size: 0.9em;
-  line-height: 1.6em;
-  overflow-x: auto;
-  text-wrap: nowrap;
-}
 .mweb-solarized-dark .code-section {
   display: flex;
-  overflow: auto;
   border: solid 1px rgb(3, 44, 54);
   background-color: rgb(6, 33, 40);
 }
 .mweb-solarized-dark section pre {
   margin: 0;
+  overflow-x: auto;
+}
+.mweb-solarized-dark section code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  text-wrap: nowrap;
 }
 .mweb-solarized-dark section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 0.9em 0 0.9em 0.9em;
@@ -242,6 +276,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.6em;
   font-size: 0.9em;
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;

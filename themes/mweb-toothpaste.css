@@ -43,13 +43,29 @@
 .mweb-toothpaste > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-toothpaste p, .mweb-toothpaste pre, .mweb-toothpaste dl, .mweb-toothpaste form, .mweb-toothpaste details, .mweb-toothpaste dl, .mweb-toothpaste blockquote, .mweb-toothpaste table, .mweb-toothpaste xmp, .mweb-toothpaste plaintext, .mweb-toothpaste listing, .mweb-toothpaste figure {
+.mweb-toothpaste p,
+.mweb-toothpaste pre,
+.mweb-toothpaste dl,
+.mweb-toothpaste form,
+.mweb-toothpaste details,
+.mweb-toothpaste dl,
+.mweb-toothpaste blockquote,
+.mweb-toothpaste table,
+.mweb-toothpaste xmp,
+.mweb-toothpaste plaintext,
+.mweb-toothpaste listing,
+.mweb-toothpaste figure {
   margin: 0.75em 0 0.45em;
 }
 .mweb-toothpaste hr {
   margin: 0.75em auto;
 }
-.mweb-toothpaste h1, .mweb-toothpaste h2, .mweb-toothpaste h3, .mweb-toothpaste h4, .mweb-toothpaste h5, .mweb-toothpaste h6 {
+.mweb-toothpaste h1,
+.mweb-toothpaste h2,
+.mweb-toothpaste h3,
+.mweb-toothpaste h4,
+.mweb-toothpaste h5,
+.mweb-toothpaste h6 {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   margin-left: 0;
@@ -88,7 +104,8 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-toothpaste pre, .mweb-toothpaste pre[class*=language-] {
+.mweb-toothpaste pre,
+.mweb-toothpaste pre[class*=language-] {
   padding: 0;
   border: 0;
 }
@@ -155,16 +172,30 @@
 .mweb-toothpaste a img {
   border: none;
 }
-.mweb-toothpaste b, .mweb-toothpaste strong {
+.mweb-toothpaste b,
+.mweb-toothpaste strong {
   font-weight: bold;
 }
-.mweb-toothpaste i, .mweb-toothpaste cite, .mweb-toothpaste em, .mweb-toothpaste var, .mweb-toothpaste address, .mweb-toothpaste dfn {
+.mweb-toothpaste i,
+.mweb-toothpaste cite,
+.mweb-toothpaste em,
+.mweb-toothpaste var,
+.mweb-toothpaste address,
+.mweb-toothpaste dfn {
   font-style: italic;
 }
-.mweb-toothpaste del, .mweb-toothpaste s {
+.mweb-toothpaste del,
+.mweb-toothpaste s {
   color: rgb(191, 191, 191);
 }
-.mweb-toothpaste pre, .mweb-toothpaste xmp, .mweb-toothpaste plaintext, .mweb-toothpaste listing, .mweb-toothpaste code, .mweb-toothpaste kbd, .mweb-toothpaste tt, .mweb-toothpaste samp {
+.mweb-toothpaste pre,
+.mweb-toothpaste xmp,
+.mweb-toothpaste plaintext,
+.mweb-toothpaste listing,
+.mweb-toothpaste code,
+.mweb-toothpaste kbd,
+.mweb-toothpaste tt,
+.mweb-toothpaste samp {
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 .mweb-toothpaste mark {
@@ -185,12 +216,15 @@
   border: 1px;
   border-spacing: 0;
 }
-.mweb-toothpaste th, .mweb-toothpaste td {
+.mweb-toothpaste th,
+.mweb-toothpaste td {
   padding: 0.7em 1em;
   font-size: 0.9em;
   border: 1px solid rgb(15, 21, 23);
 }
-.mweb-toothpaste caption, .mweb-toothpaste th, .mweb-toothpaste td {
+.mweb-toothpaste caption,
+.mweb-toothpaste th,
+.mweb-toothpaste td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
@@ -212,24 +246,24 @@
   display: inline;
   color: rgb(168, 176, 181);
 }
-.mweb-toothpaste pre code {
-  display: block;
-  padding: 0.9em;
-  font-size: 0.9em;
-  line-height: 1.6em;
-  overflow-x: auto;
-  text-wrap: nowrap;
-}
 .mweb-toothpaste .code-section {
   display: flex;
-  overflow: auto;
   border: solid 1px rgb(15, 21, 23);
   background-color: rgb(18, 24, 27);
 }
 .mweb-toothpaste section pre {
   margin: 0;
+  overflow-x: auto;
+}
+.mweb-toothpaste section code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  text-wrap: nowrap;
 }
 .mweb-toothpaste section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 0.9em 0 0.9em 0.9em;
@@ -242,6 +276,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.6em;
   font-size: 0.9em;
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;

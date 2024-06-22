@@ -299,6 +299,7 @@ Code
 }
 
 .obsidian-light section ul {
+    flex-shrink: 0;
     counter-reset: line;
     margin: 0;
     padding: 0.875em 0 0.875em 0.875em;
@@ -318,6 +319,7 @@ Code
     padding: 0;
     list-style-type: none;
     color: rgba(0, 0, 0, 0.25);
+    text-wrap: nowrap;
 }
 
 .obsidian-light pre {

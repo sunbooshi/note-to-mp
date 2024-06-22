@@ -43,13 +43,29 @@
 .mweb-d-boring > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-d-boring p, .mweb-d-boring pre, .mweb-d-boring dl, .mweb-d-boring form, .mweb-d-boring details, .mweb-d-boring dl, .mweb-d-boring blockquote, .mweb-d-boring table, .mweb-d-boring xmp, .mweb-d-boring plaintext, .mweb-d-boring listing, .mweb-d-boring figure {
+.mweb-d-boring p,
+.mweb-d-boring pre,
+.mweb-d-boring dl,
+.mweb-d-boring form,
+.mweb-d-boring details,
+.mweb-d-boring dl,
+.mweb-d-boring blockquote,
+.mweb-d-boring table,
+.mweb-d-boring xmp,
+.mweb-d-boring plaintext,
+.mweb-d-boring listing,
+.mweb-d-boring figure {
   margin: 0.75em 0 0.45em;
 }
 .mweb-d-boring hr {
   margin: 0.75em auto;
 }
-.mweb-d-boring h1, .mweb-d-boring h2, .mweb-d-boring h3, .mweb-d-boring h4, .mweb-d-boring h5, .mweb-d-boring h6 {
+.mweb-d-boring h1,
+.mweb-d-boring h2,
+.mweb-d-boring h3,
+.mweb-d-boring h4,
+.mweb-d-boring h5,
+.mweb-d-boring h6 {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   margin-left: 0;
@@ -88,7 +104,8 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-d-boring pre, .mweb-d-boring pre[class*=language-] {
+.mweb-d-boring pre,
+.mweb-d-boring pre[class*=language-] {
   padding: 0;
   border: 0;
 }
@@ -155,16 +172,30 @@
 .mweb-d-boring a img {
   border: none;
 }
-.mweb-d-boring b, .mweb-d-boring strong {
+.mweb-d-boring b,
+.mweb-d-boring strong {
   font-weight: bold;
 }
-.mweb-d-boring i, .mweb-d-boring cite, .mweb-d-boring em, .mweb-d-boring var, .mweb-d-boring address, .mweb-d-boring dfn {
+.mweb-d-boring i,
+.mweb-d-boring cite,
+.mweb-d-boring em,
+.mweb-d-boring var,
+.mweb-d-boring address,
+.mweb-d-boring dfn {
   font-style: italic;
 }
-.mweb-d-boring del, .mweb-d-boring s {
+.mweb-d-boring del,
+.mweb-d-boring s {
   color: rgb(128, 126, 128);
 }
-.mweb-d-boring pre, .mweb-d-boring xmp, .mweb-d-boring plaintext, .mweb-d-boring listing, .mweb-d-boring code, .mweb-d-boring kbd, .mweb-d-boring tt, .mweb-d-boring samp {
+.mweb-d-boring pre,
+.mweb-d-boring xmp,
+.mweb-d-boring plaintext,
+.mweb-d-boring listing,
+.mweb-d-boring code,
+.mweb-d-boring kbd,
+.mweb-d-boring tt,
+.mweb-d-boring samp {
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 .mweb-d-boring mark {
@@ -185,12 +216,15 @@
   border: 1px;
   border-spacing: 0;
 }
-.mweb-d-boring th, .mweb-d-boring td {
+.mweb-d-boring th,
+.mweb-d-boring td {
   padding: 0.7em 1em;
   font-size: 0.9em;
   border: 1px solid rgb(199, 199, 199);
 }
-.mweb-d-boring caption, .mweb-d-boring th, .mweb-d-boring td {
+.mweb-d-boring caption,
+.mweb-d-boring th,
+.mweb-d-boring td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
@@ -212,24 +246,24 @@
   display: inline;
   color: rgb(38, 37, 38);
 }
-.mweb-d-boring pre code {
-  display: block;
-  padding: 0.9em;
-  font-size: 0.9em;
-  line-height: 1.6em;
-  overflow-x: auto;
-  text-wrap: nowrap;
-}
 .mweb-d-boring .code-section {
   display: flex;
-  overflow: auto;
   border: solid 1px rgb(199, 199, 199);
   background-color: rgb(253, 253, 253);
 }
 .mweb-d-boring section pre {
   margin: 0;
+  overflow-x: auto;
+}
+.mweb-d-boring section code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  text-wrap: nowrap;
 }
 .mweb-d-boring section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 0.9em 0 0.9em 0.9em;
@@ -242,6 +276,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.6em;
   font-size: 0.9em;
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;

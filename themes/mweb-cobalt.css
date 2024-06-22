@@ -43,13 +43,29 @@
 .mweb-cobalt > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-cobalt p, .mweb-cobalt pre, .mweb-cobalt dl, .mweb-cobalt form, .mweb-cobalt details, .mweb-cobalt dl, .mweb-cobalt blockquote, .mweb-cobalt table, .mweb-cobalt xmp, .mweb-cobalt plaintext, .mweb-cobalt listing, .mweb-cobalt figure {
+.mweb-cobalt p,
+.mweb-cobalt pre,
+.mweb-cobalt dl,
+.mweb-cobalt form,
+.mweb-cobalt details,
+.mweb-cobalt dl,
+.mweb-cobalt blockquote,
+.mweb-cobalt table,
+.mweb-cobalt xmp,
+.mweb-cobalt plaintext,
+.mweb-cobalt listing,
+.mweb-cobalt figure {
   margin: 0.75em 0 0.45em;
 }
 .mweb-cobalt hr {
   margin: 0.75em auto;
 }
-.mweb-cobalt h1, .mweb-cobalt h2, .mweb-cobalt h3, .mweb-cobalt h4, .mweb-cobalt h5, .mweb-cobalt h6 {
+.mweb-cobalt h1,
+.mweb-cobalt h2,
+.mweb-cobalt h3,
+.mweb-cobalt h4,
+.mweb-cobalt h5,
+.mweb-cobalt h6 {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   margin-left: 0;
@@ -88,7 +104,8 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-cobalt pre, .mweb-cobalt pre[class*=language-] {
+.mweb-cobalt pre,
+.mweb-cobalt pre[class*=language-] {
   padding: 0;
   border: 0;
 }
@@ -155,16 +172,30 @@
 .mweb-cobalt a img {
   border: none;
 }
-.mweb-cobalt b, .mweb-cobalt strong {
+.mweb-cobalt b,
+.mweb-cobalt strong {
   font-weight: bold;
 }
-.mweb-cobalt i, .mweb-cobalt cite, .mweb-cobalt em, .mweb-cobalt var, .mweb-cobalt address, .mweb-cobalt dfn {
+.mweb-cobalt i,
+.mweb-cobalt cite,
+.mweb-cobalt em,
+.mweb-cobalt var,
+.mweb-cobalt address,
+.mweb-cobalt dfn {
   font-style: italic;
 }
-.mweb-cobalt del, .mweb-cobalt s {
+.mweb-cobalt del,
+.mweb-cobalt s {
   color: rgb(172, 191, 195);
 }
-.mweb-cobalt pre, .mweb-cobalt xmp, .mweb-cobalt plaintext, .mweb-cobalt listing, .mweb-cobalt code, .mweb-cobalt kbd, .mweb-cobalt tt, .mweb-cobalt samp {
+.mweb-cobalt pre,
+.mweb-cobalt xmp,
+.mweb-cobalt plaintext,
+.mweb-cobalt listing,
+.mweb-cobalt code,
+.mweb-cobalt kbd,
+.mweb-cobalt tt,
+.mweb-cobalt samp {
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 .mweb-cobalt mark {
@@ -185,12 +216,15 @@
   border: 1px;
   border-spacing: 0;
 }
-.mweb-cobalt th, .mweb-cobalt td {
+.mweb-cobalt th,
+.mweb-cobalt td {
   padding: 0.7em 1em;
   font-size: 0.9em;
   border: 1px solid rgb(16, 36, 50);
 }
-.mweb-cobalt caption, .mweb-cobalt th, .mweb-cobalt td {
+.mweb-cobalt caption,
+.mweb-cobalt th,
+.mweb-cobalt td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
@@ -212,24 +246,24 @@
   display: inline;
   color: rgb(225, 239, 243);
 }
-.mweb-cobalt pre code {
-  display: block;
-  padding: 0.9em;
-  font-size: 0.9em;
-  line-height: 1.6em;
-  overflow-x: auto;
-  text-wrap: nowrap;
-}
 .mweb-cobalt .code-section {
   display: flex;
-  overflow: auto;
   border: solid 1px rgb(16, 36, 50);
   background-color: rgb(21, 45, 62);
 }
 .mweb-cobalt section pre {
   margin: 0;
+  overflow-x: auto;
+}
+.mweb-cobalt section code {
+  display: block;
+  padding: 0.9em;
+  font-size: 0.9em;
+  line-height: 1.6em;
+  text-wrap: nowrap;
 }
 .mweb-cobalt section ul {
+  flex-shrink: 0;
   counter-reset: line;
   margin: 0;
   padding: 0.9em 0 0.9em 0.9em;
@@ -242,6 +276,7 @@
   padding: 0;
   display: list-item;
   text-align: right;
+  text-wrap: nowrap;
   line-height: 1.6em;
   font-size: 0.9em;
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
