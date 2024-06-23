@@ -1,24 +1,47 @@
 /* =========================================================== */
 /* UI 样式                                                      */
 /* =========================================================== */
-.preview-toolbar {
+.note-preview {
+  min-height: 100%;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
   display: flex;
-  flex-direction: row;
-  min-height: 60px;
-  padding-left: 20px;
-  align-items: center;
+  flex-direction: column;
+}
+
+.render-div {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.preview-toolbar {
+  position: relative;
+  min-height: 100px;
   border-bottom: #e4e4e4 1px solid;
-  flex-wrap: wrap;
   background-color: var(--background-primary);
 }
 
+.toolbar-line {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 10px 20px;
+}
+
 .copy-button {
-  width: 60px;
+  margin-right: 20px;
 }
 
 .refresh-button {
-  width: 60px;
-  margin: 0px 20px;
+  /* width: 60px; */
+  margin-right: 20px;
+}
+
+.upload-input {
+  margin-left: 20px;
+  visibility: hidden;
 }
 
 .style-label {
@@ -30,66 +53,23 @@
   width: 140px;
 }
 
-.note-preview {
-  min-height: 100%;
+.msg-view {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  background-color: #fff;
-}
-
-section .note-callout {
-  border: none;
-  padding: 1em 1em 1em 1.5em;
+  height: 100%;
+  background-color: var(--background-primary);
   display: flex;
   flex-direction: column;
-  margin: 1em 0;
-  border-radius: 4px;
-}
-
-section .note-callout-title-wrap {
-  display: flex;
-  flex-direction: row;
+  justify-content: center;
   align-items: center;
-  font-size: 1em;
-  font-weight: 600;
+  font-size: 18px;
+  z-index: 9999;
+  display: none;
 }
 
-section .note-callout-title {
-  margin-left: 0.25em;
+.msg-title {
+  margin-bottom: 20px;
 }
 
-section .note-callout-content {
-  color: rgb(34,34,34);
-}
-
-/* note info todo */
-section .note-callout-note { 
-  color: rgb(8, 109, 221);
-  background-color: rgba(8, 109, 221, 0.1);
-}
-/* abstract tip hint */
-section .note-callout-abstract {
-  color: rgb(0, 191, 188);
-  background-color: rgba(0, 191, 188, 0.1);
-}
-section .note-callout-success {
-  color: rgb(8, 185, 78);
-  background-color: rgba(8, 185, 78, 0.1);
-}
-/* question  help, faq, warning, caution, attention */
-section .note-callout-question {
-  color: rgb(236, 117, 0);
-  background-color: rgba(236, 117, 0, 0.1);
-}
-/* failure, fail, missing, danger, error, bug */
-section .note-callout-failure {
-  color: rgb(233, 49, 71);
-  background-color: rgba(233, 49, 71, 0.1);
-}
-section .note-callout-example {
-  color: rgb(120, 82, 238);
-  background-color: rgba(120, 82, 238, 0.1);
-}
-section .note-callout-quote {
-  color: rgb(158, 158, 158);
-  background-color: rgba(158, 158, 158, 0.1);
-}

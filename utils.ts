@@ -1,7 +1,9 @@
 import { Token, Tokens, Marked, options, Lexer} from "marked";
 import { markedHighlight } from "marked-highlight";
+import { App } from "obsidian";
 import hljs from "highlight.js";
 import GetCallout from "callouts";
+import { LocalImageExtension } from "img-extension";
 
 
 export interface ParseOptions {
@@ -132,13 +134,17 @@ function walkTokens(token:Token) {
 }
 
 function footnoteLinks() {
+	if (AllLinks.length == 0) {
+	    return '';
+	}
+	
 	const links = AllLinks.map((href, i) => {
 		return `<li>${href}&nbsp;↩</li>`;
 	});
-	return `<seciton class="footnotes"><hr><ol>${links.join('\n')}</ol></section>`;
+	return `<seciton class="footnotes"><hr><ol>${links.join('')}</ol></section>`;
 }
 
-export async function markedParse(content:string, op:ParseOptions)  {
+export async function markedParse(content:string, op:ParseOptions, app:App)  {
 	parseOptions.lineNumber = op.lineNumber;
 	parseOptions.linkStyle = op.linkStyle;
 
@@ -179,11 +185,85 @@ export async function markedParse(content:string, op:ParseOptions)  {
 			renderer(token) {
 				return calloutRender.call(this, token as Tokens.Blockquote);
 			}, 
-		}],
-	});
+		},
+		LocalImageExtension(app)
+	]});
+
+	const renderer = {
+		heading(text: string, level: number, raw: string): string {
+			// ignore IDs
+			return `<h${level}>${text}</h${level}>`;
+		},
+		hr(): string {
+			return '<hr>';
+		},
+		list(body: string, ordered: boolean, start: number | ''): string {
+			const type = ordered ? 'ol' : 'ul';
+			const startatt = (ordered && start !== 1) ? (' start="' + start + '"') : '';
+			return '<' + type + startatt + '>' + body + '</' + type + '>';
+		},
+		listitem(text: string, task: boolean, checked: boolean): string {
+			return `<li>${text}</li>`;
+		}
+	};
+	m.use({renderer});
 	const html = await m.parse(content);
 	if (parseOptions.linkStyle == 'footnote') {
 	    return html + footnoteLinks();
 	}
 	return html;
+}
+
+function getStyleSheet() {
+	for (var i = 0; i < document.styleSheets.length; i++) {
+		var sheet = document.styleSheets[i];
+		if (sheet.title == 'note-to-mp-style') {
+		  return sheet;
+		}
+	}
+}
+
+function applyStyles(element: HTMLElement, styles: CSSStyleDeclaration, computedStyle: CSSStyleDeclaration) {
+	for (let i = 0; i < styles.length; i++) {
+		const propertyName = styles[i];
+		let propertyValue = computedStyle.getPropertyValue(propertyName);
+		if (propertyName == 'width' && styles.getPropertyValue(propertyName) == 'fit-content') {
+			propertyValue = 'fit-content';
+		}
+		if (propertyName.indexOf('margin') >= 0 && styles.getPropertyValue(propertyName).indexOf('auto') >= 0) {
+		    propertyValue = styles.getPropertyValue(propertyName);
+		}
+		element.style.setProperty(propertyName, propertyValue);
+	}
+}
+
+function parseAndApplyStyles(element: HTMLElement, sheet:CSSStyleSheet) {
+	try {
+		const computedStyle = getComputedStyle(element);
+		for (let i = 0; i < sheet.cssRules.length; i++) {
+			const rule = sheet.cssRules[i];
+			if (rule instanceof CSSStyleRule && element.matches(rule.selectorText)) {
+			  	applyStyles(element, rule.style, computedStyle);
+			}
+		}
+	} catch (e) {
+		console.warn("Unable to access stylesheet: " + sheet.href, e);
+	}
+}
+
+function traverse(root: HTMLElement, sheet:CSSStyleSheet) {
+	let element = root.firstElementChild;
+	while (element) {
+	  	traverse(element as HTMLElement, sheet);
+	  	element = element.nextElementSibling;
+	}
+	parseAndApplyStyles(root, sheet);
+}
+
+export async function CSSProcess(content: HTMLElement) {
+	// 获取样式表
+	const style = getStyleSheet();
+	if (style) {
+		traverse(content, style);
+	}
 }
