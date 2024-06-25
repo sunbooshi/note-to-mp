@@ -1,5 +1,4 @@
 import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice } from 'obsidian';
-import { copy } from 'clipboard';
 import { CSSProcess, markedParse, ParseOptions } from 'utils';
 import { PreviewSetting } from 'settings';
 import ThemesManager from 'themes';
