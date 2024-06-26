@@ -1,4 +1,4 @@
-import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice } from 'obsidian';
+import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, sanitizeHTMLToDom } from 'obsidian';
 import { copy } from 'clipboard';
 import { CSSProcess, markedParse, ParseOptions } from './utils';
 import { PreviewSetting } from './settings';
@@ -27,6 +27,7 @@ export class NotePreview extends ItemView {
     container: Element;
     settings: PreviewSetting;
     themeManager: ThemesManager;
+    articleHTML: string;
     title: string;
     currentTheme: string;
     currentHighlight: string;
@@ -91,12 +92,13 @@ export class NotePreview extends ItemView {
             if (md.startsWith('---')) {
                 md = md.replace(FRONT_MATTER_REGEX, '');
             }
-            this.styleEl.innerHTML = this.getCSS();
             const op: ParseOptions = {
                 lineNumber: this.settings.lineNumber,
                 linkStyle: this.settings.linkStyle as 'footnote' | 'inline',
             }
-            this.setArticle(await markedParse(md, op, this.app));
+            this.articleHTML = await markedParse(md, op, this.app);
+            this.setArticle(this.articleHTML);
+            this.updateCss();
         }
         catch (e) {
             console.error(e);
@@ -106,9 +108,17 @@ export class NotePreview extends ItemView {
 
     setArticle(article: string) {
         this.articleDiv.empty();
-        const section = this.articleDiv.createEl('section', { cls: this.settings.defaultStyle });
-        section.id = "article-section";
-        section.innerHTML = article;
+        const html = `<section class="${this.settings.defaultStyle}" id="article-section">${article}</section>`;
+        const doc = sanitizeHTMLToDom(html);
+        if (doc.firstChild) {
+            this.articleDiv.appendChild(doc.firstChild);
+            replaceImages(this.articleDiv);
+        }
+    }
+
+    setStyle(css: string) {
+        this.styleEl.empty();
+        this.styleEl.appendChild(document.createTextNode(css));
     }
 
     getArticleSection() {
@@ -116,10 +126,10 @@ export class NotePreview extends ItemView {
     }
 
     getArticleContent() {
-        const originContent = this.articleDiv.innerHTML;
         CSSProcess(this.articleDiv);
         const content = this.articleDiv.innerHTML;
-        this.articleDiv.innerHTML = originContent;
+        this.setArticle(this.articleHTML);
+        this.updateCss();
         return content;
     }
 
@@ -322,7 +332,7 @@ export class NotePreview extends ItemView {
     }
 
     updateCss() {
-        this.styleEl.innerHTML = this.getCSS();
+        this.setStyle(this.getCSS());
         this.getArticleSection().setAttribute('class', this.currentTheme);
     }
 
@@ -358,7 +368,7 @@ export class NotePreview extends ItemView {
         // 上传图片
         await uploadLocalImage(this.app.vault, token);
         // 替换图片链接
-        this.renderDiv.innerHTML = replaceImages(this.renderDiv.innerHTML);
+        replaceImages(this.articleDiv);
 
         this.copyArticle();
         this.showMsg('图片已上传，并且已复制，请到公众号编辑器粘贴。');
@@ -383,7 +393,7 @@ export class NotePreview extends ItemView {
         //上传图片
         await uploadLocalImage(this.app.vault, token);
         // 替换图片链接
-        this.articleDiv.innerHTML = replaceImages(this.articleDiv.innerHTML);
+        replaceImages(this.articleDiv);
         // 上传封面
         let mediaId = '';
         if (this.useLocalCover.checked) {

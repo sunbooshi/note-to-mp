@@ -322,9 +322,10 @@ Code
     text-wrap: nowrap;
 }
 
-.obsidian-light pre {
+.obsidian-light section pre {
     margin: 0;
     padding: 0;
+    overflow: auto;
 }
 
 .obsidian-light code {

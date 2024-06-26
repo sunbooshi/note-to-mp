@@ -134,13 +134,24 @@ export async function uploadLocalImage(vault: Vault, token: string) {
     }
 }
 
-export function replaceImages(html: string) {
-    let res = html;
-    AllImages.forEach((value, key) => {
-        if (value.url == null) return;
-        res = res.replace(key, value.url);
-    })
-    return res;
+export function replaceImages(root: HTMLElement) {
+    const images = root.getElementsByTagName('img');
+    const keys = AllImages.keys();
+    for (let key of keys) {
+        const value = AllImages.get(key);
+        if (value == null) continue;
+        if (value.url == null) continue;
+        for (let i = 0; i < images.length; i++) {
+            const img = images[i];
+            if (img.src.startsWith('http')) {
+                continue;
+            }
+            if (img.src === key) {
+                img.setAttribute('src', value.url);
+                break;
+            }
+        }
+    }
 }
 
 export async function uploadCover(file: File, token: string) {
