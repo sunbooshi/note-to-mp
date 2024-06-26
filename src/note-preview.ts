@@ -1,11 +1,11 @@
 import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice } from 'obsidian';
 import { copy } from 'clipboard';
-import { CSSProcess, markedParse, ParseOptions } from 'utils';
-import { PreviewSetting } from 'settings';
-import ThemesManager from 'themes';
-import CalloutsCSS from 'callouts-css';
-import { uploadLocalImage, replaceImages, uploadCover } from 'img-extension';
-import { wxGetToken, wxAddDraft, wxBatchGetMaterial } from 'weixin-api';
+import { CSSProcess, markedParse, ParseOptions } from './utils';
+import { PreviewSetting } from './settings';
+import ThemesManager from './themes';
+import CalloutsCSS from './callouts-css';
+import { uploadLocalImage, replaceImages, uploadCover } from './img-extension';
+import { wxGetToken, wxAddDraft, wxBatchGetMaterial } from './weixin-api';
 
 export const VIEW_TYPE_NOTE_PREVIEW = 'note-preview';
 

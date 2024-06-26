@@ -1,5 +1,5 @@
 import { App, DropdownComponent, PluginSettingTab, Setting } from 'obsidian';
-import NoteToMpPlugin from 'main';
+import NoteToMpPlugin from './main';
 
 export class NoteToMpSettingTab extends PluginSettingTab {
 	plugin: NoteToMpPlugin;

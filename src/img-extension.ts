@@ -1,6 +1,6 @@
 import { Token, Tokens, Marked, options, Lexer} from "marked";
 import { App, Vault, request, requestUrl, getBlobArrayBuffer, RequestUrlParam } from "obsidian";
-import { wxUploadImage } from "weixin-api";
+import { wxUploadImage } from "./weixin-api";
 
 declare module 'obsidian' {
     interface Vault {

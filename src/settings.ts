@@ -1,4 +1,4 @@
-import defaultHighlight from 'default-highlight';
+import defaultHighlight from './default-highlight';
 import { App } from 'obsidian';
 
 
