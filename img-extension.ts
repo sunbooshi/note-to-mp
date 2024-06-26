@@ -57,6 +57,7 @@ function getImgPath(path: string, vault: Vault) {
         file = vault.getFileByPath(localPath);
     }
     if (file == null) {
+        console.error('cant read image: ' + path);
         return '';
     }
 
@@ -108,9 +109,7 @@ export function LocalImageExtension(app: App) {
             const basePath = getActiveFileDir(app);
             let imgPath = '';
             if (img.href.startsWith('.')) {
-                console.log('render local image: ' + img.href);
                 imgPath = resolvePath(basePath, img.href);
-                console.log('absolute path: ' + imgPath);
             }
             else {
                 imgPath = img.href;
