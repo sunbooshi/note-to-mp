@@ -1,6 +1,7 @@
 import { Token, Tokens, Marked, options, Lexer} from "marked";
 import { App, Vault, request, requestUrl, getBlobArrayBuffer, RequestUrlParam } from "obsidian";
 import { wxUploadImage } from "weixin-api";
+var path = require('path');
 
 declare module 'obsidian' {
     interface Vault {
@@ -19,6 +20,34 @@ interface ImageInfo {
 }
 
 const AllImages = new Map<string, ImageInfo>();
+
+function resolvePath(basePath: string, relativePath: string): string {
+    const stack = basePath.split("/");
+    const parts = relativePath.split("/");
+  
+    stack.pop(); // Remove the current file name (or empty string)
+
+    for (const part of parts) {
+        if (part === ".") continue;
+        if (part === "..") stack.pop();
+        else stack.push(part);
+    }
+
+    return stack.join("/");
+}
+
+function getActiveFileDir(app: App) {
+    const af = this.app.workspace.getActiveFile();
+    if (af == null) {
+        return '';
+    }
+    const parts = af.path.split('/');
+    parts.pop();
+    if (parts.length == 0) {
+        return '';
+    }
+    return parts.join('/');
+}
 
 function getImgPath(path: string, vault: Vault) {
     const attachmentFolderPath = vault.config.attachmentFolderPath || '';
@@ -77,8 +106,18 @@ export function LocalImageExtension(app: App) {
         },
         renderer(img: Tokens.Image) {
             // 渲染本地图片
-            const imgPath = getImgPath(img.href, app.vault);
-            return `<img src="${imgPath}" alt="${img.text}" />`;
+            const basePath = getActiveFileDir(app);
+            let imgPath = '';
+            if (img.href.startsWith('.')) {
+                console.log('render local image: ' + img.href);
+                imgPath = resolvePath(basePath, img.href);
+                console.log('absolute path: ' + imgPath);
+            }
+            else {
+                imgPath = img.href;
+            }
+            const src = getImgPath(imgPath, app.vault);
+            return `<img src="${src}" alt="${img.text}" />`;
         }
     }
 }
