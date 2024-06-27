@@ -1,7 +1,7 @@
 import { App, PluginManifest, Notice, requestUrl } from "obsidian";
 import * as zip from "@zip.js/zip.js";
-import DefaultTheme from "default-theme";
-import DefaultHighlight from "default-highlight";
+import DefaultTheme from "./default-theme";
+import DefaultHighlight from "./default-highlight";
 
 export interface Theme {
     name: string

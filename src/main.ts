@@ -1,8 +1,8 @@
 import { Plugin, WorkspaceLeaf, App, PluginManifest } from 'obsidian';
-import { NotePreview, VIEW_TYPE_NOTE_PREVIEW } from 'note-preview';
-import { PreviewSetting } from 'settings';
-import { NoteToMpSettingTab } from 'setting-tab';
-import ThemesManager from 'themes';
+import { NotePreview, VIEW_TYPE_NOTE_PREVIEW } from './note-preview';
+import { PreviewSetting } from './settings';
+import { NoteToMpSettingTab } from './setting-tab';
+import ThemesManager from './themes';
 
 
 export default class NoteToMpPlugin extends Plugin {

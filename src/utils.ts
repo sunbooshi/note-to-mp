@@ -2,8 +2,8 @@ import { Token, Tokens, Marked, options, Lexer} from "marked";
 import { markedHighlight } from "marked-highlight";
 import { App } from "obsidian";
 import hljs from "highlight.js";
-import GetCallout from "callouts";
-import { LocalImageExtension } from "img-extension";
+import GetCallout from "./callouts";
+import { LocalImageExtension } from "./img-extension";
 
 
 export interface ParseOptions {

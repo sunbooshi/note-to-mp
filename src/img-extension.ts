@@ -1,6 +1,6 @@
 import { Token, Tokens, Marked, options, Lexer} from "marked";
 import { App, Vault, request, requestUrl, getBlobArrayBuffer, RequestUrlParam } from "obsidian";
-import { wxUploadImage } from "weixin-api";
+import { wxUploadImage } from "./weixin-api";
 
 declare module 'obsidian' {
     interface Vault {
@@ -20,6 +20,34 @@ interface ImageInfo {
 
 const AllImages = new Map<string, ImageInfo>();
 
+function resolvePath(basePath: string, relativePath: string): string {
+    const stack = basePath.split("/");
+    const parts = relativePath.split("/");
+  
+    stack.pop(); // Remove the current file name (or empty string)
+
+    for (const part of parts) {
+        if (part === ".") continue;
+        if (part === "..") stack.pop();
+        else stack.push(part);
+    }
+
+    return stack.join("/");
+}
+
+function getActiveFileDir(app: App) {
+    const af = this.app.workspace.getActiveFile();
+    if (af == null) {
+        return '';
+    }
+    const parts = af.path.split('/');
+    parts.pop();
+    if (parts.length == 0) {
+        return '';
+    }
+    return parts.join('/');
+}
+
 function getImgPath(path: string, vault: Vault) {
     const attachmentFolderPath = vault.config.attachmentFolderPath || '';
     let localPath = path;
@@ -29,6 +57,7 @@ function getImgPath(path: string, vault: Vault) {
         file = vault.getFileByPath(localPath);
     }
     if (file == null) {
+        console.error('cant read image: ' + path);
         return '';
     }
 
@@ -77,8 +106,16 @@ export function LocalImageExtension(app: App) {
         },
         renderer(img: Tokens.Image) {
             // 渲染本地图片
-            const imgPath = getImgPath(img.href, app.vault);
-            return `<img src="${imgPath}" alt="${img.text}" />`;
+            const basePath = getActiveFileDir(app);
+            let imgPath = '';
+            if (img.href.startsWith('.')) {
+                imgPath = resolvePath(basePath, img.href);
+            }
+            else {
+                imgPath = img.href;
+            }
+            const src = getImgPath(imgPath, app.vault);
+            return `<img src="${src}" alt="${img.text}" />`;
         }
     }
 }
@@ -97,13 +134,24 @@ export async function uploadLocalImage(vault: Vault, token: string) {
     }
 }
 
-export function replaceImages(html: string) {
-    let res = html;
-    AllImages.forEach((value, key) => {
-        if (value.url == null) return;
-        res = res.replace(key, value.url);
-    })
-    return res;
+export function replaceImages(root: HTMLElement) {
+    const images = root.getElementsByTagName('img');
+    const keys = AllImages.keys();
+    for (let key of keys) {
+        const value = AllImages.get(key);
+        if (value == null) continue;
+        if (value.url == null) continue;
+        for (let i = 0; i < images.length; i++) {
+            const img = images[i];
+            if (img.src.startsWith('http')) {
+                continue;
+            }
+            if (img.src === key) {
+                img.setAttribute('src', value.url);
+                break;
+            }
+        }
+    }
 }
 
 export async function uploadCover(file: File, token: string) {
