@@ -1,5 +1,5 @@
-import { Token, Tokens, Marked, options, Lexer} from "marked";
-import { App, Vault, request, requestUrl, getBlobArrayBuffer, RequestUrlParam } from "obsidian";
+import { Token, Tokens } from "marked";
+import { App, Vault, Notice } from "obsidian";
 import { wxUploadImage } from "./weixin-api";
 
 declare module 'obsidian' {
@@ -129,8 +129,13 @@ export async function uploadLocalImage(vault: Vault, token: string) {
         const file = vault.getFileByPath(value.filePath);
         if (file == null) continue;
         const fileData = await vault.readBinary(file);
-        const url = await wxUploadImage(new Blob([fileData]), file.name, token);
-        value.url = url.url;
+        const res = await wxUploadImage(new Blob([fileData]), file.name, token);
+        if (res.errcode != 0) {
+            const msg = `上传图片失败: ${res.errcode} ${res.errmsg}`;
+            new Notice(msg);
+            console.error(msg);
+        }
+        value.url = res.url;
     }
 }
 

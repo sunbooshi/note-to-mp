@@ -8,6 +8,7 @@ export class PreviewSetting {
     linkStyle: string;
     lineNumber: boolean;
     authKey: string;
+    wxInfo: any[];
     app: App;
 
     constructor(app: App) {
@@ -17,6 +18,7 @@ export class PreviewSetting {
         this.linkStyle = 'inline'
         this.lineNumber = true;
         this.authKey = '';
+        this.wxInfo = [];
     }
 
     resetStyelAndHighlight() {
@@ -28,7 +30,7 @@ export class PreviewSetting {
         if (!data) {
             return
         }
-        const { defaultStyle, linkStyle, lineNumber, defaultHighlight, authKey } = data;
+        const { defaultStyle, linkStyle, lineNumber, defaultHighlight, authKey, wxInfo } = data;
         if (defaultStyle) {
             this.defaultStyle = defaultStyle;
         }
@@ -44,6 +46,9 @@ export class PreviewSetting {
         if (authKey) {
             this.authKey = authKey;
         }
+        if (wxInfo) {
+            this.wxInfo = wxInfo;
+        }
     }
 
     allSettings() {
@@ -53,6 +58,7 @@ export class PreviewSetting {
             'linkStyle': this.linkStyle,
             'lineNumber': this.lineNumber,
             'authKey': this.authKey,
+            'wxInfo': this.wxInfo,
         }
     }
 }

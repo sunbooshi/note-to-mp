@@ -30,6 +30,7 @@ export class NotePreview extends ItemView {
     title: string;
     currentTheme: string;
     currentHighlight: string;
+    currentAppId: string;
 
     constructor(leaf: WorkspaceLeaf, settings: PreviewSetting, themeManager: ThemesManager) {
         super(leaf);
@@ -179,7 +180,29 @@ export class NotePreview extends ItemView {
         this.toolbar = parent.createDiv({ cls: 'preview-toolbar' });
 
         let lineDiv = this.toolbar.createDiv({ cls: 'toolbar-line' });
+        // 公众号
+        lineDiv.createDiv({ cls: 'style-label' }).innerText = '公众号:';
+        const wxSelect = lineDiv.createEl('select', { cls: 'style-select' })
+        wxSelect.setAttr('style', 'width: 300px');
+        wxSelect.onchange = async () => {
+            this.currentAppId = wxSelect.value;
+        }
+        const defautlOp =wxSelect.createEl('option');
+        defautlOp.value = '';
+        defautlOp.text = '请在设置里配置公众号';
+        for (let i = 0; i < this.settings.wxInfo.length; i++) {
+            const op = wxSelect.createEl('option');
+            const wx = this.settings.wxInfo[i];
+            op.value = wx.appid;
+            op.text = wx.name;
+            if (i== 0) {
+                op.selected = true
+                this.currentAppId = wx.appid;
+            }
+        }
+
         // 复制，刷新，带图片复制，发草稿箱
+        lineDiv = this.toolbar.createDiv({ cls: 'toolbar-line' });
         const copyBtn = lineDiv.createEl('button', { cls: 'copy-button' }, async (button) => {
             button.setText('复制');
         })
@@ -356,14 +379,35 @@ export class NotePreview extends ItemView {
         return '';
     }
 
+    async getToken() {
+        const res = await wxGetToken(this.settings.authKey, this.currentAppId, this.getSecret());
+        if (res.status != 200) {
+            const data = res.json;
+            this.showMsg('获取token失败: ' + data.message);
+            return '';
+        }
+        const token = res.json.token;
+        if (token === '') {
+            this.showMsg('获取token失败');
+        }
+        return token;
+    }
+
     async uploadImages() {
         if (!this.settings.authKey) {
             this.showMsg('请先设置注册码（AuthKey）');
             return;
         }
+        if (this.currentAppId === '') {
+            this.showMsg('请先选择公众号');
+            return;
+        }
         this.showLoading('上传图片中...');
         // 获取token
-        const token = await wxGetToken(this.settings.authKey); 
+        const token = await this.getToken();
+        if (token === '') {
+            return;
+        }
         // 上传图片
         await uploadLocalImage(this.app.vault, token);
         // 替换图片链接
@@ -380,47 +424,67 @@ export class NotePreview extends ItemView {
         })])
     }
 
+    getSecret() {
+        for (const wx of this.settings.wxInfo) {
+            if (wx.appid === this.currentAppId) {
+                return wx.secret.replace('SECRET', '');
+            }
+        }
+        return '';
+    }
+
     async postArticle() {
         if (!this.settings.authKey) {
             this.showMsg('请先设置注册码（AuthKey）');
             return;
         }
-        this.showLoading('上传中...');
-        // 获取token
-        const token = await wxGetToken(this.settings.authKey);
-
-        //上传图片
-        await uploadLocalImage(this.app.vault, token);
-        // 替换图片链接
-        replaceImages(this.articleDiv);
-        // 上传封面
-        let mediaId = '';
-        if (this.useLocalCover.checked) {
-            mediaId = await this.uploadLocalCover(token);
-        }
-        else {
-            mediaId = await this.getDefaultCover(token);
-        }
-
-        if (mediaId === '') {
-            this.showMsg('请先上传图片或者设置默认封面');
+        if (this.currentAppId === '') {
+            this.showMsg('请先选择公众号');
             return;
         }
+        this.showLoading('上传中...');
+        try {
+            // 获取token
+            const token = await this.getToken();
+            if (token === '') {
+                this.showMsg('获取token失败');
+                return;
+            }
+            //上传图片
+            await uploadLocalImage(this.app.vault, token);
+            // 替换图片链接
+            replaceImages(this.articleDiv);
+            // 上传封面
+            let mediaId = '';
+            if (this.useLocalCover.checked) {
+                mediaId = await this.uploadLocalCover(token);
+            }
+            else {
+                mediaId = await this.getDefaultCover(token);
+            }
 
-        const content = this.getArticleContent();
+            if (mediaId === '') {
+                this.showMsg('请先上传图片或者设置默认封面');
+                return;
+            }
 
-        // 创建草稿
-        const draft = await wxAddDraft(token, {
-            title: this.title,
-            content: content,
-            thumb_media_id: mediaId,
-        });
+            const content = this.getArticleContent();
 
-        if (draft.media_id) {
-            this.showMsg('发布成功!');
-        }
-        else {
-            this.showMsg('发布失败!'+draft.errmsg);
+            // 创建草稿
+            const draft = await wxAddDraft(token, {
+                title: this.title,
+                content: content,
+                thumb_media_id: mediaId,
+            });
+
+            if (draft.media_id) {
+                this.showMsg('发布成功!');
+            }
+            else {
+                this.showMsg('发布失败!'+draft.errmsg);
+            }
+        } catch (error) {
+            this.showMsg('发布失败!'+error.message);
         }
     }
 }
