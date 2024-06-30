@@ -8,7 +8,7 @@ export class PreviewSetting {
     linkStyle: string;
     lineNumber: boolean;
     authKey: string;
-    wxInfo: any[];
+    wxInfo: {name:string, appid:string, secret:string}[];
     app: App;
 
     constructor(app: App) {

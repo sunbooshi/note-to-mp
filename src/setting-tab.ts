@@ -1,6 +1,6 @@
 import { App, TextAreaComponent, PluginSettingTab, Setting, Notice } from 'obsidian';
 import NoteToMpPlugin from './main';
-import { wxEncrypt } from './weixin-api';
+import { wxGetToken,wxEncrypt } from './weixin-api';
 
 export class NoteToMpSettingTab extends PluginSettingTab {
 	plugin: NoteToMpPlugin;
@@ -31,6 +31,38 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 		return res;
 	}
 
+	async testWXInfo() {
+		const authKey = this.plugin.settings.authKey;
+		if (authKey.length == 0) {
+		    new Notice('请先设置authKey');
+		    return;
+		}
+	    const wxInfo = this.plugin.settings.wxInfo;
+		if (wxInfo.length == 0) {
+		    new Notice('请先设置公众号信息');
+			return;
+		}
+		try {
+			for (let wx of wxInfo) {
+				const res = await wxGetToken(authKey, wx.appid, wx.secret.replace('SECRET', ''));
+				if (res.status != 200) {
+					const data = res.json;
+					new Notice(`${wx.name}|${wx.appid} 测试失败：${data.message}`);
+					break
+				}
+
+				const data = res.json;
+				if (data.token.length == 0) {
+					new Notice(`${wx.name}|${wx.appid} 测试失败`);
+					break
+				}
+				new Notice(`${wx.name} 测试通过`);
+			}
+		} catch (error) {
+			new Notice(`测试失败：${error}`);
+		}
+	}
+
 	async encrypt() {
 	    if (this.wxInfo.length == 0) {
 			new Notice('请输入内容');
@@ -54,10 +86,6 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 				new Notice('格式错误，请检查');
 				return false;
 			}
-			const wx = new Map<string, string>();
-			wx.set('name', items[0])
-			wx.set('appid', items[1])
-			wx.set('secret', items[2])
 			const name = items[0];
 			const appid = items[1];
 			const secret = items[2];
@@ -89,6 +117,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			return true;
 
 		} catch (error) {
+			new Notice(`加密失败：${error}`);
 			console.error(error);	
 		}
 
@@ -226,13 +255,25 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 					button.setButtonText('加密公众号信息');
 				}
 				else {
+					button.setButtonText('加密中...');
 					if (await this.encrypt()) {
 						isClear = true;
 						isRealClear = false;
 						button.setButtonText('清空公众号信息');
 					}
+					else {
+						button.setButtonText('加密公众号信息');
+					}
 				}
 			});
+		})
+		.addButton(button => {
+			button.setButtonText('测试公众号');
+			button.onClick(async () => {
+				button.setButtonText('测试中...');
+				await this.testWXInfo();
+				button.setButtonText('测试公众号');
+			})
 		})
 	}
 }

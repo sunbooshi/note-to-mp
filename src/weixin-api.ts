@@ -18,11 +18,11 @@ export async function wxGetToken(authkey:string, appid:string, secret:string) {
     return res;
 }
 
-export async function wxEncrypt(key:string, wechat:any[]) {
+export async function wxEncrypt(authkey:string, wechat:any[]) {
     const url = 'https://obplugin.sunboshi.tech/wx/encrypt';
     const body =  JSON.stringify({
-        authkey: key,
-        wechat: [...wechat]
+        authkey,
+        wechat
     });
     const res = await requestUrl({
         url: url,
