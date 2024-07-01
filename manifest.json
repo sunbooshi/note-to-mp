@@ -5,6 +5,6 @@
 	"minAppVersion": "1.4.5",
 	"description": "Send notes to WeChat MP drafts, or copy notes to WeChat MP editor, perfect preservation of note styles, support code highlighting, line numbers in code, and support local image uploads.",
 	"author": "Sun Booshi",
-	"authorUrl": "https://sun.booshi.tech",
+	"authorUrl": "https://sunboshi.tech",
 	"isDesktopOnly": false
 }
