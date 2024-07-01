@@ -183,7 +183,7 @@ export class NotePreview extends ItemView {
         // 公众号
         lineDiv.createDiv({ cls: 'style-label' }).innerText = '公众号:';
         const wxSelect = lineDiv.createEl('select', { cls: 'style-select' })
-        wxSelect.setAttr('style', 'width: 300px');
+        wxSelect.setAttr('style', 'width: 200px');
         wxSelect.onchange = async () => {
             this.currentAppId = wxSelect.value;
         }
@@ -207,8 +207,8 @@ export class NotePreview extends ItemView {
             button.setText('复制');
         })
 
-        copyBtn.onclick = async () => {
-            this.copyArticle();
+        copyBtn.onclick = async() => {
+            await this.copyArticle();
             new Notice('复制成功，请到公众号编辑器粘贴。');
         }
 
@@ -216,16 +216,16 @@ export class NotePreview extends ItemView {
             button.setText('上传图片');
         })
 
-        uploadImgBtn.onclick = async () => {
-            this.uploadImages();
+        uploadImgBtn.onclick = async() => {
+            await this.uploadImages();
         }
 
         const postBtn = lineDiv.createEl('button', { cls: 'copy-button' }, async (button) => {
             button.setText('发草稿');
         })
 
-        postBtn.onclick = async () => {
-            this.postArticle();
+        postBtn.onclick = async() => {
+            await this.postArticle();
         }
 
         const refreshBtn = lineDiv.createEl('button', { cls: 'refresh-button' }, async (button) => {
@@ -233,7 +233,7 @@ export class NotePreview extends ItemView {
         })
 
         refreshBtn.onclick = async () => {
-            this.renderMarkdown();
+            await this.renderMarkdown();
         }
 
         // 封面
@@ -250,14 +250,14 @@ export class NotePreview extends ItemView {
         this.useDefaultCover.id = 'default-cover';
         this.useDefaultCover.onchange = async () => {
             if (this.useDefaultCover.checked) {
-                this.coverEl.setAttr('style', 'visibility:hidden;');
+                this.coverEl.setAttr('style', 'visibility:hidden;width:0px;');
             }
             else {
-                this.coverEl.setAttr('style', 'visibility:visible;');
+                this.coverEl.setAttr('style', 'visibility:visible;width:180px;');
             }
         }
         const defaultLable = lineDiv.createEl('label');
-        defaultLable.innerText = '默认封面';
+        defaultLable.innerText = '默认';
         defaultLable.setAttr('for', 'default-cover');
 
         this.useLocalCover = lineDiv.createEl('input', { cls: 'input-style' });
@@ -268,16 +268,16 @@ export class NotePreview extends ItemView {
         this.useLocalCover.setAttr('style', 'margin-left:20px;');
         this.useLocalCover.onchange = async () => {
             if (this.useLocalCover.checked) {
-                this.coverEl.setAttr('style', 'visibility:visible;');
+                this.coverEl.setAttr('style', 'visibility:visible;width:180px;');
             }
             else {
-                this.coverEl.setAttr('style', 'visibility:hidden;');
+                this.coverEl.setAttr('style', 'visibility:hidden;width:0px;');
             }
         }
 
         const localLabel = lineDiv.createEl('label');
         localLabel.setAttr('for', 'local-cover');
-        localLabel.innerText = '上传封面';
+        localLabel.innerText = '上传';
 
         this.coverEl = lineDiv.createEl('input', { cls: 'upload-input' });
         this.coverEl.setAttr('type', 'file');
@@ -413,13 +413,13 @@ export class NotePreview extends ItemView {
         // 替换图片链接
         replaceImages(this.articleDiv);
 
-        this.copyArticle();
+        await this.copyArticle();
         this.showMsg('图片已上传，并且已复制，请到公众号编辑器粘贴。');
     }
 
-    copyArticle() {
+    async copyArticle() {
         const content = this.getArticleContent();
-        navigator.clipboard.write([new ClipboardItem({
+        await navigator.clipboard.write([new ClipboardItem({
             'text/html': new Blob([content], {type: 'text/html'})
         })])
     }
