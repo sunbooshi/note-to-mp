@@ -20,7 +20,6 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 	parseWXInfo() {
 	    const wxInfo = this.plugin.settings.wxInfo;
 		if (wxInfo.length == 0) {
-			console.log('no wechat info');
 			return '';
 		}
 
@@ -132,7 +131,6 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 	}
 
 	display() {
-		console.log('display');
 		const {containerEl} = this;
 
 		containerEl.empty();
