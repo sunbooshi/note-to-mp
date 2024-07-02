@@ -1,11 +1,37 @@
 import { requestUrl, RequestUrlParam, getBlobArrayBuffer } from "obsidian";
 
 // 获取token
-export async function wxGetToken(key: string) {
-    const url = 'https://wxapi.booshi.tech/token/' + key;
-    const res = requestUrl(url);
-    const data = await res.json;
-    return data.token;
+export async function wxGetToken(authkey:string, appid:string, secret:string) {
+    const url = 'https://obplugin.sunboshi.tech/wx/token';
+    const body = {
+        authkey,
+        appid,
+        secret
+    }
+    const res = await requestUrl({
+        url,
+        method: 'POST',
+        throw: false,
+        contentType: 'application/json',
+        body: JSON.stringify(body)
+    });
+    return res;
+}
+
+export async function wxEncrypt(authkey:string, wechat:any[]) {
+    const url = 'https://obplugin.sunboshi.tech/wx/encrypt';
+    const body =  JSON.stringify({
+        authkey,
+        wechat
+    });
+    const res = await requestUrl({
+        url: url,
+        method: 'POST',
+        throw: false,
+        contentType: 'application/json',
+        body: body
+    });
+    return res
 }
 
 // 上传图片

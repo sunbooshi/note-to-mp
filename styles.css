@@ -27,21 +27,21 @@
   flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
-  margin: 10px 20px;
+  margin: 10px 10px;
 }
 
 .copy-button {
-  margin-right: 20px;
+  margin-right: 10px;
 }
 
 .refresh-button {
-  /* width: 60px; */
-  margin-right: 20px;
+  margin-right: 10px;
 }
 
 .upload-input {
-  margin-left: 20px;
+  margin-left: 10px;
   visibility: hidden;
+  width: 0px;
 }
 
 .style-label {
@@ -49,8 +49,8 @@
 }
 
 .style-select {
-  margin-right: 20px;
-  width: 140px;
+  margin-right: 10px;
+  width: 120px;
 }
 
 .msg-view {
