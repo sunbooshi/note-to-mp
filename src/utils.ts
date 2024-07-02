@@ -2,6 +2,8 @@ import { Token, Tokens, Marked, options, Lexer} from "marked";
 import { markedHighlight } from "marked-highlight";
 import { App } from "obsidian";
 import hljs from "highlight.js";
+// var hljsVba = require('highlightjs-vba');
+import hljsVba from "highlightjs-vba";
 import GetCallout from "./callouts";
 import { LocalImageExtension } from "./img-extension";
 
@@ -20,6 +22,9 @@ const markedOptiones = {
     gfm: true,
     breaks: true,
 };
+
+hljs.registerLanguage("vba", hljsVba);
+hljs.initHighlightingOnLoad();
 
 function code(code: string, infostring: string | undefined): string {
     const lang = (infostring || '').match(/^\S*/)?.[0];

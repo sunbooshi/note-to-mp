@@ -25,6 +25,7 @@
 	"dependencies": {
 		"@zip.js/zip.js": "^2.7.43",
 		"highlight.js": "^11.9.0",
+		"highlightjs-vba": "^0.2.1",
 		"marked": "^12.0.1",
 		"marked-highlight": "^2.1.1"
 	}
