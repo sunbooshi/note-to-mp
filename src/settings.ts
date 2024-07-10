@@ -10,6 +10,7 @@ export class PreviewSetting {
     authKey: string;
     wxInfo: {name:string, appid:string, secret:string}[];
     app: App;
+    math: string;
 
     constructor(app: App) {
         this.app = app;
@@ -19,6 +20,7 @@ export class PreviewSetting {
         this.lineNumber = true;
         this.authKey = '';
         this.wxInfo = [];
+        this.math = 'latex';
     }
 
     resetStyelAndHighlight() {
@@ -30,7 +32,16 @@ export class PreviewSetting {
         if (!data) {
             return
         }
-        const { defaultStyle, linkStyle, lineNumber, defaultHighlight, authKey, wxInfo } = data;
+        const {
+            defaultStyle,
+            linkStyle,
+            lineNumber,
+            defaultHighlight,
+            authKey,
+            wxInfo,
+            math,
+        } = data;
+
         if (defaultStyle) {
             this.defaultStyle = defaultStyle;
         }
@@ -49,6 +60,9 @@ export class PreviewSetting {
         if (wxInfo) {
             this.wxInfo = wxInfo;
         }
+        if (math) {
+            this.math = math;
+        }
     }
 
     allSettings() {
@@ -59,6 +73,7 @@ export class PreviewSetting {
             'lineNumber': this.lineNumber,
             'authKey': this.authKey,
             'wxInfo': this.wxInfo,
+            'math': this.math,
         }
     }
 }

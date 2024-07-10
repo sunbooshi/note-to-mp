@@ -1,10 +1,7 @@
 import { Token, Tokens, Marked, options, Lexer} from "marked";
 import { markedHighlight } from "marked-highlight";
-import { App } from "obsidian";
 import hljs from "highlight.js";
 import GetCallout from "./callouts";
-import { LocalImageExtension } from "./img-extension";
-
 
 export interface ParseOptions {
     lineNumber: boolean;
@@ -144,7 +141,7 @@ function footnoteLinks() {
 	return `<seciton class="footnotes"><hr><ol>${links.join('')}</ol></section>`;
 }
 
-export async function markedParse(content:string, op:ParseOptions, app:App)  {
+export async function markedParse(content:string, op:ParseOptions, extensions:any[])  {
 	parseOptions.lineNumber = op.lineNumber;
 	parseOptions.linkStyle = op.linkStyle;
 
@@ -186,7 +183,7 @@ export async function markedParse(content:string, op:ParseOptions, app:App)  {
 				return calloutRender.call(this, token as Tokens.Blockquote);
 			}, 
 		},
-		LocalImageExtension(app)
+		... extensions
 	]});
 
 	const renderer = {
@@ -254,7 +251,12 @@ function parseAndApplyStyles(element: HTMLElement, sheet:CSSStyleSheet) {
 function traverse(root: HTMLElement, sheet:CSSStyleSheet) {
 	let element = root.firstElementChild;
 	while (element) {
-	  	traverse(element as HTMLElement, sheet);
+		if (element.tagName === 'svg') {
+			// pass
+		}
+		else {
+	  		traverse(element as HTMLElement, sheet);
+		}
 	  	element = element.nextElementSibling;
 	}
 	parseAndApplyStyles(root, sheet);

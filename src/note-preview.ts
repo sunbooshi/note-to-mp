@@ -1,17 +1,18 @@
-import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, sanitizeHTMLToDom } from 'obsidian';
+import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, sanitizeHTMLToDom, apiVersion } from 'obsidian';
 import { CSSProcess, markedParse, ParseOptions } from './utils';
 import { PreviewSetting } from './settings';
 import ThemesManager from './themes';
 import CalloutsCSS from './callouts-css';
-import { uploadLocalImage, replaceImages, uploadCover } from './img-extension';
+import { LocalImageRenderer } from './img-extension';
 import { wxGetToken, wxAddDraft, wxBatchGetMaterial } from './weixin-api';
+import { MathRenderer, MathRendererCallback } from './math';
 
 export const VIEW_TYPE_NOTE_PREVIEW = 'note-preview';
 
 const FRONT_MATTER_REGEX = /^(---)$.+?^(---)$.+?/ims;
 
 
-export class NotePreview extends ItemView {
+export class NotePreview extends ItemView implements MathRendererCallback {
     workspace: Workspace;
     mainDiv: HTMLDivElement;
     toolbar: HTMLDivElement;
@@ -31,6 +32,8 @@ export class NotePreview extends ItemView {
     currentTheme: string;
     currentHighlight: string;
     currentAppId: string;
+    mathRenderer: MathRenderer;
+    imageRenderer: LocalImageRenderer;
 
     constructor(leaf: WorkspaceLeaf, settings: PreviewSetting, themeManager: ThemesManager) {
         super(leaf);
@@ -39,6 +42,8 @@ export class NotePreview extends ItemView {
         this.themeManager = themeManager;
         this.currentTheme = this.settings.defaultStyle;
         this.currentHighlight = this.settings.defaultHighlight;
+        this.mathRenderer = new MathRenderer(this, settings);
+        this.imageRenderer = new LocalImageRenderer(this.app);
     }
 
     getViewType() {
@@ -74,7 +79,8 @@ export class NotePreview extends ItemView {
         return '<h1>渲染失败!</h1><br/>'
         + '如需帮助请前往&nbsp;&nbsp;<a href="https://github.com/sunbooshi/note-to-mp/issues">https://github.com/sunbooshi/note-to-mp/issues</a>&nbsp;&nbsp;反馈<br/><br/>'
         + '如果方便，请提供引发错误的完整Markdown内容。<br/><br/>'
-        + '错误信息：<br/>'
+        + '<br/>Obsidian版本：' + apiVersion
+        + '<br/>错误信息：<br/>'
         + `${error}`;
     }
 
@@ -96,7 +102,12 @@ export class NotePreview extends ItemView {
                 lineNumber: this.settings.lineNumber,
                 linkStyle: this.settings.linkStyle as 'footnote' | 'inline',
             }
-            this.articleHTML = await markedParse(md, op, this.app);
+            this.articleHTML = await markedParse(md, op, [
+                this.mathRenderer.blockMath(),
+                this.mathRenderer.inlineMath(),
+                this.imageRenderer.localImageExtension(),
+            ]);
+
             this.setArticle(this.articleHTML);
             this.updateCss();
         }
@@ -112,7 +123,7 @@ export class NotePreview extends ItemView {
         const doc = sanitizeHTMLToDom(html);
         if (doc.firstChild) {
             this.articleDiv.appendChild(doc.firstChild);
-            replaceImages(this.articleDiv);
+            this.imageRenderer.replaceImages(this.articleDiv);
         }
     }
 
@@ -368,7 +379,7 @@ export class NotePreview extends ItemView {
             return '';
         }
 
-        return await uploadCover(file, token);
+        return await this.imageRenderer.uploadCover(file, token);
     }
 
     async getDefaultCover(token: string) {
@@ -409,9 +420,9 @@ export class NotePreview extends ItemView {
             return;
         }
         // 上传图片
-        await uploadLocalImage(this.app.vault, token);
+        await this.imageRenderer.uploadLocalImage(token);
         // 替换图片链接
-        replaceImages(this.articleDiv);
+        this.imageRenderer.replaceImages(this.articleDiv);
 
         await this.copyArticle();
         this.showMsg('图片已上传，并且已复制，请到公众号编辑器粘贴。');
@@ -451,9 +462,9 @@ export class NotePreview extends ItemView {
                 return;
             }
             //上传图片
-            await uploadLocalImage(this.app.vault, token);
+            await this.imageRenderer.uploadLocalImage(token);
             // 替换图片链接
-            replaceImages(this.articleDiv);
+            this.imageRenderer.replaceImages(this.articleDiv);
             // 上传封面
             let mediaId = '';
             if (this.useLocalCover.checked) {
@@ -485,6 +496,19 @@ export class NotePreview extends ItemView {
             }
         } catch (error) {
             this.showMsg('发布失败!'+error.message);
+        }
+    }
+
+    updateMath(id: string, svg: string): void {
+        const span = this.articleDiv.querySelector('#'+id) as HTMLElement;
+        if (!span) return;
+        const doc = sanitizeHTMLToDom(svg);
+        span.empty();
+        if (doc.firstChild) {
+            span.appendChild(doc.firstChild);
+        }
+        else {
+            span.innerText = '渲染失败';
         }
     }
 }

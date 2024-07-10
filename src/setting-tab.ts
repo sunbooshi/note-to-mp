@@ -178,6 +178,18 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
+			.setName('数学公式语法')
+			.addDropdown(dropdown => {
+				dropdown.addOption('latex', 'latex');
+			    dropdown.addOption('asciimath', 'asciimath');
+				dropdown.setValue(this.plugin.settings.math);
+				dropdown.onChange(async (value) => {
+				    this.plugin.settings.math = value;
+					await this.plugin.saveSettings();
+				});
+			});
+
+		new Setting(containerEl)
 			.setName('显示代码行号')
 			.addToggle(toggle => {
 			    toggle.setValue(this.plugin.settings.lineNumber);
