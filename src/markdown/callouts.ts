@@ -1,3 +1,5 @@
+import { Token, Tokens, Marked, options, Lexer} from "marked";
+
 const icon_note = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-pencil"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path><path d="m15 5 4 4"></path></svg>`
 const icon_abstract = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-clipboard-list"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M12 11h4"></path><path d="M12 16h4"></path><path d="M8 11h.01"></path><path d="M8 16h.01"></path></svg>`
 const icon_info = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-info"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>`
@@ -141,6 +143,62 @@ const CalloutTypes = new Map<string, CalloutInfo>(Object.entries({
     }
 }));
 
-export default function GetCallout(type: string) {
+function GetCallout(type: string) {
     return CalloutTypes.get(type);
 };
+
+function matchCallouts(text:string) {
+    const regex = /\[\!(.*?)\]/g;
+	let m;
+	if( m = regex.exec(text)) {
+	    return m[1];
+	}
+	return "";
+}
+
+function GetCalloutTitle(callout:string, text:string) {
+	let title = callout.charAt(0).toUpperCase() + callout.slice(1)
+	let start = text.indexOf(']') + 1;
+	if (text.indexOf(']-') > 0 || text.indexOf(']+') > 0) {
+		start = start + 1;
+	}
+	let end = text.indexOf('\n');
+	if (end === -1)  end = text.length;
+	if (start >= end)  return title;
+	title = text.slice(start, end).trim();
+	return title;
+}
+
+export function calloutRender(token: Tokens.Blockquote) {
+	let callout = matchCallouts(token.text);
+	if (callout == '') {
+		const body = this.parser.parse(token.tokens);
+        return `<blockquote>\n${body}</blockquote>\n`;;
+	}
+
+    const markedOptiones = {
+        gfm: true,
+        breaks: true,
+    };
+	const title = GetCalloutTitle(callout, token.text);
+	const info = GetCallout(callout);
+	const lexer = new Lexer(markedOptiones);
+	const index = token.text.indexOf('\n');
+	let body = '';
+	if (index > 0) {
+		token.text = token.text.slice(index+1)
+		token.tokens = lexer.lex(token.text);
+		body = this.parser.parse(token.tokens);
+	} 
+	
+	return `
+		<section class="note-callout ${info?.style}">
+			<section class="note-callout-title-wrap">
+				${info?.icon}
+				<span class="note-callout-title">${title}<span>
+			</section>
+			<section class="note-callout-content">
+				${body}
+			</section>
+		</section>`;
+}

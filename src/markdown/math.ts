@@ -1,7 +1,6 @@
 import { Token, Tokens } from "marked";
-import { App, Vault, Notice, request, requestUrl, sanitizeHTMLToDom } from "obsidian";
-import { NotePreview } from "./note-preview";
-import { PreviewSetting } from "./settings";
+import { requestUrl } from "obsidian";
+import { PreviewSetting } from "../settings";
 
 const inlineRule = /^(\${1,2})(?!\$)((?:\\.|[^\\\n])*?(?:\\.|[^\\\n\$]))\1(?=[\s?!\.,:？！。，：]|$)/;
 const blockRule = /^(\${1,2})\n((?:\\[^]|[^\\])+?)\n\1(?:\n|$)/;
@@ -31,12 +30,31 @@ export class MathRenderer {
         return `math-id-${this.mathIndex}`;
     }
 
-    async renderMath(expression: string, inline: boolean, id: string) {
-        this.rendererQueue.getMathSVG(expression, inline, this.setting.math, (svg: string)=>{
+    addToQueue(expression: string, inline: boolean, type:string, id: string) {
+        this.rendererQueue.getMathSVG(expression, inline, type, (svg: string)=>{
             this.svgCache.set(expression, svg);
             this.callback.updateMath(id, svg); 
         })
     }
+
+    renderer(token: Tokens.Generic, inline: boolean, type: string = '') {
+        if (type === '') {
+            type = this.setting.math;
+        }
+
+        const id = this.generateId();
+        let svg = '渲染中';
+        if (this.svgCache.has(token.text)) {
+            svg = this.svgCache.get(token.text) as string;
+        }
+        else {
+            this.addToQueue(token.text, false, type, id);
+        }
+
+        let className = inline? 'inline-math-svg' : 'block-math-svg';
+        return `<span id="${id}" class="${className}">${svg}</span>`;
+    }
+
     inlineMath() {
         return {
             name: 'InlineMath',
@@ -74,16 +92,7 @@ export class MathRenderer {
                 }
             },
             renderer: (token: Tokens.Generic) => {
-                const id = this.generateId();
-                let svg = '渲染中';
-                if (this.svgCache.has(token.text)) {
-                    svg = this.svgCache.get(token.text) as string;
-                    console.log('render from cache:' + id);
-                }
-                else {
-                    this.renderMath(token.text, false, id);
-                }
-                return `<span id="${id}" class="inline-math-svg">${svg}</span>`;
+               return this.renderer(token, true);
             }
         }
     }
@@ -103,16 +112,7 @@ export class MathRenderer {
                 }
             },
             renderer: (token: Tokens.Generic) => {
-                const id = this.generateId();
-                let svg = '渲染中';
-                if (this.svgCache.has(token.text)) {
-                    svg = this.svgCache.get(token.text) as string;
-                    console.log('render from cache:' + id);
-                }
-                else {
-                    this.renderMath(token.text, false, id);
-                }
-                return `<span id="${id}" class="block-math-section">${svg}</span>`;
+                return this.renderer(token, false);
             }
         };
     }

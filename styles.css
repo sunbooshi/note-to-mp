@@ -73,11 +73,15 @@
   margin-bottom: 20px;
 }
 
-.block-math-section {
+.block-math-svg {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   margin:20px 0px;
+}
+
+.note-highlight {
+  background-color: rgba(255,208,0, 0.4);
 }

@@ -1,11 +1,13 @@
 import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, sanitizeHTMLToDom, apiVersion } from 'obsidian';
-import { CSSProcess, markedParse, ParseOptions } from './utils';
+import { CSSProcess } from './utils';
+import { markedParse, ParseOptions } from './markdown/parser';
 import { PreviewSetting } from './settings';
 import ThemesManager from './themes';
 import CalloutsCSS from './callouts-css';
-import { LocalImageRenderer } from './img-extension';
+import { LocalImageRenderer } from './markdown/img-extension';
 import { wxGetToken, wxAddDraft, wxBatchGetMaterial } from './weixin-api';
-import { MathRenderer, MathRendererCallback } from './math';
+import { MathRenderer, MathRendererCallback } from './markdown/math';
+import { CodeRenderer } from './markdown/code';
 
 export const VIEW_TYPE_NOTE_PREVIEW = 'note-preview';
 
@@ -34,6 +36,7 @@ export class NotePreview extends ItemView implements MathRendererCallback {
     currentAppId: string;
     mathRenderer: MathRenderer;
     imageRenderer: LocalImageRenderer;
+    codeRenderer: CodeRenderer;
 
     constructor(leaf: WorkspaceLeaf, settings: PreviewSetting, themeManager: ThemesManager) {
         super(leaf);
@@ -44,6 +47,7 @@ export class NotePreview extends ItemView implements MathRendererCallback {
         this.currentHighlight = this.settings.defaultHighlight;
         this.mathRenderer = new MathRenderer(this, settings);
         this.imageRenderer = new LocalImageRenderer(this.app);
+        this.codeRenderer = new CodeRenderer(settings.lineNumber, this.mathRenderer);
     }
 
     getViewType() {
@@ -106,6 +110,7 @@ export class NotePreview extends ItemView implements MathRendererCallback {
                 this.mathRenderer.blockMath(),
                 this.mathRenderer.inlineMath(),
                 this.imageRenderer.localImageExtension(),
+                this.codeRenderer.codeExtension(),
             ]);
 
             this.setArticle(this.articleHTML);

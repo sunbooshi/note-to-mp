@@ -1,6 +1,6 @@
 import { Token, Tokens } from "marked";
-import { App, Vault, Notice, apiVersion } from "obsidian";
-import { wxUploadImage } from "./weixin-api";
+import { App, Notice } from "obsidian";
+import { wxUploadImage } from "../weixin-api";
 
 declare module 'obsidian' {
     interface Vault {
