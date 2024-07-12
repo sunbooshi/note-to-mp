@@ -3,9 +3,9 @@ import { MathRenderer } from "./math";
 
 export class CodeRenderer {
 	showLineNumber: boolean;
-	mathRenderer: MathRenderer;
+	mathRenderer: MathRenderer|null;
 
-    constructor(showLineNumber: boolean, mathRenderer: MathRenderer) {
+    constructor(showLineNumber: boolean, mathRenderer: MathRenderer|null) {
 		this.showLineNumber = showLineNumber;
 		this.mathRenderer = mathRenderer;
 	}
@@ -59,9 +59,11 @@ export class CodeRenderer {
 			name: 'code',
 			level: 'block',
 			renderer: (token: Tokens.Code) => {
-				const type = CodeRenderer.getMathType(token.lang??'');
-				if (type) {
-				    return this.mathRenderer.renderer(token, false, type);
+				if (this.mathRenderer) {
+					const type = CodeRenderer.getMathType(token.lang??'');
+					if (type) {
+						return this.mathRenderer.renderer(token, false, type);
+					}
 				}
 				return this.codeRenderer(token.text, token.lang);
 			},

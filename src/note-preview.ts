@@ -34,7 +34,7 @@ export class NotePreview extends ItemView implements MathRendererCallback {
     currentTheme: string;
     currentHighlight: string;
     currentAppId: string;
-    mathRenderer: MathRenderer;
+    mathRenderer: MathRenderer|null = null;
     imageRenderer: LocalImageRenderer;
     codeRenderer: CodeRenderer;
 
@@ -45,7 +45,9 @@ export class NotePreview extends ItemView implements MathRendererCallback {
         this.themeManager = themeManager;
         this.currentTheme = this.settings.defaultStyle;
         this.currentHighlight = this.settings.defaultHighlight;
-        this.mathRenderer = new MathRenderer(this, settings);
+        if (settings.authKey.length > 0) {
+            this.mathRenderer = new MathRenderer(this, settings);
+        }
         this.imageRenderer = new LocalImageRenderer(this.app);
         this.codeRenderer = new CodeRenderer(settings.lineNumber, this.mathRenderer);
     }
@@ -92,12 +94,12 @@ export class NotePreview extends ItemView implements MathRendererCallback {
         try {
             const af = this.app.workspace.getActiveFile();
             let md = '';
-            if (af) {
+            if (af && af.extension.toLocaleLowerCase() === 'md') {
                 md = await this.app.vault.adapter.read(af.path);
                 this.title = af.basename;
             }
             else {
-                md = '没有可渲染的笔记';
+                md = '没有可渲染的笔记或文件不支持渲染';
             }
             if (md.startsWith('---')) {
                 md = md.replace(FRONT_MATTER_REGEX, '');
@@ -106,12 +108,16 @@ export class NotePreview extends ItemView implements MathRendererCallback {
                 lineNumber: this.settings.lineNumber,
                 linkStyle: this.settings.linkStyle as 'footnote' | 'inline',
             }
-            this.articleHTML = await markedParse(md, op, [
-                this.mathRenderer.blockMath(),
-                this.mathRenderer.inlineMath(),
-                this.imageRenderer.localImageExtension(),
-                this.codeRenderer.codeExtension(),
-            ]);
+
+            const extensions = [];
+            if (this.mathRenderer) {
+                extensions.push(this.mathRenderer.blockMath());
+                extensions.push(this.mathRenderer.inlineMath());
+            }
+            extensions.push(this.imageRenderer.localImageExtension());
+            extensions.push(this.codeRenderer.codeExtension());
+
+            this.articleHTML = await markedParse(md, op, extensions);
 
             this.setArticle(this.articleHTML);
             this.updateCss();
