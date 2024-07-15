@@ -1,4 +1,4 @@
-import { App, TextAreaComponent, PluginSettingTab, Setting, Notice } from 'obsidian';
+import { App, TextAreaComponent, PluginSettingTab, Setting, Notice, FileSystemAdapter } from 'obsidian';
 import NoteToMpPlugin from './main';
 import { wxGetToken,wxEncrypt } from './weixin-api';
 
@@ -130,6 +130,18 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 		this.displayWXInfo('')
 	}
 
+	openAssets() {
+	    const path = require('path');
+		const vaultRoot = (
+			this.app.vault.adapter as FileSystemAdapter
+		).getBasePath();
+		const assets = this.plugin.themesManager.assetsPath;
+		const dst = path.join(vaultRoot, assets);
+		console.log(dst);
+		const { shell } = require('electron');
+		shell.openPath(dst);
+	}
+
 	display() {
 		const {containerEl} = this;
 
@@ -209,6 +221,12 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 					button.setButtonText('下载完成');
 				});
 			})
+			.addButton(button => {
+				button.setIcon('folder-open');
+				button.onClick(async () => {
+					this.openAssets();
+				});
+			});
 
 		new Setting(containerEl)
 			.setName('清空主题')
@@ -220,10 +238,25 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 			})
+
+		new Setting(containerEl)
+			.setName('CSS代码片段')
+			.addButton(button => {
+				button.setIcon('refresh-ccw');
+				button.onClick(async () => {
+					this.plugin.themesManager.loadCustomCSS();
+				});
+			})
+			.addButton(button => {
+				button.setIcon('folder-open');
+				button.onClick(async () => {
+					this.openAssets();
+				});
+			});
 		
 		new Setting(containerEl)
 			.setName('注册码（AuthKey）')
-			.setDesc('详情请参考：https://doc.booshi.tech/info.html')
+			.setDesc('详情请参考：https://mp.weixin.qq.com/s/LYujo4ODEYLuq0OkzkkoCw')
 			.addText(text => {
 			    text.setPlaceholder('请输入注册码')
 					.setValue(this.plugin.settings.authKey)

@@ -26,6 +26,7 @@ export default class ThemesManager {
     assetsPath: string;
     themesPath: string;
     hilightPath: string;
+    customCSS: string;
 
     constructor(app: App, manifest: PluginManifest) {
         this.app = app;
@@ -38,6 +39,7 @@ export default class ThemesManager {
     async loadAssets() {
         await this.loadThemes();
         await this.loadHighlights();
+        await this.loadCustomCSS();
     }
 
     async loadThemes() {
@@ -68,6 +70,19 @@ export default class ThemesManager {
                 if (cssContent) {
                     theme.css = cssContent;
                 }
+            }
+        } catch (error) {
+            console.error(error);
+            new Notice('读取CSS失败！');
+        }
+    }
+
+    async loadCustomCSS() {
+        try {
+            const configFile = this.assetsPath + 'custom.css';
+            const cssContent = await this.app.vault.adapter.read(configFile);
+            if (cssContent) {
+                this.customCSS = cssContent;
             }
         } catch (error) {
             console.error(error);

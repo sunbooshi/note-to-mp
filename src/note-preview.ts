@@ -159,7 +159,8 @@ export class NotePreview extends ItemView implements MathRendererCallback {
         try {
             const theme = this.themeManager.getTheme(this.currentTheme);
             const highlight = this.themeManager.getHighlight(this.currentHighlight);
-            return `${theme!.css}\n\n${highlight!.css}\n\n${CalloutsCSS}`;
+            const customCSS = this.themeManager.customCSS;
+            return `${theme!.css}\n\n${highlight!.css}\n\n${CalloutsCSS}\n\n${customCSS}`;
         } catch (error) {
             console.error(error);
             new Notice(`获取样式失败${this.currentTheme}|${this.currentHighlight}，请检查主题是否正确安装。`);
