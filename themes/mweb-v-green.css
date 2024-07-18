@@ -1,4 +1,4 @@
-.mweb-v-green {
+.note-to-mp {
   min-width: 200px;
   max-width: 760px;
   padding: 3rem 1em 1em;
@@ -10,79 +10,79 @@
   overflow-x: hidden;
   color: #333;
 }
-.mweb-v-green h1,
-.mweb-v-green h2,
-.mweb-v-green h3,
-.mweb-v-green h4,
-.mweb-v-green h5,
-.mweb-v-green h6 {
+.note-to-mp h1,
+.note-to-mp h2,
+.note-to-mp h3,
+.note-to-mp h4,
+.note-to-mp h5,
+.note-to-mp h6 {
   line-height: 1.5;
   margin-top: 35px;
   margin-bottom: 10px;
   padding-bottom: 5px;
 }
-.mweb-v-green h1:first-child,
-.mweb-v-green h2:first-child,
-.mweb-v-green h3:first-child,
-.mweb-v-green h4:first-child,
-.mweb-v-green h5:first-child,
-.mweb-v-green h6:first-child {
+.note-to-mp h1:first-child,
+.note-to-mp h2:first-child,
+.note-to-mp h3:first-child,
+.note-to-mp h4:first-child,
+.note-to-mp h5:first-child,
+.note-to-mp h6:first-child {
   margin-top: -1.5rem;
   margin-bottom: 1rem;
 }
-.mweb-v-green h1::before,
-.mweb-v-green h2::before,
-.mweb-v-green h3::before,
-.mweb-v-green h4::before,
-.mweb-v-green h5::before,
-.mweb-v-green h6::before {
+.note-to-mp h1::before,
+.note-to-mp h2::before,
+.note-to-mp h3::before,
+.note-to-mp h4::before,
+.note-to-mp h5::before,
+.note-to-mp h6::before {
   content: "#";
   display: inline-block;
   color: #3eaf7c;
   padding-right: 0.23em;
 }
-.mweb-v-green h1 {
+.note-to-mp h1 {
   position: relative;
   font-size: 2.5rem;
   margin-bottom: 5px;
 }
-.mweb-v-green h1::before {
+.note-to-mp h1::before {
   font-size: 2.5rem;
 }
-.mweb-v-green h2 {
+.note-to-mp h2 {
   padding-bottom: 0.5rem;
   font-size: 2.2rem;
   border-bottom: 1px solid #ececec;
 }
-.mweb-v-green h3 {
+.note-to-mp h3 {
   font-size: 1.5rem;
   padding-bottom: 0;
 }
-.mweb-v-green h4 {
+.note-to-mp h4 {
   font-size: 1.25rem;
 }
-.mweb-v-green h5 {
+.note-to-mp h5 {
   font-size: 1rem;
 }
-.mweb-v-green h6 {
+.note-to-mp h6 {
   margin-top: 5px;
 }
-.mweb-v-green p {
+.note-to-mp p {
   line-height: inherit;
   margin-top: 22px;
   margin-bottom: 22px;
 }
-.mweb-v-green strong {
+.note-to-mp strong {
   color: #3eaf7c;
 }
-.mweb-v-green img {
+.note-to-mp img {
   max-width: 100%;
   border-radius: 2px;
   display: block;
   margin: auto;
   border: 3px solid rgba(62, 175, 124, 0.2);
 }
-.mweb-v-green hr {
+.note-to-mp hr {
   border-top: 1px solid #3eaf7c;
   border-bottom: none;
   border-left: none;
@@ -90,19 +90,19 @@
   margin-top: 32px;
   margin-bottom: 32px;
 }
-.mweb-v-green a {
+.note-to-mp a {
   font-weight: 500;
   text-decoration: none;
   color: #3eaf7c;
 }
-.mweb-v-green a:hover,
-.mweb-v-green a:active {
+.note-to-mp a:hover,
+.note-to-mp a:active {
   border-bottom: 1.5px solid #3eaf7c;
 }
-.mweb-v-green a:before {
+.note-to-mp a:before {
   content: "⇲";
 }
-.mweb-v-green table {
+.note-to-mp table {
   display: inline-block !important;
   font-size: 12px;
   width: auto;
@@ -110,23 +110,23 @@
   overflow: auto;
   border: solid 1px #3eaf7c;
 }
-.mweb-v-green thead {
+.note-to-mp thead {
   background: #3eaf7c;
   color: #fff;
   text-align: left;
 }
-.mweb-v-green tr:nth-child(2n) {
+.note-to-mp tr:nth-child(2n) {
   background-color: rgba(62, 175, 124, 0.2);
 }
-.mweb-v-green th,
-.mweb-v-green td {
+.note-to-mp th,
+.note-to-mp td {
   padding: 12px 7px;
   line-height: 24px;
 }
-.mweb-v-green td {
+.note-to-mp td {
   min-width: 120px;
 }
-.mweb-v-green blockquote {
+.note-to-mp blockquote {
   color: #666;
   padding: 1px 23px;
   margin: 22px 0;
@@ -134,80 +134,80 @@
   border-color: #42b983;
   background-color: #f8f8f8;
 }
-.mweb-v-green blockquote::after {
+.note-to-mp blockquote::after {
   display: block;
   content: "";
 }
-.mweb-v-green blockquote > p {
+.note-to-mp blockquote > p {
   margin: 10px 0;
 }
-.mweb-v-green details {
+.note-to-mp details {
   border: none;
   outline: none;
   border-left: 4px solid #3eaf7c;
   padding-left: 10px;
   margin-left: 4px;
 }
-.mweb-v-green details summary {
+.note-to-mp details summary {
   cursor: pointer;
   border: none;
   outline: none;
   background: white;
   margin: 0px -17px;
 }
-.mweb-v-green details summary::-webkit-details-marker {
+.note-to-mp details summary::-webkit-details-marker {
   color: #3eaf7c;
 }
-.mweb-v-green ol,
-.mweb-v-green ul {
+.note-to-mp ol,
+.note-to-mp ul {
   padding-left: 28px;
 }
-.mweb-v-green ol li,
-.mweb-v-green ul li {
+.note-to-mp ol li,
+.note-to-mp ul li {
   margin-bottom: 0;
   list-style: inherit;
 }
-.mweb-v-green ol li .task-list-item,
-.mweb-v-green ul li .task-list-item {
+.note-to-mp ol li .task-list-item,
+.note-to-mp ul li .task-list-item {
   list-style: none;
 }
-.mweb-v-green ol li .task-list-item ul,
-.mweb-v-green ul li .task-list-item ul,
-.mweb-v-green ol li .task-list-item ol,
-.mweb-v-green ul li .task-list-item ol {
+.note-to-mp ol li .task-list-item ul,
+.note-to-mp ul li .task-list-item ul,
+.note-to-mp ol li .task-list-item ol,
+.note-to-mp ul li .task-list-item ol {
   margin-top: 0;
 }
-.mweb-v-green ol ul,
-.mweb-v-green ul ul,
-.mweb-v-green ol ol,
-.mweb-v-green ul ol {
+.note-to-mp ol ul,
+.note-to-mp ul ul,
+.note-to-mp ol ol,
+.note-to-mp ul ol {
   margin-top: 3px;
 }
-.mweb-v-green ol li {
+.note-to-mp ol li {
   padding-left: 6px;
 }
-.mweb-v-green ol li::marker {
+.note-to-mp ol li::marker {
   color: #3eaf7c;
 }
-.mweb-v-green ul li::marker {
+.note-to-mp ul li::marker {
   color: #3eaf7c;
 }
 @media (max-width: 720px) {
-  .mweb-v-green h1 {
+  .note-to-mp h1 {
     font-size: 24px;
   }
-  .mweb-v-green h2 {
+  .note-to-mp h2 {
     font-size: 20px;
   }
-  .mweb-v-green h3 {
+  .note-to-mp h3 {
     font-size: 18px;
   }
 }
-.mweb-v-green .footnotes hr {
+.note-to-mp .footnotes hr {
   margin-top: 4em;
   margin-bottom: 0.5em;
 }
-.mweb-v-green code {
+.note-to-mp code {
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   word-break: break-word;
   overflow-x: auto;
@@ -218,13 +218,13 @@
   background-color: rgba(27, 31, 35, 0.05);
   border-radius: 3px;
 }
-.mweb-v-green pre {
+.note-to-mp pre {
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   overflow: auto;
   position: relative;
   line-height: 1.75;
 }
-.mweb-v-green pre > code {
+.note-to-mp pre > code {
   font-size: 12px;
   padding: 15px 12px;
   margin: 0;
@@ -234,19 +234,19 @@
   color: #333;
   background: #f8f8f8;
 }
-.mweb-v-green .code-section {
+.note-to-mp .code-section {
   display: flex;
   background: #f8f8f8;
   border-radius: 6px;
   border: 2px solid #3eaf7c;
 }
-.mweb-v-green section pre {
+.note-to-mp section pre {
   margin: 0;
   display: block;
   padding: 1em;
   overflow-x: auto;
 }
-.mweb-v-green section pre code {
+.note-to-mp section pre code {
   border: none;
   font-size: 1em;
   line-height: 1.8em;
@@ -254,7 +254,7 @@
   margin: 0 !important;
   text-wrap: nowrap;
 }
-.mweb-v-green section ul {
+.note-to-mp section ul {
   flex-shrink: 0;
   counter-reset: line;
   margin: 0;
@@ -262,7 +262,7 @@
   white-space: normal;
   width: fit-content;
 }
-.mweb-v-green section ul > li {
+.note-to-mp section ul > li {
   position: relative;
   margin: 0;
   padding: 0;
@@ -275,6 +275,6 @@
   list-style-type: none;
   text-wrap: nowrap;
 }
-.mweb-v-green section ul > li::marker {
+.note-to-mp section ul > li::marker {
   content: none;
 }

@@ -1,7 +1,7 @@
 /* =========================================================== */
 /* 笔记样式 https://github.com/xbmlz/hexo-theme-maple            */
 /* =========================================================== */
-.maple {
+.note-to-mp {
     padding: 20px 20px;
     user-select: text;
     -webkit-user-select: text;
@@ -9,15 +9,15 @@
     font-family: "Inter", Inter var, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
 }
 
-.maple:last-child {
+.note-to-mp:last-child {
     margin-bottom: 0;
 }
 
-.maple .fancybox-img {
+.note-to-mp .fancybox-img {
     border: none;
 }
 
-.maple .fancybox-img:hover {
+.note-to-mp .fancybox-img:hover {
     opacity: none;
     border: none;
 }
@@ -27,7 +27,7 @@
    Heading 
   ==================================
   */
-.maple h1 {
+.note-to-mp h1 {
     color: #222;
     font-weight: 800;
     font-size: 2.25em;
@@ -36,7 +36,7 @@
     line-height: 1.1111111;
 }
 
-.maple h2 {
+.note-to-mp h2 {
     color: inherit;
     font-weight: 700;
     font-size: 1.5em;
@@ -45,7 +45,7 @@
     line-height: 1.3333333;
 }
 
-.maple h3 {
+.note-to-mp h3 {
     color: inherit;
     font-weight: 600;
     font-size: 1.25em;
@@ -54,7 +54,7 @@
     line-height: 1.6;
 }
 
-.maple h4 {
+.note-to-mp h4 {
     color: inherit;
     font-weight: 600;
     margin-top: 1.5em;
@@ -67,7 +67,7 @@
   Horizontal Rules
   ==================================
   */
-.maple hr {
+.note-to-mp hr {
     border-color: rgba(125, 125, 125, 0.3);
     margin-top: 3em;
     margin-bottom: 3em;
@@ -78,7 +78,7 @@
   Paragraphs
   ==================================
   */
-.maple p {
+.note-to-mp p {
     margin: 1em 0;
 }
 
@@ -87,16 +87,16 @@
   Emphasis
   ==================================
   */
-.maple strong {
+.note-to-mp strong {
     color: #222;
     font-weight: 600;
 }
 
-.maple em {
+.note-to-mp em {
     color: inherit;
 }
 
-.maple s {
+.note-to-mp s {
     color: inherit;
 }
 
@@ -105,7 +105,7 @@
   Blockquotes
   ==================================
   */
-.maple blockquote {
+.note-to-mp blockquote {
     font-size: 1rem;
     display: block;
     margin: 1em 0;
@@ -115,11 +115,11 @@
     border-left: 0.25rem solid rgba(125, 125, 125, 0.302);
 }
 
-.maple blockquote p {
+.note-to-mp blockquote p {
     margin: 0;
 }
 
-.maple blockquote footer strong {
+.note-to-mp blockquote footer strong {
     margin-right: 0.5em;
 }
 
@@ -128,26 +128,26 @@
   List
   ==================================
   */
-.maple ul {
+.note-to-mp ul {
     margin: 0;
     /* padding: 0; */
     margin-top: 1.25em;
     margin-bottom: 1.25em;
 }
 
-.maple ul>li {
+.note-to-mp ul>li {
     position: relative;
     /* padding-left: 1.75rem; */
     margin-top: 0.5em;
     margin-bottom: 0.5em;
 }
 
-.maple ul>li::marker {
+.note-to-mp ul>li::marker {
     color: #555;
     /* font-size: 1.5em; */
 }
 
-.maple ol {
+.note-to-mp ol {
     margin: 0;
     padding: 0;
     margin-top: 1.25em;
@@ -155,7 +155,7 @@
     list-style-type: decimal;
 }
 
-.maple ol>li {
+.note-to-mp ol>li {
     position: relative;
     padding-left: 0.8em;
     margin-left: 2em;
@@ -168,7 +168,7 @@
   Link
   ==================================
   */
-.maple a {
+.note-to-mp a {
     color: #000;
     text-decoration: none;
     font-weight: 500;
@@ -177,7 +177,7 @@
     transition: border 0.3s ease-in-out;
 }
 
-.maple a:hover {
+.note-to-mp a:hover {
     border-bottom: 1px solid #555;
 }
 
@@ -186,7 +186,7 @@
   Table
   ==================================
   */
-.maple table {
+.note-to-mp table {
     width: 100%;
     table-layout: auto;
     text-align: left;
@@ -199,38 +199,38 @@
     text-indent: 0;
 }
 
-.maple table thead {
+.note-to-mp table thead {
     color: #000;
     font-weight: 600;
     border-bottom-width: 1px;
     border-bottom-color: #d1d5db;
 }
 
-.maple table thead th {
+.note-to-mp table thead th {
     vertical-align: bottom;
     padding-right: 0.5714286em;
     padding-bottom: 0.5714286em;
     padding-left: 0.5714286em;
 }
 
-.maple table thead th:first-child {
+.note-to-mp table thead th:first-child {
     padding-left: 0;
 }
 
-.maple table thead th:last-child {
+.note-to-mp table thead th:last-child {
     padding-right: 0;
 }
 
-.maple table tbody tr {
+.note-to-mp table tbody tr {
     border-bottom-width: 1px;
     border-bottom-color: #e5e7eb;
 }
 
-.maple table tbody tr:last-child {
+.note-to-mp table tbody tr:last-child {
     border-bottom-width: 0;
 }
 
-.maple table tbody td {
+.note-to-mp table tbody td {
     vertical-align: top;
     padding-top: 0.5714286em;
     padding-right: 0.5714286em;
@@ -238,11 +238,11 @@
     padding-left: 0.5714286em;
 }
 
-.maple table tbody td:first-child {
+.note-to-mp table tbody td:first-child {
     padding-left: 0;
 }
 
-.maple table tbody td:last-child {
+.note-to-mp table tbody td:last-child {
     padding-right: 0;
 }
 
@@ -251,12 +251,12 @@
   Images
   ==================================
   */
-.maple img {
+.note-to-mp img {
     margin-top: 2em;
     margin-bottom: 2em;
 }
 
-.maple .footnotes hr {
+.note-to-mp .footnotes hr {
     margin-top: 4em;
     margin-bottom: 0.5em;
 }
@@ -266,13 +266,13 @@
   Code
   ==================================
   */
-.maple .code-section {
+.note-to-mp .code-section {
     display: flex;
     background-color: rgb(250, 250, 250);
     border: rgb(240, 240, 240) 1px solid;
 }
 
-.maple section ul {
+.note-to-mp section ul {
     flex-shrink: 0;
     counter-reset: line;
     margin: 0;
@@ -281,7 +281,7 @@
     width: fit-content;
 }
 
-.maple section ul>li {
+.note-to-mp section ul>li {
     font-family: Consolas, ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", "Courier New", monospace;
     position: relative;
     margin: 0;
@@ -295,12 +295,12 @@
     color: rgba(0, 0, 0, 0.25);
 }
 
-.maple pre {
+.note-to-mp pre {
     margin: 0;
     padding: 0;
 }
 
-.maple code {
+.note-to-mp code {
     line-height: 1.75em;
     font-family: Consolas, ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", "Courier New", monospace;
     color: #333;
@@ -309,6 +309,6 @@
     text-wrap: nowrap;
 }
 
-.maple pre code {
+.note-to-mp pre code {
     display: block;
 }

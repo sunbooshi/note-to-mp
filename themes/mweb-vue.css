@@ -3,7 +3,7 @@
   --control-text-color: #777;
 }
 
-.mweb-vue {
+.note-to-mp {
   font-size: 16px;
   font-family: Source Sans Pro, Helvetica Neue, Arial, sans-serif !important;
   color: #34495e;
@@ -16,41 +16,41 @@
   /** focus mode */
   /* MWeb：代码块高亮 */
 }
-.mweb-vue .task-list-item {
+.note-to-mp .task-list-item {
   list-style-type: none;
   text-indent: -1.5em;
 }
-.mweb-vue .task-list-item:before {
+.note-to-mp .task-list-item:before {
   content: "";
   display: static;
   margin-right: 0px;
 }
-.mweb-vue .task-list-item > input[type=checkbox] {
+.note-to-mp .task-list-item > input[type=checkbox] {
   text-indent: -1.7em;
 }
-.mweb-vue > *:first-child {
+.note-to-mp > *:first-child {
   margin-top: 0 !important;
 }
-.mweb-vue > *:last-child {
+.note-to-mp > *:last-child {
   margin-bottom: 0 !important;
 }
-.mweb-vue img {
+.note-to-mp img {
   max-width: 100%;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-.mweb-vue a {
+.note-to-mp a {
   color: #42b983;
   font-weight: 600;
   padding: 0 2px;
   text-decoration: none;
 }
-.mweb-vue h1,
-.mweb-vue h2,
-.mweb-vue h3,
-.mweb-vue h4,
-.mweb-vue h5,
-.mweb-vue h6 {
+.note-to-mp h1,
+.note-to-mp h2,
+.note-to-mp h3,
+.note-to-mp h4,
+.note-to-mp h5,
+.note-to-mp h6 {
   position: relative;
   margin-top: 1rem;
   margin-bottom: 1rem;
@@ -58,82 +58,82 @@
   line-height: 1.4;
   cursor: text;
 }
-.mweb-vue h1:hover a.anchor,
-.mweb-vue h2:hover a.anchor,
-.mweb-vue h3:hover a.anchor,
-.mweb-vue h4:hover a.anchor,
-.mweb-vue h5:hover a.anchor,
-.mweb-vue h6:hover a.anchor {
+.note-to-mp h1:hover a.anchor,
+.note-to-mp h2:hover a.anchor,
+.note-to-mp h3:hover a.anchor,
+.note-to-mp h4:hover a.anchor,
+.note-to-mp h5:hover a.anchor,
+.note-to-mp h6:hover a.anchor {
   text-decoration: none;
 }
-.mweb-vue h1 tt,
-.mweb-vue h1 code {
+.note-to-mp h1 tt,
+.note-to-mp h1 code {
   font-size: inherit !important;
 }
-.mweb-vue h2 tt,
-.mweb-vue h2 code {
+.note-to-mp h2 tt,
+.note-to-mp h2 code {
   font-size: inherit !important;
 }
-.mweb-vue h3 tt,
-.mweb-vue h3 code {
+.note-to-mp h3 tt,
+.note-to-mp h3 code {
   font-size: inherit !important;
 }
-.mweb-vue h4 tt,
-.mweb-vue h4 code {
+.note-to-mp h4 tt,
+.note-to-mp h4 code {
   font-size: inherit !important;
 }
-.mweb-vue h5 tt,
-.mweb-vue h5 code {
+.note-to-mp h5 tt,
+.note-to-mp h5 code {
   font-size: inherit !important;
 }
-.mweb-vue h6 tt,
-.mweb-vue h6 code {
+.note-to-mp h6 tt,
+.note-to-mp h6 code {
   font-size: inherit !important;
 }
-.mweb-vue h2 a,
-.mweb-vue h3 a {
+.note-to-mp h2 a,
+.note-to-mp h3 a {
   color: #34495e;
 }
-.mweb-vue h1 {
+.note-to-mp h1 {
   padding-bottom: 0.4rem;
   font-size: 2.2rem;
   line-height: 1.3;
 }
-.mweb-vue h2 {
+.note-to-mp h2 {
   font-size: 1.75rem;
   line-height: 1.225;
   margin: 35px 0 15px;
   padding-bottom: 0.5em;
   border-bottom: 1px solid #ddd;
 }
-.mweb-vue h3 {
+.note-to-mp h3 {
   font-size: 1.4rem;
   line-height: 1.43;
   margin: 20px 0 7px;
 }
-.mweb-vue h4 {
+.note-to-mp h4 {
   font-size: 1.2rem;
 }
-.mweb-vue h5 {
+.note-to-mp h5 {
   font-size: 1rem;
 }
-.mweb-vue h6 {
+.note-to-mp h6 {
   font-size: 1rem;
   color: #777;
 }
-.mweb-vue p,
-.mweb-vue blockquote,
-.mweb-vue ul,
-.mweb-vue ol,
-.mweb-vue dl,
-.mweb-vue table {
+.note-to-mp p,
+.note-to-mp blockquote,
+.note-to-mp ul,
+.note-to-mp ol,
+.note-to-mp dl,
+.note-to-mp table {
   margin: 0.8em 0;
 }
-.mweb-vue li > ol,
-.mweb-vue li > ul {
+.note-to-mp li > ol,
+.note-to-mp li > ul {
   margin: 0 0;
 }
-.mweb-vue hr {
+.note-to-mp hr {
   height: 2px;
   padding: 0;
   margin: 16px 0;
@@ -142,78 +142,78 @@
   overflow: hidden;
   box-sizing: content-box;
 }
-.mweb-vue > h2:first-child {
+.note-to-mp > h2:first-child {
   margin-top: 0;
   padding-top: 0;
 }
-.mweb-vue > h1:first-child {
+.note-to-mp > h1:first-child {
   margin-top: 0;
   padding-top: 0;
 }
-.mweb-vue > h1:first-child + h2 {
+.note-to-mp > h1:first-child + h2 {
   margin-top: 0;
   padding-top: 0;
 }
-.mweb-vue > h3:first-child,
-.mweb-vue > h4:first-child,
-.mweb-vue > h5:first-child,
-.mweb-vue > h6:first-child {
+.note-to-mp > h3:first-child,
+.note-to-mp > h4:first-child,
+.note-to-mp > h5:first-child,
+.note-to-mp > h6:first-child {
   margin-top: 0;
   padding-top: 0;
 }
-.mweb-vue a:first-child h1,
-.mweb-vue a:first-child h2,
-.mweb-vue a:first-child h3,
-.mweb-vue a:first-child h4,
-.mweb-vue a:first-child h5,
-.mweb-vue a:first-child h6 {
+.note-to-mp a:first-child h1,
+.note-to-mp a:first-child h2,
+.note-to-mp a:first-child h3,
+.note-to-mp a:first-child h4,
+.note-to-mp a:first-child h5,
+.note-to-mp a:first-child h6 {
   margin-top: 0;
   padding-top: 0;
 }
-.mweb-vue h1 p,
-.mweb-vue h2 p,
-.mweb-vue h3 p,
-.mweb-vue h4 p,
-.mweb-vue h5 p,
-.mweb-vue h6 p {
+.note-to-mp h1 p,
+.note-to-mp h2 p,
+.note-to-mp h3 p,
+.note-to-mp h4 p,
+.note-to-mp h5 p,
+.note-to-mp h6 p {
   margin-top: 0;
 }
-.mweb-vue li p.first {
+.note-to-mp li p.first {
   display: inline-block;
 }
-.mweb-vue ul,
-.mweb-vue ol {
+.note-to-mp ul,
+.note-to-mp ol {
   padding-left: 30px;
 }
-.mweb-vue ul:first-child,
-.mweb-vue ol:first-child {
+.note-to-mp ul:first-child,
+.note-to-mp ol:first-child {
   margin-top: 0;
 }
-.mweb-vue ul:last-child,
-.mweb-vue ol:last-child {
+.note-to-mp ul:last-child,
+.note-to-mp ol:last-child {
   margin-bottom: 0;
 }
-.mweb-vue blockquote {
+.note-to-mp blockquote {
   border-left: 4px solid #42b983;
   padding: 10px 15px;
   color: #777;
   background-color: rgba(66, 185, 131, 0.1);
 }
-.mweb-vue table {
+.note-to-mp table {
   padding: 0;
   word-break: initial;
   border-collapse: collapse;
 }
-.mweb-vue table tr {
+.note-to-mp table tr {
   border-top: 1px solid #dfe2e5;
   margin: 0;
   padding: 0;
 }
-.mweb-vue table tr:nth-child(2n),
-.mweb-vue thead {
+.note-to-mp table tr:nth-child(2n),
+.note-to-mp thead {
   background-color: #fafafa;
 }
-.mweb-vue table tr th {
+.note-to-mp table tr th {
   font-weight: bold;
   border: 1px solid #dfe2e5;
   border-bottom: 0;
@@ -221,89 +221,89 @@
   margin: 0;
   padding: 6px 13px;
 }
-.mweb-vue table tr td {
+.note-to-mp table tr td {
   border: 1px solid #dfe2e5;
   text-align: left;
   margin: 0;
   padding: 6px 13px;
 }
-.mweb-vue table tr th:first-child,
-.mweb-vue table tr td:first-child {
+.note-to-mp table tr th:first-child,
+.note-to-mp table tr td:first-child {
   margin-top: 0;
 }
-.mweb-vue table tr th:last-child,
-.mweb-vue table tr td:last-child {
+.note-to-mp table tr th:last-child,
+.note-to-mp table tr td:last-child {
   margin-bottom: 0;
 }
-.mweb-vue .cm-s-inner .cm-link,
-.mweb-vue .cm-s-inner.cm-link {
+.note-to-mp .cm-s-inner .cm-link,
+.note-to-mp .cm-s-inner.cm-link {
   color: #22a2c9;
 }
-.mweb-vue .cm-s-inner .cm-string {
+.note-to-mp .cm-s-inner .cm-string {
   color: #22a2c9;
 }
-.mweb-vue .md-task-list-item > input {
+.note-to-mp .md-task-list-item > input {
   margin-left: -1.3em;
 }
-.mweb-vue .md-fences {
+.note-to-mp .md-fences {
   background-color: #f8f8f8;
 }
-.mweb-vue .mathjax-block > .code-tooltip {
+.note-to-mp .mathjax-block > .code-tooltip {
   bottom: 0.375rem;
 }
-.mweb-vue .md-image > .md-meta {
+.note-to-mp .md-image > .md-meta {
   border-radius: 3px;
   font-family: Consolas, "Liberation Mono", Courier, monospace;
   padding: 2px 0 0 4px;
   font-size: 0.9em;
   color: inherit;
 }
-.mweb-vue .md-tag {
+.note-to-mp .md-tag {
   color: inherit;
 }
-.mweb-vue .md-toc {
+.note-to-mp .md-toc {
   margin-top: 20px;
   padding-bottom: 20px;
 }
-.mweb-vue .sidebar-tabs {
+.note-to-mp .sidebar-tabs {
   border-bottom: none;
 }
-.mweb-vue #typora-quick-open {
+.note-to-mp #typora-quick-open {
   border: 1px solid #ddd;
   background-color: #f8f8f8;
 }
-.mweb-vue #typora-quick-open-item {
+.note-to-mp #typora-quick-open-item {
   background-color: #fafafa;
   border-color: #fefefe #e5e5e5 #e5e5e5 #eee;
   border-style: solid;
   border-width: 1px;
 }
-.mweb-vue #md-notification:before {
+.note-to-mp #md-notification:before {
   top: 10px;
 }
-.mweb-vue .on-focus-mode blockquote {
+.note-to-mp .on-focus-mode blockquote {
   border-left-color: rgba(85, 85, 85, 0.12);
 }
-.mweb-vue .file-node-content:hover .file-node-icon,
-.mweb-vue .file-node-content:hover .file-node-open-state {
+.note-to-mp .file-node-content:hover .file-node-icon,
+.note-to-mp .file-node-content:hover .file-node-open-state {
   visibility: visible;
 }
-.mweb-vue .mac-seamless-mode #typora-sidebar {
+.note-to-mp .mac-seamless-mode #typora-sidebar {
   background-color: var(--side-bar-bg-color);
 }
-.mweb-vue .md-lang {
+.note-to-mp .md-lang {
   color: #b4654d;
 }
-.mweb-vue .html-for-mac .context-menu {
+.note-to-mp .html-for-mac .context-menu {
   --item-hover-bg-color: #e6f0fe;
 }
-.mweb-vue .footnotes hr {
+.note-to-mp .footnotes hr {
   margin-top: 4em;
   margin-bottom: 0.5em;
 }
-.mweb-vue code,
-.mweb-vue tt,
-.mweb-vue pre {
+.note-to-mp code,
+.note-to-mp tt,
+.note-to-mp pre {
   border-radius: 2px;
   font-family: Roboto Mono, Source Sans Pro, Monaco, courier, monospace !important;
   font-size: 0.92rem;
@@ -311,32 +311,32 @@
   overflow-x: auto;
   background-color: #f8f8f8;
 }
-.mweb-vue code {
+.note-to-mp code {
   margin: 0 2px;
   padding: 2px 4px;
 }
-.mweb-vue pre code {
+.note-to-mp pre code {
   background: none;
   border: none;
   margin: 0;
   padding: 0;
 }
-.mweb-vue pre {
+.note-to-mp pre {
   padding: 0.7em 1em;
 }
-.mweb-vue .code-section {
+.note-to-mp .code-section {
   display: flex;
   background: #f8f8f8;
   border-radius: 2px;
 }
-.mweb-vue section pre {
+.note-to-mp section pre {
   margin: 0;
   display: block;
   padding: 1em;
   font-size: 1em;
   overflow-x: auto;
 }
-.mweb-vue section pre code {
+.note-to-mp section pre code {
   border: none;
   font-size: 1em;
   line-height: 1.6em;
@@ -344,7 +344,7 @@
   margin: 0 !important;
   text-wrap: nowrap;
 }
-.mweb-vue section ul {
+.note-to-mp section ul {
   flex-shrink: 0;
   counter-reset: line;
   margin: 0;
@@ -352,7 +352,7 @@
   white-space: normal;
   width: fit-content;
 }
-.mweb-vue section ul > li {
+.note-to-mp section ul > li {
   position: relative;
   margin: 0;
   padding: 0;
@@ -365,6 +365,6 @@
   list-style-type: none;
   font-family: Roboto Mono, Source Sans Pro, Monaco, courier, monospace !important;
 }
-.mweb-vue section ul > li::marker {
+.note-to-mp section ul > li::marker {
   content: none;
 }

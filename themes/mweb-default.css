@@ -17,10 +17,10 @@
  * 各个属性的默认值为 chrome 的默认样式，见 variables/default.scss。
  */
 /**
- * MWeb 包裹 markdown 的容器是 .mweb-default
+ * MWeb 包裹 markdown 的容器是 .note-to-mp
  * Typora 中是 #write
  */
-.mweb-default {
+.note-to-mp {
   line-height: 1.6em;
   -webkit-text-size-adjust: 100%;
   margin: 0px 0px;
@@ -36,22 +36,22 @@
   /* table */
   /* svg */
 }
-.mweb-default * {
+.note-to-mp * {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
-.mweb-default > *:first-child {
+.note-to-mp > *:first-child {
   margin-top: 0 !important;
 }
-.mweb-default > *:last-child {
+.note-to-mp > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-default p, .mweb-default details, .mweb-default dl, .mweb-default ol, .mweb-default ul, .mweb-default pre, .mweb-default xmp, .mweb-default plaintext, .mweb-default listing, .mweb-default blockquote, .mweb-default table, .mweb-default figure, .mweb-default hr {
+.note-to-mp p, .note-to-mp details, .note-to-mp dl, .note-to-mp ol, .note-to-mp ul, .note-to-mp pre, .note-to-mp xmp, .note-to-mp plaintext, .note-to-mp listing, .note-to-mp blockquote, .note-to-mp table, .note-to-mp figure, .note-to-mp hr {
   margin-top: 0.75em;
   margin-bottom: 0.75em;
 }
-.mweb-default h1 {
+.note-to-mp h1 {
   font-size: 2em;
   font-weight: bold;
   margin-top: 1.5em;
@@ -59,7 +59,7 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-default h2 {
+.note-to-mp h2 {
   font-size: 1.5em;
   font-weight: bold;
   margin-top: 1.5em;
@@ -67,7 +67,7 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-default h3 {
+.note-to-mp h3 {
   font-size: 1.17em;
   font-weight: bold;
   margin-top: 1.5em;
@@ -75,7 +75,7 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-default h4 {
+.note-to-mp h4 {
   font-size: 1em;
   font-weight: bold;
   margin-top: 1.5em;
@@ -83,7 +83,7 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-default h5 {
+.note-to-mp h5 {
   font-size: 0.83em;
   font-weight: bold;
   margin-top: 1.5em;
@@ -91,7 +91,7 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-default h6 {
+.note-to-mp h6 {
   font-size: 0.67em;
   font-weight: bold;
   margin-top: 1.5em;
@@ -99,105 +99,105 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-default p {
+.note-to-mp p {
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-default pre, .mweb-default xmp, .mweb-default plaintext, .mweb-default listing {
+.note-to-mp pre, .note-to-mp xmp, .note-to-mp plaintext, .note-to-mp listing {
   font-family: monospace, Menlo-Regular, Menlo, Monaco, Consolas, "Courier New";
 }
-.mweb-default blockquote > :first-child {
+.note-to-mp blockquote > :first-child {
   margin-top: 0;
 }
-.mweb-default blockquote > :last-child {
+.note-to-mp blockquote > :last-child {
   margin-bottom: 0;
 }
-.mweb-default hr {
+.note-to-mp hr {
   border-style: inset;
   border-width: 1px;
 }
-.mweb-default img {
+.note-to-mp img {
   max-width: 100%;
   height: auto;
 }
-.mweb-default li {
+.note-to-mp li {
   word-wrap: break-all;
 }
-.mweb-default li + li {
+.note-to-mp li + li {
   margin-top: 0.25em;
 }
-.mweb-default ul ul, .mweb-default ol ul, .mweb-default ul ol, .mweb-default ol ol {
+.note-to-mp ul ul, .note-to-mp ol ul, .note-to-mp ul ol, .note-to-mp ol ol {
   margin-top: 0;
   margin-bottom: 0;
 }
-.mweb-default .task-list-item {
+.note-to-mp .task-list-item {
   list-style-type: none;
 }
-.mweb-default a {
+.note-to-mp a {
   color: -webkit-link;
   text-decoration: underline;
 }
-.mweb-default a img {
+.note-to-mp a img {
   border: none;
 }
-.mweb-default b, .mweb-default strong {
+.note-to-mp b, .note-to-mp strong {
   font-weight: bold;
 }
-.mweb-default i, .mweb-default cite, .mweb-default em, .mweb-default var, .mweb-default address, .mweb-default dfn {
+.note-to-mp i, .note-to-mp cite, .note-to-mp em, .note-to-mp var, .note-to-mp address, .note-to-mp dfn {
   font-style: italic;
 }
-.mweb-default code, .mweb-default kbd, .mweb-default tt, .mweb-default samp {
+.note-to-mp code, .note-to-mp kbd, .note-to-mp tt, .note-to-mp samp {
   font-family: monospace, Menlo-Regular, Menlo, Monaco, Consolas, "Courier New";
 }
-.mweb-default mark {
+.note-to-mp mark {
   padding: 0.2em 0;
   background-color: yellow;
 }
-.mweb-default del, .mweb-default s {
+.note-to-mp del, .note-to-mp s {
   color: inherit;
 }
-.mweb-default table {
+.note-to-mp table {
   color: black;
   border-collapse: collapse;
   background-color: white;
   border-spacing: 2px;
   font-size: 1em;
 }
-.mweb-default th, .mweb-default td {
+.note-to-mp th, .note-to-mp td {
   border-color: gray;
   border-width: 1px;
   border-style: solid;
 }
-.mweb-default th {
+.note-to-mp th {
   padding: 4px 8px;
   font-size: 1em;
   font-weight: bold;
 }
-.mweb-default td {
+.note-to-mp td {
   padding: 4px 8px;
   font-size: 1em;
   font-weight: normal;
 }
-.mweb-default div[id^=mweb-chart-ele] svg {
+.note-to-mp div[id^=mweb-chart-ele] svg {
   background-color: white;
 }
 
-.mweb-default .task-list-item + .task-list-item {
+.note-to-mp .task-list-item + .task-list-item {
   margin-top: 3px;
 }
-.mweb-default .task-list-item input {
+.note-to-mp .task-list-item input {
   margin: 0.3em 0 0.25em -1.6em;
 }
-.mweb-default .code-section {
+.note-to-mp .code-section {
   display: flex;
   border: 1px solid gray;
 }
-.mweb-default section pre {
+.note-to-mp section pre {
   margin: 0;
   padding: 0;
   overflow-x: auto;
 }
-.mweb-default section pre code {
+.note-to-mp section pre code {
   font-family: Consolas, ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", "Courier New", monospace;
   border: none;
   font-size: 1em;
@@ -206,7 +206,7 @@
   display: block;
   text-wrap: nowrap;
 }
-.mweb-default section ul {
+.note-to-mp section ul {
   flex-shrink: 0;
   counter-reset: line;
   margin: 0;
@@ -214,7 +214,7 @@
   white-space: normal;
   width: fit-content;
 }
-.mweb-default section ul > li {
+.note-to-mp section ul > li {
   position: relative;
   margin: 0;
   padding: 0;
@@ -228,6 +228,6 @@
   list-style-type: none;
   color: #ff502c;
 }
-.mweb-default section ul > li::marker {
+.note-to-mp section ul > li::marker {
   content: none;
 }

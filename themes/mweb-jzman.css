@@ -13,10 +13,10 @@
  * 各个属性的默认值为 chrome 的默认样式，见 variables/default.scss。
  */
 /**
- * MWeb 包裹 markdown 的容器是 .mweb-jzman
+ * MWeb 包裹 markdown 的容器是 .note-to-mp
  * Typora 中是 #write
  */
-.mweb-jzman {
+.note-to-mp {
   line-height: 1.6em;
   -webkit-text-size-adjust: 100%;
   margin: 0px 0px;
@@ -32,22 +32,22 @@
   /* table */
   /* svg */
 }
-.mweb-jzman * {
+.note-to-mp * {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
-.mweb-jzman > *:first-child {
+.note-to-mp > *:first-child {
   margin-top: 0 !important;
 }
-.mweb-jzman > *:last-child {
+.note-to-mp > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-jzman p, .mweb-jzman details, .mweb-jzman dl, .mweb-jzman ol, .mweb-jzman ul, .mweb-jzman pre, .mweb-jzman xmp, .mweb-jzman plaintext, .mweb-jzman listing, .mweb-jzman blockquote, .mweb-jzman table, .mweb-jzman figure, .mweb-jzman hr {
+.note-to-mp p, .note-to-mp details, .note-to-mp dl, .note-to-mp ol, .note-to-mp ul, .note-to-mp pre, .note-to-mp xmp, .note-to-mp plaintext, .note-to-mp listing, .note-to-mp blockquote, .note-to-mp table, .note-to-mp figure, .note-to-mp hr {
   margin-top: 0.75em;
   margin-bottom: 0.75em;
 }
-.mweb-jzman h1 {
+.note-to-mp h1 {
   font-size: 2em;
   font-weight: bold;
   margin-top: 1.5em;
@@ -55,7 +55,7 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-jzman h2 {
+.note-to-mp h2 {
   font-size: 1.5em;
   font-weight: bold;
   margin-top: 1.5em;
@@ -63,7 +63,7 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-jzman h3 {
+.note-to-mp h3 {
   font-size: 1.17em;
   font-weight: bold;
   margin-top: 1.5em;
@@ -71,7 +71,7 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-jzman h4 {
+.note-to-mp h4 {
   font-size: 1em;
   font-weight: bold;
   margin-top: 1.5em;
@@ -79,7 +79,7 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-jzman h5 {
+.note-to-mp h5 {
   font-size: 0.83em;
   font-weight: bold;
   margin-top: 1.5em;
@@ -87,7 +87,7 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-jzman h6 {
+.note-to-mp h6 {
   font-size: 0.67em;
   font-weight: bold;
   margin-top: 1.5em;
@@ -95,90 +95,90 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-jzman p {
+.note-to-mp p {
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-jzman pre, .mweb-jzman xmp, .mweb-jzman plaintext, .mweb-jzman listing {
+.note-to-mp pre, .note-to-mp xmp, .note-to-mp plaintext, .note-to-mp listing {
   font-family: monospace, Menlo-Regular, Menlo, Monaco, Consolas, "Courier New";
 }
-.mweb-jzman blockquote > :first-child {
+.note-to-mp blockquote > :first-child {
   margin-top: 0;
 }
-.mweb-jzman blockquote > :last-child {
+.note-to-mp blockquote > :last-child {
   margin-bottom: 0;
 }
-.mweb-jzman hr {
+.note-to-mp hr {
   border-style: inset;
   border-width: 1px;
 }
-.mweb-jzman img {
+.note-to-mp img {
   max-width: 100%;
   height: auto;
 }
-.mweb-jzman li {
+.note-to-mp li {
   word-wrap: break-all;
 }
-.mweb-jzman li + li {
+.note-to-mp li + li {
   margin-top: 0.25em;
 }
-.mweb-jzman ul ul, .mweb-jzman ol ul, .mweb-jzman ul ol, .mweb-jzman ol ol {
+.note-to-mp ul ul, .note-to-mp ol ul, .note-to-mp ul ol, .note-to-mp ol ol {
   margin-top: 0;
   margin-bottom: 0;
 }
-.mweb-jzman .task-list-item {
+.note-to-mp .task-list-item {
   list-style-type: none;
 }
-.mweb-jzman a {
+.note-to-mp a {
   color: -webkit-link;
   text-decoration: underline;
 }
-.mweb-jzman a img {
+.note-to-mp a img {
   border: none;
 }
-.mweb-jzman b, .mweb-jzman strong {
+.note-to-mp b, .note-to-mp strong {
   font-weight: bold;
 }
-.mweb-jzman i, .mweb-jzman cite, .mweb-jzman em, .mweb-jzman var, .mweb-jzman address, .mweb-jzman dfn {
+.note-to-mp i, .note-to-mp cite, .note-to-mp em, .note-to-mp var, .note-to-mp address, .note-to-mp dfn {
   font-style: italic;
 }
-.mweb-jzman code, .mweb-jzman kbd, .mweb-jzman tt, .mweb-jzman samp {
+.note-to-mp code, .note-to-mp kbd, .note-to-mp tt, .note-to-mp samp {
   font-family: monospace, Menlo-Regular, Menlo, Monaco, Consolas, "Courier New";
 }
-.mweb-jzman mark {
+.note-to-mp mark {
   padding: 0.2em 0;
   background-color: yellow;
 }
-.mweb-jzman del, .mweb-jzman s {
+.note-to-mp del, .note-to-mp s {
   color: inherit;
 }
-.mweb-jzman table {
+.note-to-mp table {
   color: black;
   border-collapse: collapse;
   background-color: white;
   border-spacing: 2px;
   font-size: 1em;
 }
-.mweb-jzman th, .mweb-jzman td {
+.note-to-mp th, .note-to-mp td {
   border-color: gray;
   border-width: 1px;
   border-style: solid;
 }
-.mweb-jzman th {
+.note-to-mp th {
   padding: 4px 8px;
   font-size: 1em;
   font-weight: bold;
 }
-.mweb-jzman td {
+.note-to-mp td {
   padding: 4px 8px;
   font-size: 1em;
   font-weight: normal;
 }
-.mweb-jzman div[id^=mweb-chart-ele] svg {
+.note-to-mp div[id^=mweb-chart-ele] svg {
   background-color: white;
 }
 
-.mweb-jzman {
+.note-to-mp {
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
   padding: 2em;
   word-break: break-word;
@@ -194,32 +194,32 @@
   background-position: center center;
   /* 代码块特殊处理 */
 }
-.mweb-jzman h1,
-.mweb-jzman h2,
-.mweb-jzman h3,
-.mweb-jzman h4,
-.mweb-jzman h5,
-.mweb-jzman h6 {
+.note-to-mp h1,
+.note-to-mp h2,
+.note-to-mp h3,
+.note-to-mp h4,
+.note-to-mp h5,
+.note-to-mp h6 {
   line-height: 1.5;
   margin-top: 35px;
   margin-bottom: 10px;
   padding-bottom: 5px;
   font-weight: 600;
 }
-.mweb-jzman h1 {
+.note-to-mp h1 {
   font-size: 30px;
   margin-bottom: 5px;
 }
-.mweb-jzman h2 {
+.note-to-mp h2 {
   padding-bottom: 12px;
   font-size: 24px;
   border-bottom: 1px solid #ececec;
 }
-.mweb-jzman h3 {
+.note-to-mp h3 {
   font-size: 18px;
   padding-bottom: 0;
 }
-.mweb-jzman h4 {
+.note-to-mp h4 {
   font-size: 1.2em;
   border-bottom: 2px solid rgb(239, 112, 96);
   word-spacing: 0px !important;
@@ -235,21 +235,21 @@
   border-top-left-radius: 3px;
   margin-right: 3px;
 }
-.mweb-jzman h5 {
+.note-to-mp h5 {
   font-size: 15px;
 }
-.mweb-jzman h6 {
+.note-to-mp h6 {
   margin-top: 5px;
 }
-.mweb-jzman p {
+.note-to-mp p {
   line-height: inherit;
   margin-top: 22px;
   margin-bottom: 22px;
 }
-.mweb-jzman img {
+.note-to-mp img {
   max-width: 100%;
 }
-.mweb-jzman hr {
+.note-to-mp hr {
   border-top: 1px solid #ddd;
   border-bottom: none;
   border-left: none;
@@ -257,16 +257,16 @@
   margin-top: 32px;
   margin-bottom: 32px;
 }
-.mweb-jzman a {
+.note-to-mp a {
   text-decoration: none;
   color: #0269c8;
   border-bottom: 1px solid #d1e9ff;
 }
-.mweb-jzman a:hover,
-.mweb-jzman a:active {
+.note-to-mp a:hover,
+.note-to-mp a:active {
   color: #275b8c;
 }
-.mweb-jzman table {
+.note-to-mp table {
   display: inline-block !important;
   font-size: 12px;
   width: auto;
@@ -274,78 +274,78 @@
   overflow: auto;
   border: solid 1px #f6f6f6;
 }
-.mweb-jzman thead {
+.note-to-mp thead {
   background: #f6f6f6;
   color: #000;
   text-align: left;
 }
-.mweb-jzman tr:nth-child(2n) {
+.note-to-mp tr:nth-child(2n) {
   background-color: #fcfcfc;
 }
-.mweb-jzman th,
-.mweb-jzman td {
+.note-to-mp th,
+.note-to-mp td {
   padding: 12px 7px;
   line-height: 24px;
 }
-.mweb-jzman td {
+.note-to-mp td {
   min-width: 120px;
 }
-.mweb-jzman blockquote {
+.note-to-mp blockquote {
   color: #666;
   padding: 1px 23px;
   margin: 22px 0;
   border-left: 4px solid #cbcbcb;
   background-color: #f8f8f8;
 }
-.mweb-jzman blockquote::after {
+.note-to-mp blockquote::after {
   display: block;
   content: "";
 }
-.mweb-jzman blockquote > p {
+.note-to-mp blockquote > p {
   margin: 10px 0;
 }
-.mweb-jzman ol,
-.mweb-jzman ul {
+.note-to-mp ol,
+.note-to-mp ul {
   padding-left: 28px;
 }
-.mweb-jzman ol li,
-.mweb-jzman ul li {
+.note-to-mp ol li,
+.note-to-mp ul li {
   margin-bottom: 0;
   list-style: inherit;
 }
-.mweb-jzman ol li .task-list-item,
-.mweb-jzman ul li .task-list-item {
+.note-to-mp ol li .task-list-item,
+.note-to-mp ul li .task-list-item {
   list-style: none;
 }
-.mweb-jzman .task-list-item ul,
-.mweb-jzman .task-list-item ol {
+.note-to-mp .task-list-item ul,
+.note-to-mp .task-list-item ol {
   margin-top: 0;
 }
-.mweb-jzman ol ul,
-.mweb-jzman ol ol,
-.mweb-jzman ul ul,
-.mweb-jzman ul ol {
+.note-to-mp ol ul,
+.note-to-mp ol ol,
+.note-to-mp ul ul,
+.note-to-mp ul ol {
   margin-top: 3px;
 }
-.mweb-jzman ol li {
+.note-to-mp ol li {
   padding-left: 6px;
 }
 @media (max-width: 720px) {
-  .mweb-jzman h1 {
+  .note-to-mp h1 {
     font-size: 24px;
   }
-  .mweb-jzman h2 {
+  .note-to-mp h2 {
     font-size: 20px;
   }
-  .mweb-jzman h3 {
+  .note-to-mp h3 {
     font-size: 18px;
   }
 }
-.mweb-jzman .footnotes hr {
+.note-to-mp .footnotes hr {
   margin-top: 4em;
   margin-bottom: 0.5em;
 }
-.mweb-jzman code {
+.note-to-mp code {
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   word-break: break-word;
   border-radius: 2px;
@@ -355,12 +355,12 @@
   font-size: 0.87em;
   padding: 0.065em 0.4em;
 }
-.mweb-jzman .code-section {
+.note-to-mp .code-section {
   display: flex;
   overflow: auto;
   background-color: #fff5f5;
 }
-.mweb-jzman section code {
+.note-to-mp section code {
   font-size: 1em;
   line-height: 1.75em;
   color: #ff502c;
@@ -369,13 +369,13 @@
   text-wrap: nowrap;
   display: block;
 }
-.mweb-jzman section pre {
+.note-to-mp section pre {
   display: block;
   overflow: auto;
   padding: 1em;
   margin: 0;
 }
-.mweb-jzman section ul {
+.note-to-mp section ul {
   flex-shrink: 0;
   counter-reset: line;
   margin: 0;
@@ -383,7 +383,7 @@
   white-space: normal;
   width: fit-content;
 }
-.mweb-jzman section ul > li {
+.note-to-mp section ul > li {
   position: relative;
   margin: 0;
   padding: 0;
@@ -397,6 +397,6 @@
   color: #ff502c;
   text-wrap: nowrap;
 }
-.mweb-jzman section ul > li::marker {
+.note-to-mp section ul > li::marker {
   content: none;
 }

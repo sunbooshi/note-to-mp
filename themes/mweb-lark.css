@@ -19,10 +19,10 @@
  * 各个属性的默认值为 chrome 的默认样式，见 variables/default.scss。
  */
 /**
- * MWeb 包裹 markdown 的容器是 .mweb-lark
+ * MWeb 包裹 markdown 的容器是 .note-to-mp
  * Typora 中是 #write
  */
-.mweb-lark {
+.note-to-mp {
   line-height: 1.68;
   -webkit-text-size-adjust: 100%;
   margin: 0px 0px;
@@ -38,22 +38,22 @@
   /* table */
   /* svg */
 }
-.mweb-lark * {
+.note-to-mp * {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
-.mweb-lark > *:first-child {
+.note-to-mp > *:first-child {
   margin-top: 0 !important;
 }
-.mweb-lark > *:last-child {
+.note-to-mp > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-lark p, .mweb-lark details, .mweb-lark dl, .mweb-lark ol, .mweb-lark ul, .mweb-lark pre, .mweb-lark xmp, .mweb-lark plaintext, .mweb-lark listing, .mweb-lark blockquote, .mweb-lark table, .mweb-lark figure, .mweb-lark hr {
+.note-to-mp p, .note-to-mp details, .note-to-mp dl, .note-to-mp ol, .note-to-mp ul, .note-to-mp pre, .note-to-mp xmp, .note-to-mp plaintext, .note-to-mp listing, .note-to-mp blockquote, .note-to-mp table, .note-to-mp figure, .note-to-mp hr {
   margin-top: 8px;
   margin-bottom: 8px;
 }
-.mweb-lark h1 {
+.note-to-mp h1 {
   font-size: 26px;
   font-weight: bold;
   margin-top: 26px;
@@ -61,7 +61,7 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-lark h2 {
+.note-to-mp h2 {
   font-size: 22px;
   font-weight: bold;
   margin-top: 22px;
@@ -69,7 +69,7 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-lark h3 {
+.note-to-mp h3 {
   font-size: 20px;
   font-weight: bold;
   margin-top: 20px;
@@ -77,7 +77,7 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-lark h4 {
+.note-to-mp h4 {
   font-size: 18px;
   font-weight: bold;
   margin-top: 18px;
@@ -85,7 +85,7 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-lark h5 {
+.note-to-mp h5 {
   font-size: 16px;
   font-weight: bold;
   margin-top: 16px;
@@ -93,7 +93,7 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-lark h6 {
+.note-to-mp h6 {
   font-size: 16px;
   font-weight: bold;
   margin-top: 16px;
@@ -101,107 +101,107 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-lark p {
+.note-to-mp p {
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-lark pre, .mweb-lark xmp, .mweb-lark plaintext, .mweb-lark listing {
+.note-to-mp pre, .note-to-mp xmp, .note-to-mp plaintext, .note-to-mp listing {
   font-family: monospace, Menlo-Regular, Menlo, Monaco, Consolas, "Courier New";
 }
-.mweb-lark blockquote > :first-child {
+.note-to-mp blockquote > :first-child {
   margin-top: 0;
 }
-.mweb-lark blockquote > :last-child {
+.note-to-mp blockquote > :last-child {
   margin-bottom: 0;
 }
-.mweb-lark hr {
+.note-to-mp hr {
   border-style: inset;
   border-width: 1px;
 }
-.mweb-lark img {
+.note-to-mp img {
   max-width: 100%;
   height: auto;
 }
-.mweb-lark li {
+.note-to-mp li {
   word-wrap: break-all;
 }
-.mweb-lark li + li {
+.note-to-mp li + li {
   margin-top: 4px;
 }
-.mweb-lark ul ul, .mweb-lark ol ul, .mweb-lark ul ol, .mweb-lark ol ol {
+.note-to-mp ul ul, .note-to-mp ol ul, .note-to-mp ul ol, .note-to-mp ol ol {
   margin-top: 0;
   margin-bottom: 0;
 }
-.mweb-lark .task-list-item {
+.note-to-mp .task-list-item {
   list-style-type: none;
 }
-.mweb-lark a {
+.note-to-mp a {
   color: #3370ff;
   text-decoration: underline;
 }
-.mweb-lark a img {
+.note-to-mp a img {
   border: none;
 }
-.mweb-lark b, .mweb-lark strong {
+.note-to-mp b, .note-to-mp strong {
   font-weight: bold;
 }
-.mweb-lark i, .mweb-lark cite, .mweb-lark em, .mweb-lark var, .mweb-lark address, .mweb-lark dfn {
+.note-to-mp i, .note-to-mp cite, .note-to-mp em, .note-to-mp var, .note-to-mp address, .note-to-mp dfn {
   font-style: italic;
 }
-.mweb-lark code, .mweb-lark kbd, .mweb-lark tt, .mweb-lark samp {
+.note-to-mp code, .note-to-mp kbd, .note-to-mp tt, .note-to-mp samp {
   font-family: monospace, Menlo-Regular, Menlo, Monaco, Consolas, "Courier New";
 }
-.mweb-lark mark {
+.note-to-mp mark {
   padding: 0.2em 0;
   background-color: rgba(255, 246, 122, 0.8);
 }
-.mweb-lark del, .mweb-lark s {
+.note-to-mp del, .note-to-mp s {
   color: inherit;
 }
-.mweb-lark table {
+.note-to-mp table {
   color: black;
   border-collapse: collapse;
   background-color: white;
   border-spacing: 2px;
   font-size: 1em;
 }
-.mweb-lark th, .mweb-lark td {
+.note-to-mp th, .note-to-mp td {
   border-color: #dee0e3;
   border-width: 1px;
   border-style: solid;
 }
-.mweb-lark th {
+.note-to-mp th {
   padding: 8px 8px;
   font-size: 1em;
   font-weight: 600;
 }
-.mweb-lark td {
+.note-to-mp td {
   padding: 8px 8px;
   font-size: 1em;
   font-weight: normal;
 }
-.mweb-lark div[id^=mweb-chart-ele] svg {
+.note-to-mp div[id^=mweb-chart-ele] svg {
   background-color: white;
 }
 
-.mweb-lark * {
+.note-to-mp * {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-.mweb-lark h1, .mweb-lark h2, .mweb-lark h3, .mweb-lark h4, .mweb-lark h5, .mweb-lark h6 {
+.note-to-mp h1, .note-to-mp h2, .note-to-mp h3, .note-to-mp h4, .note-to-mp h5, .note-to-mp h6 {
   line-height: 1.4;
   font-weight: 600;
   margin-top: 1em;
   margin-bottom: 0.37em;
 }
-.mweb-lark blockquote {
+.note-to-mp blockquote {
   display: block;
   margin-left: 0;
   padding-left: 14px;
   border-left: 2px solid #3370ff;
   color: rgba(31, 35, 41, 0.7);
 }
-.mweb-lark a {
+.note-to-mp a {
   overflow-wrap: break-word;
   word-wrap: break-word;
   white-space: pre-wrap;
@@ -210,10 +210,10 @@
   color: #3370ff;
   text-decoration: none;
 }
-.mweb-lark a:hover {
+.note-to-mp a:hover {
   text-decoration: underline;
 }
-.mweb-lark hr {
+.note-to-mp hr {
   margin: 13px 0 12px;
   border: 0px;
   height: 1px;
@@ -221,35 +221,35 @@
   background-image: linear-gradient(90deg, rgb(187, 191, 196), rgb(187, 191, 196));
   background-repeat: no-repeat;
 }
-.mweb-lark ul > li:not([class*=task-list-item]) {
+.note-to-mp ul > li:not([class*=task-list-item]) {
   word-wrap: break-all;
   padding-left: 12px;
 }
-.mweb-lark ul > li:not([class*=task-list-item])::marker {
+.note-to-mp ul > li:not([class*=task-list-item])::marker {
   color: #3370ff;
 }
-.mweb-lark ol > li:not([class*=task-list-item]) {
+.note-to-mp ol > li:not([class*=task-list-item]) {
   word-wrap: break-all;
   padding-left: 12px;
 }
-.mweb-lark ol > li:not([class*=task-list-item])::marker {
+.note-to-mp ol > li:not([class*=task-list-item])::marker {
   color: #3370ff;
 }
-.mweb-lark li + li, .mweb-lark ul ul, .mweb-lark ol ul, .mweb-lark ul ol, .mweb-lark ol ol, .mweb-lark li ul, .mweb-lark li ol {
+.note-to-mp li + li, .note-to-mp ul ul, .note-to-mp ol ul, .note-to-mp ul ol, .note-to-mp ol ol, .note-to-mp li ul, .note-to-mp li ol {
   margin-top: 4px;
 }
-.mweb-lark .task-list-item {
+.note-to-mp .task-list-item {
   padding-left: 28px;
   margin-left: -6px;
   list-style: none;
   word-wrap: break-all;
 }
-.mweb-lark .task-list-item input {
+.note-to-mp .task-list-item input {
   margin: 0 !important;
   appearance: none;
   -webkit-appearance: none;
 }
-.mweb-lark .task-list-item input:before {
+.note-to-mp .task-list-item input:before {
   content: " ";
   display: inline-block;
   position: relative;
@@ -265,15 +265,15 @@
   margin-left: -22px;
   margin-right: 6px;
 }
-.mweb-lark .task-list-item input:checked:before {
+.note-to-mp .task-list-item input:checked:before {
   background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iMTQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEwLjU4OSAzLjkwM2wuODA4LjgwOGEuMzUuMzUgMCAwIDEgMCAuNDk1TDYuMTggMTAuNDI1YS4zNS4zNSAwIDAgMS0uNDk1IDBMMi43MDMgNy40NDRhLjM1LjM1IDAgMCAxIDAtLjQ5NWwuODA4LS44MDhhLjM1LjM1IDAgMCAxIC40OTUgMGwxLjkyNSAxLjkyNCA0LjE2My00LjE2M2EuMzUuMzUgMCAwIDEgLjQ5NSAweiIgZmlsbD0iIzMzNzBGRiIvPjwvc3ZnPg==);
   background-size: contain;
 }
-.mweb-lark .footnotes hr {
+.note-to-mp .footnotes hr {
   margin-top: 4em;
   margin-bottom: 0.5em;
 }
-.mweb-lark code {
+.note-to-mp code {
   border-radius: 4px;
   margin-left: 2px;
   margin-right: 2px;
@@ -283,18 +283,18 @@
   line-height: 1.6em;
   padding: 0 2px;
 }
-.mweb-lark .code-section {
+.note-to-mp .code-section {
   display: flex;
   border: 1px solid #dee0e3;
   background-color: #f5f6f7;
 }
-.mweb-lark section pre {
+.note-to-mp section pre {
   margin: 0;
   display: block;
   padding: 1em;
   overflow-x: auto;
 }
-.mweb-lark section pre code {
+.note-to-mp section pre code {
   border: none;
   font-size: 1em;
   line-height: 1.8em;
@@ -302,7 +302,7 @@
   margin: 0 !important;
   text-wrap: nowrap;
 }
-.mweb-lark section ul {
+.note-to-mp section ul {
   flex-shrink: 0;
   counter-reset: line;
   margin: 0;
@@ -310,7 +310,7 @@
   white-space: normal;
   width: fit-content;
 }
-.mweb-lark section ul > li {
+.note-to-mp section ul > li {
   position: relative;
   margin: 0;
   padding: 0;
@@ -324,6 +324,6 @@
   list-style-type: none;
   color: #ff502c;
 }
-.mweb-lark section ul > li::marker {
+.note-to-mp section ul > li::marker {
   content: none;
 }
