@@ -10,6 +10,9 @@ export interface ParseOptions {
 	linkStyle: 'footnote' | 'inline';
 };
 
+
+const BlockMarkRegex = /\^[0-9A-Za-z-]+$/;
+
 let AllLinks:string[] = [];
 const parseOptions:ParseOptions = {
     lineNumber: true,
@@ -49,6 +52,33 @@ function footnoteLinks() {
 		return `<li>${href}&nbsp;↩</li>`;
 	});
 	return `<seciton class="footnotes"><hr><ol>${links.join('')}</ol></section>`;
+}
+
+function EmbedBlockMark() {
+	return {
+		name: 'EmbedBlockMark',
+		level: 'inline',
+		start(src: string) {
+			let index = src.indexOf('^');
+			if (index === -1) {
+			    return;
+			}
+			return index;
+		},
+		tokenizer(src: string, tokens: Token[]) {
+			const match = src.match(BlockMarkRegex);
+			if (match) {
+				return {
+					type: 'EmbedBlockMark',
+					raw: match[0],
+					text: match[0]
+				};
+			}
+		},
+		renderer: (token: Tokens.Generic) => {
+			return `<span data-txt="${token.text}"></span}`;
+		}
+	}
 }
 
 export async function markedParse(content:string, op:ParseOptions, extensions:any[])  {
@@ -91,6 +121,7 @@ export async function markedParse(content:string, op:ParseOptions, extensions:an
 			}, 
 		},
 		bgHighlight(),
+		EmbedBlockMark(),
 		... extensions
 	]});
 
