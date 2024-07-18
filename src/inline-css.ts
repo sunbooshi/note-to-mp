@@ -1,4 +1,9 @@
-export default `section .note-callout {
+// 需要渲染进inline style的css样式
+export default `
+/* --------------------------------------- */
+/* callout */
+/* --------------------------------------- */
+section .note-callout {
   border: none;
   padding: 1em 1em 1em 1.5em;
   display: flex;
@@ -54,4 +59,32 @@ section .note-callout-example {
 section .note-callout-quote {
   color: rgb(158, 158, 158);
   background-color: rgba(158, 158, 158, 0.1);
-}`;
+}
+
+/* --------------------------------------- */
+/* math */
+/* --------------------------------------- */
+.block-math-svg {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin:20px 0px;
+  max-width: 300% !important;
+}
+
+/* --------------------------------------- */
+/* 高亮 */
+/* --------------------------------------- */
+.note-highlight {
+  background-color: rgba(255,208,0, 0.4);
+}
+
+/* --------------------------------------- */
+/* 列表需要强制设置样式*/
+/* --------------------------------------- */
+ul {
+  list-style-type: disc;
+}
+`;

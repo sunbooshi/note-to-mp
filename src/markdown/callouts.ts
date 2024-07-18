@@ -157,7 +157,7 @@ function matchCallouts(text:string) {
 }
 
 function GetCalloutTitle(callout:string, text:string) {
-	let title = callout.charAt(0).toUpperCase() + callout.slice(1)
+	let title = callout.charAt(0).toUpperCase() + callout.slice(1).toLowerCase();
 	let start = text.indexOf(']') + 1;
 	if (text.indexOf(']-') > 0 || text.indexOf(']+') > 0) {
 		start = start + 1;
@@ -181,7 +181,10 @@ export function calloutRender(token: Tokens.Blockquote) {
         breaks: true,
     };
 	const title = GetCalloutTitle(callout, token.text);
-	const info = GetCallout(callout);
+	let info = GetCallout(callout.toLowerCase());
+    if (info == null) {
+        info = GetCallout('note');
+    }
 	const lexer = new Lexer(markedOptiones);
 	const index = token.text.indexOf('\n');
 	let body = '';

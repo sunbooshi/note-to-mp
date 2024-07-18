@@ -5,9 +5,11 @@ import { App } from 'obsidian';
 export class PreviewSetting {
     defaultStyle: string;
     defaultHighlight: string;
+    showStyleUI: boolean;
     linkStyle: string;
     lineNumber: boolean;
     authKey: string;
+    useCustomCss: boolean;
     wxInfo: {name:string, appid:string, secret:string}[];
     app: App;
     math: string;
@@ -16,8 +18,10 @@ export class PreviewSetting {
         this.app = app;
         this.defaultStyle = 'obsidian-light';
         this.defaultHighlight = '默认';
-        this.linkStyle = 'inline'
+        this.showStyleUI = true;
+        this.linkStyle = 'inline';
         this.lineNumber = true;
+        this.useCustomCss = true;
         this.authKey = '';
         this.wxInfo = [];
         this.math = 'latex';
@@ -35,11 +39,13 @@ export class PreviewSetting {
         const {
             defaultStyle,
             linkStyle,
+            showStyleUI,
             lineNumber,
             defaultHighlight,
             authKey,
             wxInfo,
             math,
+            useCustomCss,
         } = data;
 
         if (defaultStyle) {
@@ -47,6 +53,9 @@ export class PreviewSetting {
         }
         if (defaultHighlight) {
             this.defaultHighlight = defaultHighlight;
+        }
+        if (showStyleUI !== undefined) {
+            this.showStyleUI = showStyleUI;
         }
         if (linkStyle) {
             this.linkStyle = linkStyle;
@@ -63,17 +72,22 @@ export class PreviewSetting {
         if (math) {
             this.math = math;
         }
+        if (useCustomCss !== undefined) {
+            this.useCustomCss = useCustomCss;
+        }
     }
 
     allSettings() {
         return {
             'defaultStyle': this.defaultStyle,
             'defaultHighlight': this.defaultHighlight,
+            'showStyleUI': this.showStyleUI,
             'linkStyle': this.linkStyle,
             'lineNumber': this.lineNumber,
             'authKey': this.authKey,
             'wxInfo': this.wxInfo,
             'math': this.math,
+            'useCustomCss': this.useCustomCss,
         }
     }
 }

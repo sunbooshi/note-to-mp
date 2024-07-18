@@ -1,3 +1,6 @@
+import * as postcss from "postcss";
+import { sanitizeHTMLToDom } from "obsidian";
+
 function getStyleSheet() {
 	for (var i = 0; i < document.styleSheets.length; i++) {
 		var sheet = document.styleSheets[i];
@@ -55,4 +58,45 @@ export async function CSSProcess(content: HTMLElement) {
 	if (style) {
 		traverse(content, style);
 	}
+}
+
+export function parseCSS(css: string) {
+	return postcss.parse(css);
+}
+
+export function ruleToStyle(rule: postcss.Rule) {
+	let style = '';	
+	rule.walkDecls(decl => {
+		style += decl.prop + ':' + decl.value + ';';
+	})
+
+	return style;
+}
+
+function applyStyle(root: HTMLElement, cssRoot: postcss.Root) {
+	cssRoot.walkRules(rule => {
+		if (root.matches(rule.selector)) {
+			rule.walkDecls(decl => {
+				root.style.setProperty(decl.prop, decl.value);
+			})
+		}
+	});
+
+	let element = root.firstElementChild;
+	while (element) {
+		if (element.tagName === 'svg') {
+			// pass
+		}
+		else {
+			applyStyle(element as HTMLElement, cssRoot);
+		}
+	  	element = element.nextElementSibling;
+	}
+}
+
+export function applyCSS(html: string, css: string) {
+	const doc = sanitizeHTMLToDom(html);
+	const root = postcss.parse(css);
+	applyStyle(doc.firstChild as HTMLElement, root);
+	return doc.firstChild;
 }

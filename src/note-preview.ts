@@ -1,12 +1,13 @@
 import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, sanitizeHTMLToDom, apiVersion } from 'obsidian';
-import { CSSProcess } from './utils';
+import { CSSProcess, parseCSS, ruleToStyle, applyCSS } from './utils';
 import { markedParse, ParseOptions } from './markdown/parser';
 import { PreviewSetting } from './settings';
 import ThemesManager from './themes';
-import CalloutsCSS from './callouts-css';
+import InlineCSS from './inline-css';
 import { LocalImageRenderer } from './markdown/img-extension';
 import { wxGetToken, wxAddDraft, wxBatchGetMaterial } from './weixin-api';
-import { MathRenderer, MathRendererCallback } from './markdown/math';
+import { MathRenderer } from './markdown/math';
+import { MDRendererCallback } from './markdown/callback';
 import { CodeRenderer } from './markdown/code';
 
 export const VIEW_TYPE_NOTE_PREVIEW = 'note-preview';
@@ -14,13 +15,12 @@ export const VIEW_TYPE_NOTE_PREVIEW = 'note-preview';
 const FRONT_MATTER_REGEX = /^(---)$.+?^(---)$.+?/ims;
 
 
-export class NotePreview extends ItemView implements MathRendererCallback {
+export class NotePreview extends ItemView implements MDRendererCallback {
     workspace: Workspace;
     mainDiv: HTMLDivElement;
     toolbar: HTMLDivElement;
     renderDiv: HTMLDivElement;
     articleDiv: HTMLDivElement;
-    styleEl: HTMLElement;
     coverEl: HTMLInputElement;
     useDefaultCover: HTMLInputElement;
     useLocalCover: HTMLInputElement;
@@ -48,7 +48,7 @@ export class NotePreview extends ItemView implements MathRendererCallback {
         if (settings.authKey.length > 0) {
             this.mathRenderer = new MathRenderer(this, settings);
         }
-        this.imageRenderer = new LocalImageRenderer(this.app);
+        this.imageRenderer = new LocalImageRenderer(this.app, this);
         this.codeRenderer = new CodeRenderer(settings.lineNumber, this.mathRenderer);
     }
 
@@ -120,7 +120,7 @@ export class NotePreview extends ItemView implements MathRendererCallback {
             this.articleHTML = await markedParse(md, op, extensions);
 
             this.setArticle(this.articleHTML);
-            this.updateCss();
+            // this.updateCss();
         }
         catch (e) {
             console.error(e);
@@ -128,19 +128,27 @@ export class NotePreview extends ItemView implements MathRendererCallback {
         }
     }
 
+    isOldTheme() {
+        const theme = this.themeManager.getTheme(this.currentTheme);
+        if (theme) {
+            return theme.css.indexOf('.note-to-mp') < 0;
+        }
+        return false;
+    }
     setArticle(article: string) {
         this.articleDiv.empty();
-        const html = `<section class="${this.settings.defaultStyle}" id="article-section">${article}</section>`;
-        const doc = sanitizeHTMLToDom(html);
-        if (doc.firstChild) {
-            this.articleDiv.appendChild(doc.firstChild);
+        const css = this.getCSS();
+        let className = 'note-to-mp';
+        // 兼容旧版本样式
+        if (this.isOldTheme()) {
+            className = this.currentTheme;
+        }
+        const html = `<section class="${className}" id="article-section">${article}</section>`;
+        const node = applyCSS(html, this.getCSS());
+        if (node) {
+            this.articleDiv.appendChild(node);
             this.imageRenderer.replaceImages(this.articleDiv);
         }
-    }
-
-    setStyle(css: string) {
-        this.styleEl.empty();
-        this.styleEl.appendChild(document.createTextNode(css));
     }
 
     getArticleSection() {
@@ -148,10 +156,7 @@ export class NotePreview extends ItemView implements MathRendererCallback {
     }
 
     getArticleContent() {
-        CSSProcess(this.articleDiv);
         const content = this.articleDiv.innerHTML;
-        this.setArticle(this.articleHTML);
-        this.updateCss();
         return content;
     }
 
@@ -159,8 +164,8 @@ export class NotePreview extends ItemView implements MathRendererCallback {
         try {
             const theme = this.themeManager.getTheme(this.currentTheme);
             const highlight = this.themeManager.getHighlight(this.currentHighlight);
-            const customCSS = this.themeManager.customCSS;
-            return `${theme!.css}\n\n${highlight!.css}\n\n${CalloutsCSS}\n\n${customCSS}`;
+            const customCSS = this.settings.useCustomCss ? this.themeManager.customCSS : '';
+            return `${InlineCSS}\n\n${highlight!.css}\n\n${theme!.css}\n\n${customCSS}`;
         } catch (error) {
             console.error(error);
             new Notice(`获取样式失败${this.currentTheme}|${this.currentHighlight}，请检查主题是否正确安装。`);
@@ -310,41 +315,43 @@ export class NotePreview extends ItemView implements MathRendererCallback {
         this.coverEl.id = 'cover-input';
 
         // 样式
-        lineDiv = this.toolbar.createDiv({ cls: 'toolbar-line' }); 
-        const cssStyle = lineDiv.createDiv({ cls: 'style-label' });
-        cssStyle.innerText = '样式:';
+        if (this.settings.showStyleUI) {
+            lineDiv = this.toolbar.createDiv({ cls: 'toolbar-line' }); 
+            const cssStyle = lineDiv.createDiv({ cls: 'style-label' });
+            cssStyle.innerText = '样式:';
 
-        const selectBtn = lineDiv.createEl('select', { cls: 'style-select' }, async (sel) => {
+            const selectBtn = lineDiv.createEl('select', { cls: 'style-select' }, async (sel) => {
 
-        })
+            })
 
-        selectBtn.onchange = async () => {
-            this.updateStyle(selectBtn.value);
-        }
+            selectBtn.onchange = async () => {
+                this.updateStyle(selectBtn.value);
+            }
 
-        for (let s of this.themeManager.themes) {
-            const op = selectBtn.createEl('option');
-            op.value = s.className;
-            op.text = s.name;
-            op.selected = s.className == this.settings.defaultStyle;
-        }
+            for (let s of this.themeManager.themes) {
+                const op = selectBtn.createEl('option');
+                op.value = s.className;
+                op.text = s.name;
+                op.selected = s.className == this.settings.defaultStyle;
+            }
 
-        const highlightStyle = lineDiv.createDiv({ cls: 'style-label' });
-        highlightStyle.innerText = '代码高亮:';
+            const highlightStyle = lineDiv.createDiv({ cls: 'style-label' });
+            highlightStyle.innerText = '代码高亮:';
 
-        const highlightStyleBtn = lineDiv.createEl('select', { cls: 'style-select' }, async (sel) => {
+            const highlightStyleBtn = lineDiv.createEl('select', { cls: 'style-select' }, async (sel) => {
 
-        })
+            })
 
-        highlightStyleBtn.onchange = async () => {
-            this.updateHighLight(highlightStyleBtn.value);
-        }
+            highlightStyleBtn.onchange = async () => {
+                this.updateHighLight(highlightStyleBtn.value);
+            }
 
-        for (let s of this.themeManager.highlights) {
-            const op = highlightStyleBtn.createEl('option');
-            op.value = s.name;
-            op.text = s.name;
-            op.selected = s.name == this.settings.defaultHighlight;
+            for (let s of this.themeManager.highlights) {
+                const op = highlightStyleBtn.createEl('option');
+                op.value = s.name;
+                op.text = s.name;
+                op.selected = s.name == this.settings.defaultHighlight;
+            }
         }
 
         this.buildMsgView(this.toolbar);
@@ -361,8 +368,6 @@ export class NotePreview extends ItemView implements MathRendererCallback {
         this.renderDiv = this.mainDiv.createDiv({cls: 'render-div'});
         this.renderDiv.id = 'render-div';
         this.renderDiv.setAttribute('style', '-webkit-user-select: text; user-select: text;')
-        this.styleEl = this.renderDiv.createEl('style');
-        this.styleEl.setAttr('title', 'note-to-mp-style');
         this.articleDiv = this.renderDiv.createEl('div');
     }
 
@@ -377,8 +382,7 @@ export class NotePreview extends ItemView implements MathRendererCallback {
     }
 
     updateCss() {
-        this.setStyle(this.getCSS());
-        this.getArticleSection().setAttribute('class', this.currentTheme);
+        this.setArticle(this.articleHTML);
     }
 
     async uploadLocalCover(token: string) {
@@ -411,7 +415,7 @@ export class NotePreview extends ItemView implements MathRendererCallback {
         }
         const token = res.json.token;
         if (token === '') {
-            this.showMsg('获取token失败');
+            this.showMsg('获取token失败: ' + res.json.message);
         }
         return token;
     }
@@ -470,7 +474,6 @@ export class NotePreview extends ItemView implements MathRendererCallback {
             // 获取token
             const token = await this.getToken();
             if (token === '') {
-                this.showMsg('获取token失败');
                 return;
             }
             //上传图片
@@ -522,5 +525,20 @@ export class NotePreview extends ItemView implements MathRendererCallback {
         else {
             span.innerText = '渲染失败';
         }
+    }
+
+    updateElementByID(id:string, html:string):void {
+        const item = this.articleDiv.querySelector('#'+id) as HTMLElement;
+        if (!item) return;
+        const doc = sanitizeHTMLToDom(html);
+        item.empty();
+        if (doc.hasChildNodes()) {
+            for (const child of doc.childNodes) {
+                item.appendChild(child);
+            }
+        }
+        else {
+            item.innerText = '渲染失败';
+        } 
     }
 }

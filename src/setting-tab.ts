@@ -178,6 +178,17 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
+			.setName('在工具栏展示样式选择')
+			.setDesc('建议在移动端关闭，可以增大文章预览区域')
+			.addToggle(toggle => {
+			    toggle.setValue(this.plugin.settings.showStyleUI);
+				toggle.onChange(async (value) => {
+				    this.plugin.settings.showStyleUI = value;
+					await this.plugin.saveSettings();
+				});
+			});
+
+		new Setting(containerEl)
 			.setName('链接展示样式')
 			.addDropdown(dropdown => {
 				dropdown.addOption('inline', '内嵌');
@@ -241,10 +252,18 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('CSS代码片段')
+			.addToggle(toggle => {
+			    toggle.setValue(this.plugin.settings.useCustomCss);
+				toggle.onChange(async (value) => {
+				    this.plugin.settings.useCustomCss = value;
+					await this.plugin.saveSettings();
+				});
+			})
 			.addButton(button => {
 				button.setIcon('refresh-ccw');
 				button.onClick(async () => {
-					this.plugin.themesManager.loadCustomCSS();
+					await this.plugin.themesManager.loadCustomCSS();
+					new Notice('刷新成功');
 				});
 			})
 			.addButton(button => {

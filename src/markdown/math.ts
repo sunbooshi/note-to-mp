@@ -1,23 +1,20 @@
 import { Token, Tokens } from "marked";
 import { requestUrl } from "obsidian";
 import { PreviewSetting } from "../settings";
+import { MDRendererCallback } from "./callback";
 
 const inlineRule = /^(\${1,2})(?!\$)((?:\\.|[^\\\n])*?(?:\\.|[^\\\n\$]))\1(?=[\s?!\.,:？！。，：]|$)/;
 const blockRule = /^(\${1,2})\n((?:\\[^]|[^\\])+?)\n\1(?:\n|$)/;
 
-export interface MathRendererCallback {
-    updateMath(id: string, svg: string):void;
-}
-
 export class MathRenderer {
-    callback: MathRendererCallback;
+    callback: MDRendererCallback;
     svgCache: Map<string, string>;
     mathIndex: number;
     rendererQueue: RendererQueue;
     setting: PreviewSetting;
 
 
-    constructor(callback: MathRendererCallback, setting: PreviewSetting) {
+    constructor(callback: MDRendererCallback, setting: PreviewSetting) {
         this.callback = callback;
         this.svgCache = new Map();
         this.mathIndex = 0;
@@ -33,7 +30,7 @@ export class MathRenderer {
     addToQueue(expression: string, inline: boolean, type:string, id: string) {
         this.rendererQueue.getMathSVG(expression, inline, type, (svg: string)=>{
             this.svgCache.set(expression, svg);
-            this.callback.updateMath(id, svg); 
+            this.callback.updateElementByID(id, svg); 
         })
     }
 
@@ -122,7 +119,8 @@ class RendererQueue {
     private queue: (() => Promise<any>)[] = [];
     private isProcessing: boolean = false;
     // TODO: 测试
-    private host = 'http://10.1.1.178:3000'
+    private host = 'http://10.1.1.178:3000';
+    // private host = 'https://obplugin.sunboshi.tech';
     private authkey: string;
 
     constructor (authkey: string) {
@@ -165,7 +163,13 @@ class RendererQueue {
                     }
                     callback(svg);
                     resolve();
+                }).catch(err => {
+                    console.log(err.msg);
+                    const svg = '渲染失败';
+                    callback(svg);
+                    resolve();
                 })
+
        })}
        this.enqueue(req);
     }
@@ -188,7 +192,6 @@ class RendererQueue {
             if (request) {
                 try {
                     await request();
-                    console.log('finish request');
                 } catch (error) {
                     console.error('Request failed:', error);
                 }
