@@ -4,6 +4,7 @@ import { MathRenderer } from "./math";
 export class CodeRenderer {
 	showLineNumber: boolean;
 	mathRenderer: MathRenderer|null;
+	cardData: string | null;
 
     constructor(showLineNumber: boolean, mathRenderer: MathRenderer|null) {
 		this.showLineNumber = showLineNumber;
@@ -54,6 +55,36 @@ export class CodeRenderer {
 		return null;
 	}
 
+	parseCard(htmlString: string) {
+		const headimgRegex = /data-headimg="([^"]+)"/;
+		const nicknameRegex = /data-nickname="([^"]+)"/;
+		const signatureRegex = /data-signature="([^"]+)"/;
+	
+		const headimgMatch = htmlString.match(headimgRegex);
+		const nicknameMatch = htmlString.match(nicknameRegex);
+		const signatureMatch = htmlString.match(signatureRegex);
+	
+		return {
+			headimg: headimgMatch ? headimgMatch[1] : '',
+			nickname: nicknameMatch ? nicknameMatch[1] : '公众号名称',
+			signature: signatureMatch ? signatureMatch[1] : '公众号介绍'
+		};
+	}
+
+	renderCard(token: Tokens.Code) {
+		this.cardData = token.text;
+		const { headimg, nickname, signature } = this.parseCard(token.text);
+		return `<div class="note-mpcard-wrapper"><div class="note-mpcard-content"><img class="note-mpcard-headimg" width="54" height="54" src="${headimg}"></img><div class="note-mpcard-info"><div class="note-mpcard-nickname">${nickname}</div><div class="note-mpcard-signature">${signature}</div></div></div><div class="note-mpcard-foot">公众号</div></div>`;
+	}
+
+	restoreCard(html: string) {
+		if (this.cardData) {
+			const divRegex = /<div class="note-mpcard-wrapper">[\s\S]*?<\/div>/;
+			return html.replace(divRegex, this.cardData);
+		}
+		return html;
+	}
+
 	codeExtension() {
 		return {
 			name: 'code',
@@ -64,6 +95,9 @@ export class CodeRenderer {
 					if (type) {
 						return this.mathRenderer.renderer(token, false, type);
 					}
+				}
+				if (token.lang && token.lang.trim().toLocaleLowerCase() =='mpcard') {
+					return this.renderCard(token);
 				}
 				return this.codeRenderer(token.text, token.lang);
 			},

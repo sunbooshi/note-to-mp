@@ -91,6 +91,7 @@ export async function markedParse(content:string, op:ParseOptions, extensions:an
 	    highlight(code, lang, info) {
 			const type = CodeRenderer.getMathType(lang)
 			if (type) return code;
+			if (lang && lang.trim().toLocaleLowerCase() == 'mpcard') return code;
 
 		  	if (lang && hljs.getLanguage(lang)) {
 				try {

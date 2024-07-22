@@ -192,7 +192,10 @@ export class LocalImageRenderer {
                     result += line + '\n';
                     continue;
                 }
-                if (line.indexOf(header) < 0) continue;
+                if (!line.trim().startsWith('#')) continue;
+                const items = line.trim().split(' ');
+                if (items.length != 2) continue;
+                if (header.trim() != items[1].trim()) continue;
                 if (this.getHeaderLevel(line)) {
                     result += line + '\n';
                     level = this.getHeaderLevel(line);

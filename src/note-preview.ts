@@ -77,7 +77,13 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         this.listeners.forEach(listener => this.workspace.offref(listener));
     }
 
+    onAppIdChanged() {
+        // 清理上传过的图片
+        this.imageRenderer.allImages.clear();
+    }
+
     async update() {
+        this.codeRenderer.cardData = null;
         this.renderMarkdown();
     }
 
@@ -120,7 +126,6 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             this.articleHTML = await markedParse(md, op, extensions);
 
             this.setArticle(this.articleHTML);
-            // this.updateCss();
         }
         catch (e) {
             console.error(e);
@@ -157,7 +162,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
 
     getArticleContent() {
         const content = this.articleDiv.innerHTML;
-        return content;
+        return this.codeRenderer.restoreCard(content);
     }
 
     getCSS() {
@@ -214,6 +219,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         wxSelect.setAttr('style', 'width: 200px');
         wxSelect.onchange = async () => {
             this.currentAppId = wxSelect.value;
+            this.onAppIdChanged();
         }
         const defautlOp =wxSelect.createEl('option');
         defautlOp.value = '';

@@ -280,7 +280,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			    text.setPlaceholder('请输入注册码')
 					.setValue(this.plugin.settings.authKey)
 					.onChange(async (value) => {
-					    this.plugin.settings.authKey = value;
+					    this.plugin.settings.authKey = value.trim();
 						await this.plugin.saveSettings();
 					})
 					.inputEl.setAttr('style', 'width: 320px;')

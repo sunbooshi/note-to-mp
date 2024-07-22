@@ -3,7 +3,7 @@ import { requestUrl } from "obsidian";
 import { PreviewSetting } from "../settings";
 import { MDRendererCallback } from "./callback";
 
-const inlineRule = /^(\${1,2})(?!\$)((?:\\.|[^\\\n])*?(?:\\.|[^\\\n\$]))\1(?=[\s?!\.,:？！。，：]|$)/;
+const inlineRule = /^(\${1,2})(?!\$)((?:\\.|[^\\\n])*?(?:\\.|[^\\\n\$]))\1/;
 const blockRule = /^(\${1,2})\n((?:\\[^]|[^\\])+?)\n\1(?:\n|$)/;
 
 export class MathRenderer {
@@ -66,12 +66,10 @@ export class MathRenderer {
                         return;
                     }
 
-                    if (index === 0 || indexSrc.charAt(index - 1) === ' ') {
-                        const possibleKatex = indexSrc.substring(index);
+                    const possibleKatex = indexSrc.substring(index);
 
-                        if (possibleKatex.match(inlineRule)) {
-                            return index;
-                        }
+                    if (possibleKatex.match(inlineRule)) {
+                        return index;
                     }
 
                     indexSrc = indexSrc.substring(index + 1).replace(/^\$+/, '');
