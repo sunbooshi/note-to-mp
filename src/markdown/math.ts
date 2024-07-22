@@ -116,15 +116,11 @@ export class MathRenderer {
 class RendererQueue {
     private queue: (() => Promise<any>)[] = [];
     private isProcessing: boolean = false;
-    // TODO: 测试
-    private host = 'http://10.1.1.178:3000';
-    // private host = 'https://obplugin.sunboshi.tech';
+    private host = 'https://obplugin.sunboshi.tech';
     private authkey: string;
 
     constructor (authkey: string) {
         this.authkey = authkey;
-        // TODO: 测试
-        this.authkey = 'c95581ff-0b03-4390-9be6-97bc5cfc7ae5'
     }
 
     getMathSVG(expression:string, inline:boolean, type:string, callback:(svg:string)=>void) {
