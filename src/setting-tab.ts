@@ -130,18 +130,6 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 		this.displayWXInfo('')
 	}
 
-	openAssets() {
-	    const path = require('path');
-		const vaultRoot = (
-			this.app.vault.adapter as FileSystemAdapter
-		).getBasePath();
-		const assets = this.plugin.themesManager.assetsPath;
-		const dst = path.join(vaultRoot, assets);
-		console.log(dst);
-		const { shell } = require('electron');
-		shell.openPath(dst);
-	}
-
 	display() {
 		const {containerEl} = this;
 
@@ -235,7 +223,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			.addButton(button => {
 				button.setIcon('folder-open');
 				button.onClick(async () => {
-					this.openAssets();
+					await this.plugin.themesManager.openAssets();
 				});
 			});
 
@@ -269,7 +257,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			.addButton(button => {
 				button.setIcon('folder-open');
 				button.onClick(async () => {
-					this.openAssets();
+					await this.plugin.themesManager.openAssets();
 				});
 			});
 		

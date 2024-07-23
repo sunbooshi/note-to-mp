@@ -74,12 +74,12 @@ export class CodeRenderer {
 	renderCard(token: Tokens.Code) {
 		this.cardData = token.text;
 		const { headimg, nickname, signature } = this.parseCard(token.text);
-		return `<div class="note-mpcard-wrapper"><div class="note-mpcard-content"><img class="note-mpcard-headimg" width="54" height="54" src="${headimg}"></img><div class="note-mpcard-info"><div class="note-mpcard-nickname">${nickname}</div><div class="note-mpcard-signature">${signature}</div></div></div><div class="note-mpcard-foot">公众号</div></div>`;
+		return `<section class="note-mpcard-wrapper"><div class="note-mpcard-content"><img class="note-mpcard-headimg" width="54" height="54" src="${headimg}"></img><div class="note-mpcard-info"><div class="note-mpcard-nickname">${nickname}</div><div class="note-mpcard-signature">${signature}</div></div></div><div class="note-mpcard-foot">公众号</div></section>`;
 	}
 
 	restoreCard(html: string) {
 		if (this.cardData) {
-			const divRegex = /<div class="note-mpcard-wrapper">[\s\S]*?<\/div>/;
+			const divRegex = /<section class="note-mpcard-wrapper">[\s\S]*?<\/section>/;
 			return html.replace(divRegex, this.cardData);
 		}
 		return html;

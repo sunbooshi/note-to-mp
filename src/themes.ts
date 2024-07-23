@@ -1,4 +1,4 @@
-import { App, PluginManifest, Notice, requestUrl } from "obsidian";
+import { App, PluginManifest, Notice, requestUrl, FileSystemAdapter } from "obsidian";
 import * as zip from "@zip.js/zip.js";
 import DefaultTheme from "./default-theme";
 import DefaultHighlight from "./default-highlight";
@@ -26,7 +26,10 @@ export default class ThemesManager {
     assetsPath: string;
     themesPath: string;
     hilightPath: string;
-    customCSS: string;
+    customCSS: string = '';
+    themeCfg: string;
+    hilightCfg: string;
+    customCSSPath: string;
 
     constructor(app: App, manifest: PluginManifest) {
         this.app = app;
@@ -34,6 +37,9 @@ export default class ThemesManager {
         this.assetsPath = this.app.vault.configDir + '/plugins/' + this.manifest.id + '/assets/';
         this.themesPath = this.assetsPath + 'themes/';
         this.hilightPath = this.assetsPath + 'highlights/';
+        this.themeCfg = this.assetsPath + 'themes.json';
+        this.hilightCfg = this.assetsPath + 'highlights.json';
+        this.customCSSPath = this.assetsPath + 'custom.css';
     }
 
     async loadAssets() {
@@ -44,13 +50,12 @@ export default class ThemesManager {
 
     async loadThemes() {
         try {
-            const configFile = this.assetsPath + 'themes.json';
-            if (!await this.app.vault.adapter.exists(configFile)) {
+            if (!await this.app.vault.adapter.exists(this.themeCfg)) {
                 new Notice('主题资源未下载，请前往设置下载！');
                 this.themes = [this.defaultTheme];
                 return;
             }
-            const data = await this.app.vault.adapter.read(configFile);
+            const data = await this.app.vault.adapter.read(this.themeCfg);
             if (data) {
                 const themes = JSON.parse(data);
                 await this.loadCSS(themes);
@@ -79,8 +84,11 @@ export default class ThemesManager {
 
     async loadCustomCSS() {
         try {
-            const configFile = this.assetsPath + 'custom.css';
-            const cssContent = await this.app.vault.adapter.read(configFile);
+            if (!await this.app.vault.adapter.exists(this.customCSSPath)) {
+                return;
+            }
+
+            const cssContent = await this.app.vault.adapter.read(this.customCSSPath);
             if (cssContent) {
                 this.customCSS = cssContent;
             }
@@ -92,15 +100,14 @@ export default class ThemesManager {
 
     async loadHighlights() {
         try {
-            const configFile = this.assetsPath + 'highlights.json';
             const defaultHighlight = {name: '默认', url: '', css: DefaultHighlight};
             this.highlights = [defaultHighlight];
-            if (!await this.app.vault.adapter.exists(configFile)) {
+            if (!await this.app.vault.adapter.exists(this.hilightCfg)) {
                 new Notice('高亮资源未下载，请前往设置下载！');
                 return;
             }
 
-            const data = await this.app.vault.adapter.read(configFile);
+            const data = await this.app.vault.adapter.read(this.hilightCfg);
             if (data) {
                 const items = JSON.parse(data);
                 for (const item of items) {
@@ -139,7 +146,7 @@ export default class ThemesManager {
 
     async downloadThemes() {
         try {
-            if (await this.app.vault.adapter.exists(this.assetsPath)) {
+            if (await this.app.vault.adapter.exists(this.themeCfg)) {
                 new Notice('主题资源已存在！')
                 return;
             }
@@ -160,7 +167,9 @@ export default class ThemesManager {
         const zipReader = new zip.ZipReader(zipFileReader);
         const entries = await zipReader.getEntries();
 
-        this.app.vault.adapter.mkdir(this.assetsPath);
+        if (!await this.app.vault.adapter.exists(this.assetsPath)) {
+            this.app.vault.adapter.mkdir(this.assetsPath);
+        }
 
         for (const entry of entries) {
             if (entry.directory) {
@@ -182,14 +191,37 @@ export default class ThemesManager {
 
     async removeThemes() {
         try {
-            if (await this.app.vault.adapter.exists(this.assetsPath)) {
-                this.app.vault.adapter.rmdir(this.assetsPath, true);
-                this.loadAssets();
+            const adapter = this.app.vault.adapter;
+            if (await adapter.exists(this.themeCfg)) {
+                await adapter.remove(this.themeCfg);
             }
+            if (await adapter.exists(this.hilightCfg)) {
+                await adapter.remove(this.hilightCfg);
+            }
+            if (await adapter.exists(this.themesPath)) {
+                await adapter.rmdir(this.themesPath, true);
+            }
+            if (await adapter.exists(this.hilightPath)) {
+                await adapter.rmdir(this.hilightPath, true);
+            }
+            await this.loadAssets();
             new Notice('清空完成！');
         } catch (error) {
             console.error(error);
             new Notice('清空主题失败！');
         }
     }
+
+    async openAssets() {
+	    const path = require('path');
+        const adapter = this.app.vault.adapter as FileSystemAdapter;
+		const vaultRoot = adapter.getBasePath();
+		const assets = this.assetsPath;
+        if (!await adapter.exists(assets)) {
+            await adapter.mkdir(assets);
+        }
+		const dst = path.join(vaultRoot, assets);
+		const { shell } = require('electron');
+		shell.openPath(dst);
+	}
 }
