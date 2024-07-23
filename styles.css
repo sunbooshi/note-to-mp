@@ -83,7 +83,11 @@
   display: flex;
 }
 .note-mpcard-headimg {
-  border-radius: 27px;
+  border: none !important;
+  border-radius: 27px !important;
+  box-shadow: none !important;
+  width: 54px !important;
+  height: 54px !important;
   margin: 0 !important;
 }
 .note-mpcard-info { 

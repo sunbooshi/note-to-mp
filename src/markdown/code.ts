@@ -79,7 +79,10 @@ export class CodeRenderer {
 
 	restoreCard(html: string) {
 		if (this.cardData) {
-			const divRegex = /<section class="note-mpcard-wrapper">[\s\S]*?<\/section>/;
+			const divRegex = /<section class="note-mpcard-wrapper"[\s\S]*?<\/section>/;
+			if (!divRegex.test(html)) {
+				console.error('未能正确替换公众号卡片');
+			}
 			return html.replace(divRegex, this.cardData);
 		}
 		return html;
