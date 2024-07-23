@@ -291,7 +291,7 @@ export class LocalImageRenderer {
                 if (matches == null) return;
                 const token: Token = {
                     type: 'LocalImage',
-                    raw: src,
+                    raw: matches[0],
                     href: matches[1],
                     text: matches[1]
                 };
