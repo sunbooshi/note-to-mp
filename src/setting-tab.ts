@@ -1,6 +1,7 @@
 import { App, TextAreaComponent, PluginSettingTab, Setting, Notice, FileSystemAdapter, sanitizeHTMLToDom } from 'obsidian';
 import NoteToMpPlugin from './main';
 import { wxGetToken,wxEncrypt } from './weixin-api';
+import { cleanMathCache } from './markdown/math';
 
 export class NoteToMpSettingTab extends PluginSettingTab {
 	plugin: NoteToMpPlugin;
@@ -196,6 +197,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 				dropdown.setValue(this.plugin.settings.math);
 				dropdown.onChange(async (value) => {
 				    this.plugin.settings.math = value;
+					cleanMathCache();
 					await this.plugin.saveSettings();
 				});
 			});

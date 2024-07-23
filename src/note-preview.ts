@@ -142,7 +142,6 @@ export class NotePreview extends ItemView implements MDRendererCallback {
     }
     setArticle(article: string) {
         this.articleDiv.empty();
-        const css = this.getCSS();
         let className = 'note-to-mp';
         // 兼容旧版本样式
         if (this.isOldTheme()) {
@@ -379,16 +378,12 @@ export class NotePreview extends ItemView implements MDRendererCallback {
 
     updateStyle(styleName: string) {
         this.currentTheme = styleName;
-        this.updateCss();
+        this.renderMarkdown();
     }
 
     updateHighLight(styleName: string) {
         this.currentHighlight = styleName;
-        this.updateCss();
-    }
-
-    updateCss() {
-        this.setArticle(this.articleHTML);
+        this.renderMarkdown();
     }
 
     async uploadLocalCover(token: string) {

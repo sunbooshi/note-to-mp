@@ -6,9 +6,14 @@ import { MDRendererCallback } from "./callback";
 const inlineRule = /^(\${1,2})(?!\$)((?:\\.|[^\\\n])*?(?:\\.|[^\\\n\$]))\1/;
 const blockRule = /^(\${1,2})\n((?:\\[^]|[^\\])+?)\n\1(?:\n|$)/;
 
+const svgCache = new Map<string, string>();
+
+export function cleanMathCache() {
+    svgCache.clear();
+}
+
 export class MathRenderer {
     callback: MDRendererCallback;
-    svgCache: Map<string, string>;
     mathIndex: number;
     rendererQueue: RendererQueue;
     setting: PreviewSetting;
@@ -16,7 +21,6 @@ export class MathRenderer {
 
     constructor(callback: MDRendererCallback, setting: PreviewSetting) {
         this.callback = callback;
-        this.svgCache = new Map();
         this.mathIndex = 0;
         this.setting = setting;
         this.rendererQueue = new RendererQueue(setting.authKey);
@@ -29,7 +33,7 @@ export class MathRenderer {
 
     addToQueue(expression: string, inline: boolean, type:string, id: string) {
         this.rendererQueue.getMathSVG(expression, inline, type, (svg: string)=>{
-            this.svgCache.set(expression, svg);
+            svgCache.set(expression, svg);
             this.callback.updateElementByID(id, svg); 
         })
     }
@@ -41,8 +45,8 @@ export class MathRenderer {
 
         const id = this.generateId();
         let svg = '渲染中';
-        if (this.svgCache.has(token.text)) {
-            svg = this.svgCache.get(token.text) as string;
+        if (svgCache.has(token.text)) {
+            svg = svgCache.get(token.text) as string;
         }
         else {
             this.addToQueue(token.text, false, type, id);
