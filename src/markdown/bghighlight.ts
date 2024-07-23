@@ -30,8 +30,8 @@ export function bgHighlight() {
         renderer(token: Tokens.Generic) {
             const lexer = new Lexer();
             const tokens = lexer.lex(token.text);
-            let body = this.parser.parse(tokens)
             // TODO: 优化一下
+            let body = this.parser.parse(tokens)
             body = body.replace('<p>', '')
             body = body.replace('</p>', '')
             return `<span class="note-highlight">${body}</span>`;

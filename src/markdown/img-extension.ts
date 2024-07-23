@@ -14,7 +14,7 @@ declare module 'obsidian' {
 }
 
 
-const LocalImageRegex = /!\[\[(.*?)\]\]/;
+const LocalImageRegex = /^!\[\[(.*?)\]\]/;
 
 interface ImageInfo {
     resUrl: string;
@@ -246,11 +246,17 @@ export class LocalImageRenderer {
 
     async renderFile(link: string, id: string) {
         let { path, head: header, block} = this.parseFileLink(link);
-        if (!path.endsWith('.md')) {
-            path = path + '.md';
+        let file = null;
+        if (path === '') {
+            file = this.app.workspace.getActiveFile();
+        }
+        else {
+            if (!path.endsWith('.md')) {
+                path = path + '.md';
+            }
+            file = this.searchFile(path);
         }
 
-        const file = this.searchFile(path);
         if (file == null) {
             const msg = '找不到文件：' + path;
             console.error(msg)
@@ -275,7 +281,7 @@ export class LocalImageRenderer {
         return {
             name: 'LocalImage',
             level: 'inline',
-            start(src: string) {
+            start: (src: string) => {
                 const index = src.indexOf('![[')
                 if (index === -1) return
                 return index
@@ -285,7 +291,7 @@ export class LocalImageRenderer {
                 if (matches == null) return;
                 const token: Token = {
                     type: 'LocalImage',
-                    raw: matches[0],
+                    raw: src,
                     href: matches[1],
                     text: matches[1]
                 };

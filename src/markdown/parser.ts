@@ -11,7 +11,7 @@ export interface ParseOptions {
 };
 
 
-const BlockMarkRegex = /\^[0-9A-Za-z-]+$/;
+const BlockMarkRegex = /^\^[0-9A-Za-z-]+$/;
 
 let AllLinks:string[] = [];
 const parseOptions:ParseOptions = {
