@@ -34,6 +34,17 @@ export async function wxEncrypt(authkey:string, wechat:any[]) {
     return res
 }
 
+export async function wxKeyInfo(authkey:string) {
+    const url = 'https://obplugin.sunboshi.tech/wx/info/' + authkey;
+    const res = await requestUrl({
+        url: url,
+        method: 'GET',
+        throw: false,
+        contentType: 'application/json',
+    });
+    return res
+}
+
 // 上传图片
 export async function wxUploadImage(data: Blob, filename: string, token: string, type?: string) {
     let url = '';

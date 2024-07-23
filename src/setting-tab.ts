@@ -1,4 +1,4 @@
-import { App, TextAreaComponent, PluginSettingTab, Setting, Notice, FileSystemAdapter } from 'obsidian';
+import { App, TextAreaComponent, PluginSettingTab, Setting, Notice, FileSystemAdapter, sanitizeHTMLToDom } from 'obsidian';
 import NoteToMpPlugin from './main';
 import { wxGetToken,wxEncrypt } from './weixin-api';
 
@@ -261,14 +261,21 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 				});
 			});
 		
+		// const descHtml = '有效期至：aaaaa <br/>详情说明：<a href="https://mp.weixin.qq.com/s/LYujo4ODEYLuq0OkzkkoCw">https://mp.weixin.qq.com/s/LYujo4ODEYLuq0OkzkkoCw</a>';
+		let descHtml = '详情说明：<a href="https://mp.weixin.qq.com/s/LYujo4ODEYLuq0OkzkkoCw">https://mp.weixin.qq.com/s/LYujo4ODEYLuq0OkzkkoCw</a>';
+		if (this.plugin.settings.expireat) {
+			const timestr = this.plugin.settings.expireat.toLocaleString();
+			descHtml = `有效期至：${timestr} <br/>${descHtml}`
+		}
 		new Setting(containerEl)
 			.setName('注册码（AuthKey）')
-			.setDesc('详情请参考：https://mp.weixin.qq.com/s/LYujo4ODEYLuq0OkzkkoCw')
+			.setDesc(sanitizeHTMLToDom(descHtml))
 			.addText(text => {
 			    text.setPlaceholder('请输入注册码')
 					.setValue(this.plugin.settings.authKey)
 					.onChange(async (value) => {
 					    this.plugin.settings.authKey = value.trim();
+						this.plugin.settings.getExpiredDate();
 						await this.plugin.saveSettings();
 					})
 					.inputEl.setAttr('style', 'width: 320px;')

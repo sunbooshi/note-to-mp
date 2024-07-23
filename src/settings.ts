@@ -1,6 +1,5 @@
-import defaultHighlight from './default-highlight';
 import { App } from 'obsidian';
-
+import { wxKeyInfo } from './weixin-api';
 
 export class PreviewSetting {
     defaultStyle: string;
@@ -13,6 +12,7 @@ export class PreviewSetting {
     wxInfo: {name:string, appid:string, secret:string}[];
     app: App;
     math: string;
+    expireat: Date | null = null;
 
     constructor(app: App) {
         this.app = app;
@@ -75,6 +75,7 @@ export class PreviewSetting {
         if (useCustomCss !== undefined) {
             this.useCustomCss = useCustomCss;
         }
+        this.getExpiredDate();
     }
 
     allSettings() {
@@ -89,5 +90,14 @@ export class PreviewSetting {
             'math': this.math,
             'useCustomCss': this.useCustomCss,
         }
+    }
+
+    getExpiredDate() {
+        if (this.authKey.length == 0) return;
+        wxKeyInfo(this.authKey).then((res) => {
+            if (res.status == 200) {
+                this.expireat = new Date(res.json.expireat);
+            }
+        })
     }
 }
