@@ -129,7 +129,7 @@ export async function markedParse(content:string, op:ParseOptions, extensions:an
 	const renderer = {
 		heading(text: string, level: number, raw: string): string {
 			// ignore IDs
-			return `<h${level}><span class="head-prefix"></span><span class="head-content">${text}</span><span class="head-suffix"></span></h${level}>`;
+			return `<h${level}><span class="h-prefix"></span><span class="h-content">${text}</span><span class="h-suffix"></span></h${level}>`;
 		},
 		hr(): string {
 			return '<hr>';
