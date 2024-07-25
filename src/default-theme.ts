@@ -298,7 +298,7 @@ Code
     border: rgb(240, 240, 240) 1px solid;
 }
 
-.note-to-mp section ul {
+.note-to-mp .code-section ul {
     flex-shrink: 0;
     counter-reset: line;
     margin: 0;
@@ -307,7 +307,7 @@ Code
     width: fit-content;
 }
 
-.note-to-mp section ul>li {
+.note-to-mp .code-section ul>li {
     font-family: Consolas, ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", "Courier New", monospace;
     position: relative;
     margin: 0;
@@ -322,13 +322,13 @@ Code
     text-wrap: nowrap;
 }
 
-.note-to-mp section pre {
+.note-to-mp .code-section pre {
     margin: 0;
     padding: 0;
     overflow: auto;
 }
 
-.note-to-mp code {
+.note-to-mp .code-section code {
     font-family: Consolas, ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", "Courier New", monospace;
     color: #5c5c5c;
     background-color: #fafafa;
@@ -337,7 +337,7 @@ Code
     padding: 0 0.5em;
 }    
 
-.note-to-mp pre code {
+.note-to-mp .code-section pre code {
     display: block;
     text-wrap: nowrap;
     line-height: 1.75em;

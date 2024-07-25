@@ -272,7 +272,7 @@
     border: rgb(240, 240, 240) 1px solid;
 }
 
-.note-to-mp section ul {
+.note-to-mp .code-section ul {
     flex-shrink: 0;
     counter-reset: line;
     margin: 0;
@@ -281,7 +281,7 @@
     width: fit-content;
 }
 
-.note-to-mp section ul>li {
+.note-to-mp .code-section ul>li {
     font-family: Consolas, ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", "Courier New", monospace;
     position: relative;
     margin: 0;
@@ -295,7 +295,7 @@
     color: rgba(0, 0, 0, 0.25);
 }
 
-.note-to-mp pre {
+.note-to-mp .code-section pre {
     margin: 0;
     padding: 0;
 }
@@ -309,6 +309,6 @@
     text-wrap: nowrap;
 }
 
-.note-to-mp pre code {
+.note-to-mp .code-section pre code {
     display: block;
 }

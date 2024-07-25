@@ -251,18 +251,18 @@
   border: solid 1px rgb(3, 44, 54);
   background-color: rgb(6, 33, 40);
 }
-.note-to-mp section pre {
+.note-to-mp .code-section pre {
   margin: 0;
   overflow-x: auto;
 }
-.note-to-mp section code {
+.note-to-mp .code-section code {
   display: block;
   padding: 0.9em;
   font-size: 0.9em;
   line-height: 1.6em;
   text-wrap: nowrap;
 }
-.note-to-mp section ul {
+.note-to-mp .code-section ul {
   flex-shrink: 0;
   counter-reset: line;
   margin: 0;
@@ -270,7 +270,7 @@
   white-space: normal;
   width: fit-content;
 }
-.note-to-mp section ul > li {
+.note-to-mp .code-section ul > li {
   position: relative;
   margin: 0;
   padding: 0;
@@ -284,6 +284,6 @@
   list-style-type: none;
   color: rgb(155, 166, 164);
 }
-.note-to-mp section ul > li::marker {
+.note-to-mp .code-section ul > li::marker {
   content: none;
 }

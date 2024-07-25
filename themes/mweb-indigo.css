@@ -334,7 +334,7 @@
   border: solid 1px #5a67d8;
   background-color: #ebf4ff;
 }
-.note-to-mp section pre {
+.note-to-mp .code-section pre {
   display: block;
   overflow-x: auto;
   padding: 0.9em;
@@ -342,7 +342,7 @@
   font-size: 1em;
   margin: 0;
 }
-.note-to-mp section code {
+.note-to-mp .code-section code {
   font-size: 1em;
   line-height: 1.6em;
   text-wrap: nowrap;
@@ -350,7 +350,7 @@
   margin: 0 !important;
   display: block;
 }
-.note-to-mp section ul {
+.note-to-mp .code-section ul {
   flex-shrink: 0;
   counter-reset: line;
   margin: 0;
@@ -358,7 +358,7 @@
   white-space: normal;
   width: fit-content;
 }
-.note-to-mp section ul > li {
+.note-to-mp .code-section ul > li {
   position: relative;
   margin: 0;
   padding: 0;
@@ -373,6 +373,6 @@
   color: rgba(0, 0, 0, 0.25);
   text-wrap: nowrap;
 }
-.note-to-mp section ul > li::marker {
+.note-to-mp .code-section ul > li::marker {
   content: none;
 }
