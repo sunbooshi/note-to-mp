@@ -338,6 +338,7 @@
 }
 .note-to-mp .code-section pre code {
   border: none;
+  background: #f8f8f8;
   font-size: 1em;
   line-height: 1.6em;
   padding: 0 !important;

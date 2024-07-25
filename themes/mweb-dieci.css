@@ -261,6 +261,7 @@
   font-size: 0.9em;
   line-height: 1.6em;
   text-wrap: nowrap;
+  background-color: rgb(16, 16, 16);
 }
 .note-to-mp .code-section ul {
   flex-shrink: 0;

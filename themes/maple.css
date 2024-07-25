@@ -304,6 +304,7 @@
     line-height: 1.75em;
     font-family: Consolas, ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", "Courier New", monospace;
     color: #333;
+    background-color: rgb(250, 250, 250);
     font-size: 0.875em;
     padding: 1em;
     text-wrap: nowrap;
