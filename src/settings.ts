@@ -21,7 +21,7 @@ export class PreviewSetting {
         this.showStyleUI = true;
         this.linkStyle = 'inline';
         this.lineNumber = true;
-        this.useCustomCss = true;
+        this.useCustomCss = false;
         this.authKey = '';
         this.wxInfo = [];
         this.math = 'latex';
