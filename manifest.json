@@ -1,7 +1,7 @@
 {
 	"id": "note-to-mp",
-	"name": "Note to MP",
-	"version": "1.0.6",
+	"name": "NoteToMP",
+	"version": "1.0.7",
 	"minAppVersion": "1.4.5",
 	"description": "Send notes to WeChat MP drafts, or copy notes to WeChat MP editor, perfect preservation of note styles, support code highlighting, line numbers in code, and support local image uploads.",
 	"author": "Sun Booshi",
