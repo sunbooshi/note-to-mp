@@ -6,6 +6,7 @@ export class PreviewSetting {
     defaultHighlight: string;
     showStyleUI: boolean;
     linkStyle: string;
+    embedStyle: string;
     lineNumber: boolean;
     authKey: string;
     useCustomCss: boolean;
@@ -20,6 +21,7 @@ export class PreviewSetting {
         this.defaultHighlight = '默认';
         this.showStyleUI = true;
         this.linkStyle = 'inline';
+        this.embedStyle = 'quote';
         this.lineNumber = true;
         this.useCustomCss = false;
         this.authKey = '';
@@ -39,6 +41,7 @@ export class PreviewSetting {
         const {
             defaultStyle,
             linkStyle,
+            embedStyle,
             showStyleUI,
             lineNumber,
             defaultHighlight,
@@ -59,6 +62,9 @@ export class PreviewSetting {
         }
         if (linkStyle) {
             this.linkStyle = linkStyle;
+        }
+        if (embedStyle) {
+            this.embedStyle = embedStyle;
         }
         if (lineNumber !== undefined) {
             this.lineNumber = lineNumber;
@@ -84,6 +90,7 @@ export class PreviewSetting {
             'defaultHighlight': this.defaultHighlight,
             'showStyleUI': this.showStyleUI,
             'linkStyle': this.linkStyle,
+            'embedStyle': this.embedStyle,
             'lineNumber': this.lineNumber,
             'authKey': this.authKey,
             'wxInfo': this.wxInfo,

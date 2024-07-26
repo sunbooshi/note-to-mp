@@ -309,7 +309,8 @@ export class LocalImageRenderer {
                 else {
                     const id = this.generateId();
                     this.renderFile(token.href, id);
-                    return `<blockquote class="note-embed-file" id="${id}">渲染中</blockquote>`
+                    const tag = this.callback.settings.embedStyle === 'quote' ? 'blockquote' : 'section';
+                    return `<${tag} class="note-embed-file" id="${id}">渲染中</${tag}>`
                 }
             }
         }

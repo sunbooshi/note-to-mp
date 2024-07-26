@@ -190,6 +190,18 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
+			.setName('文件嵌入展示样式')
+			.addDropdown(dropdown => {
+				dropdown.addOption('quote', '引用');
+			    dropdown.addOption('content', '正文');
+				dropdown.setValue(this.plugin.settings.embedStyle);
+				dropdown.onChange(async (value) => {
+				    this.plugin.settings.embedStyle = value;
+					await this.plugin.saveSettings();
+				});
+			});
+
+		new Setting(containerEl)
 			.setName('数学公式语法')
 			.addDropdown(dropdown => {
 				dropdown.addOption('latex', 'latex');
