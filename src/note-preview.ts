@@ -1,23 +1,26 @@
-import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, sanitizeHTMLToDom } from 'obsidian';
-import { CSSProcess, markedParse, ParseOptions } from './utils';
+import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, sanitizeHTMLToDom, apiVersion } from 'obsidian';
+import { CSSProcess, parseCSS, ruleToStyle, applyCSS } from './utils';
+import { markedParse, ParseOptions } from './markdown/parser';
 import { PreviewSetting } from './settings';
 import ThemesManager from './themes';
-import CalloutsCSS from './callouts-css';
-import { uploadLocalImage, replaceImages, uploadCover } from './img-extension';
+import InlineCSS from './inline-css';
+import { LocalImageRenderer } from './markdown/img-extension';
 import { wxGetToken, wxAddDraft, wxBatchGetMaterial } from './weixin-api';
+import { MathRenderer } from './markdown/math';
+import { MDRendererCallback } from './markdown/callback';
+import { CodeRenderer } from './markdown/code';
 
 export const VIEW_TYPE_NOTE_PREVIEW = 'note-preview';
 
 const FRONT_MATTER_REGEX = /^(---)$.+?^(---)$.+?/ims;
 
 
-export class NotePreview extends ItemView {
+export class NotePreview extends ItemView implements MDRendererCallback {
     workspace: Workspace;
     mainDiv: HTMLDivElement;
     toolbar: HTMLDivElement;
     renderDiv: HTMLDivElement;
     articleDiv: HTMLDivElement;
-    styleEl: HTMLElement;
     coverEl: HTMLInputElement;
     useDefaultCover: HTMLInputElement;
     useLocalCover: HTMLInputElement;
@@ -31,6 +34,9 @@ export class NotePreview extends ItemView {
     currentTheme: string;
     currentHighlight: string;
     currentAppId: string;
+    mathRenderer: MathRenderer|null = null;
+    imageRenderer: LocalImageRenderer;
+    codeRenderer: CodeRenderer;
 
     constructor(leaf: WorkspaceLeaf, settings: PreviewSetting, themeManager: ThemesManager) {
         super(leaf);
@@ -39,6 +45,11 @@ export class NotePreview extends ItemView {
         this.themeManager = themeManager;
         this.currentTheme = this.settings.defaultStyle;
         this.currentHighlight = this.settings.defaultHighlight;
+        if (settings.authKey.length > 0) {
+            this.mathRenderer = new MathRenderer(this, settings);
+        }
+        this.imageRenderer = new LocalImageRenderer(this.app, this);
+        this.codeRenderer = new CodeRenderer(settings.lineNumber, this.mathRenderer);
     }
 
     getViewType() {
@@ -66,7 +77,13 @@ export class NotePreview extends ItemView {
         this.listeners.forEach(listener => this.workspace.offref(listener));
     }
 
+    onAppIdChanged() {
+        // 清理上传过的图片
+        this.imageRenderer.allImages.clear();
+    }
+
     async update() {
+        this.codeRenderer.cardData = null;
         this.renderMarkdown();
     }
 
@@ -74,7 +91,8 @@ export class NotePreview extends ItemView {
         return '<h1>渲染失败!</h1><br/>'
         + '如需帮助请前往&nbsp;&nbsp;<a href="https://github.com/sunbooshi/note-to-mp/issues">https://github.com/sunbooshi/note-to-mp/issues</a>&nbsp;&nbsp;反馈<br/><br/>'
         + '如果方便，请提供引发错误的完整Markdown内容。<br/><br/>'
-        + '错误信息：<br/>'
+        + '<br/>Obsidian版本：' + apiVersion
+        + '<br/>错误信息：<br/>'
         + `${error}`;
     }
 
@@ -82,12 +100,12 @@ export class NotePreview extends ItemView {
         try {
             const af = this.app.workspace.getActiveFile();
             let md = '';
-            if (af) {
+            if (af && af.extension.toLocaleLowerCase() === 'md') {
                 md = await this.app.vault.adapter.read(af.path);
                 this.title = af.basename;
             }
             else {
-                md = '没有可渲染的笔记';
+                md = '没有可渲染的笔记或文件不支持渲染';
             }
             if (md.startsWith('---')) {
                 md = md.replace(FRONT_MATTER_REGEX, '');
@@ -96,9 +114,18 @@ export class NotePreview extends ItemView {
                 lineNumber: this.settings.lineNumber,
                 linkStyle: this.settings.linkStyle as 'footnote' | 'inline',
             }
-            this.articleHTML = await markedParse(md, op, this.app);
+
+            const extensions = [];
+            if (this.mathRenderer) {
+                extensions.push(this.mathRenderer.blockMath());
+                extensions.push(this.mathRenderer.inlineMath());
+            }
+            extensions.push(this.imageRenderer.localImageExtension());
+            extensions.push(this.codeRenderer.codeExtension());
+
+            this.articleHTML = await markedParse(md, op, extensions);
+
             this.setArticle(this.articleHTML);
-            this.updateCss();
         }
         catch (e) {
             console.error(e);
@@ -106,19 +133,26 @@ export class NotePreview extends ItemView {
         }
     }
 
+    isOldTheme() {
+        const theme = this.themeManager.getTheme(this.currentTheme);
+        if (theme) {
+            return theme.css.indexOf('.note-to-mp') < 0;
+        }
+        return false;
+    }
     setArticle(article: string) {
         this.articleDiv.empty();
-        const html = `<section class="${this.settings.defaultStyle}" id="article-section">${article}</section>`;
-        const doc = sanitizeHTMLToDom(html);
-        if (doc.firstChild) {
-            this.articleDiv.appendChild(doc.firstChild);
-            replaceImages(this.articleDiv);
+        let className = 'note-to-mp';
+        // 兼容旧版本样式
+        if (this.isOldTheme()) {
+            className = this.currentTheme;
         }
-    }
-
-    setStyle(css: string) {
-        this.styleEl.empty();
-        this.styleEl.appendChild(document.createTextNode(css));
+        const html = `<section class="${className}" id="article-section">${article}</section>`;
+        const node = applyCSS(html, this.getCSS());
+        if (node) {
+            this.articleDiv.appendChild(node);
+            this.imageRenderer.replaceImages(this.articleDiv);
+        }
     }
 
     getArticleSection() {
@@ -126,18 +160,16 @@ export class NotePreview extends ItemView {
     }
 
     getArticleContent() {
-        CSSProcess(this.articleDiv);
         const content = this.articleDiv.innerHTML;
-        this.setArticle(this.articleHTML);
-        this.updateCss();
-        return content;
+        return this.codeRenderer.restoreCard(content);
     }
 
     getCSS() {
         try {
             const theme = this.themeManager.getTheme(this.currentTheme);
             const highlight = this.themeManager.getHighlight(this.currentHighlight);
-            return `${theme!.css}\n\n${highlight!.css}\n\n${CalloutsCSS}`;
+            const customCSS = this.settings.useCustomCss ? this.themeManager.customCSS : '';
+            return `${InlineCSS}\n\n${highlight!.css}\n\n${theme!.css}\n\n${customCSS}`;
         } catch (error) {
             console.error(error);
             new Notice(`获取样式失败${this.currentTheme}|${this.currentHighlight}，请检查主题是否正确安装。`);
@@ -186,6 +218,7 @@ export class NotePreview extends ItemView {
         wxSelect.setAttr('style', 'width: 200px');
         wxSelect.onchange = async () => {
             this.currentAppId = wxSelect.value;
+            this.onAppIdChanged();
         }
         const defautlOp =wxSelect.createEl('option');
         defautlOp.value = '';
@@ -287,41 +320,43 @@ export class NotePreview extends ItemView {
         this.coverEl.id = 'cover-input';
 
         // 样式
-        lineDiv = this.toolbar.createDiv({ cls: 'toolbar-line' }); 
-        const cssStyle = lineDiv.createDiv({ cls: 'style-label' });
-        cssStyle.innerText = '样式:';
+        if (this.settings.showStyleUI) {
+            lineDiv = this.toolbar.createDiv({ cls: 'toolbar-line' }); 
+            const cssStyle = lineDiv.createDiv({ cls: 'style-label' });
+            cssStyle.innerText = '样式:';
 
-        const selectBtn = lineDiv.createEl('select', { cls: 'style-select' }, async (sel) => {
+            const selectBtn = lineDiv.createEl('select', { cls: 'style-select' }, async (sel) => {
 
-        })
+            })
 
-        selectBtn.onchange = async () => {
-            this.updateStyle(selectBtn.value);
-        }
+            selectBtn.onchange = async () => {
+                this.updateStyle(selectBtn.value);
+            }
 
-        for (let s of this.themeManager.themes) {
-            const op = selectBtn.createEl('option');
-            op.value = s.className;
-            op.text = s.name;
-            op.selected = s.className == this.settings.defaultStyle;
-        }
+            for (let s of this.themeManager.themes) {
+                const op = selectBtn.createEl('option');
+                op.value = s.className;
+                op.text = s.name;
+                op.selected = s.className == this.settings.defaultStyle;
+            }
 
-        const highlightStyle = lineDiv.createDiv({ cls: 'style-label' });
-        highlightStyle.innerText = '代码高亮:';
+            const highlightStyle = lineDiv.createDiv({ cls: 'style-label' });
+            highlightStyle.innerText = '代码高亮:';
 
-        const highlightStyleBtn = lineDiv.createEl('select', { cls: 'style-select' }, async (sel) => {
+            const highlightStyleBtn = lineDiv.createEl('select', { cls: 'style-select' }, async (sel) => {
 
-        })
+            })
 
-        highlightStyleBtn.onchange = async () => {
-            this.updateHighLight(highlightStyleBtn.value);
-        }
+            highlightStyleBtn.onchange = async () => {
+                this.updateHighLight(highlightStyleBtn.value);
+            }
 
-        for (let s of this.themeManager.highlights) {
-            const op = highlightStyleBtn.createEl('option');
-            op.value = s.name;
-            op.text = s.name;
-            op.selected = s.name == this.settings.defaultHighlight;
+            for (let s of this.themeManager.highlights) {
+                const op = highlightStyleBtn.createEl('option');
+                op.value = s.name;
+                op.text = s.name;
+                op.selected = s.name == this.settings.defaultHighlight;
+            }
         }
 
         this.buildMsgView(this.toolbar);
@@ -338,24 +373,17 @@ export class NotePreview extends ItemView {
         this.renderDiv = this.mainDiv.createDiv({cls: 'render-div'});
         this.renderDiv.id = 'render-div';
         this.renderDiv.setAttribute('style', '-webkit-user-select: text; user-select: text;')
-        this.styleEl = this.renderDiv.createEl('style');
-        this.styleEl.setAttr('title', 'note-to-mp-style');
         this.articleDiv = this.renderDiv.createEl('div');
     }
 
     updateStyle(styleName: string) {
         this.currentTheme = styleName;
-        this.updateCss();
+        this.renderMarkdown();
     }
 
     updateHighLight(styleName: string) {
         this.currentHighlight = styleName;
-        this.updateCss();
-    }
-
-    updateCss() {
-        this.setStyle(this.getCSS());
-        this.getArticleSection().setAttribute('class', this.currentTheme);
+        this.renderMarkdown();
     }
 
     async uploadLocalCover(token: string) {
@@ -368,7 +396,7 @@ export class NotePreview extends ItemView {
             return '';
         }
 
-        return await uploadCover(file, token);
+        return await this.imageRenderer.uploadCover(file, token);
     }
 
     async getDefaultCover(token: string) {
@@ -388,7 +416,7 @@ export class NotePreview extends ItemView {
         }
         const token = res.json.token;
         if (token === '') {
-            this.showMsg('获取token失败');
+            this.showMsg('获取token失败: ' + res.json.message);
         }
         return token;
     }
@@ -409,9 +437,9 @@ export class NotePreview extends ItemView {
             return;
         }
         // 上传图片
-        await uploadLocalImage(this.app.vault, token);
+        await this.imageRenderer.uploadLocalImage(token);
         // 替换图片链接
-        replaceImages(this.articleDiv);
+        this.imageRenderer.replaceImages(this.articleDiv);
 
         await this.copyArticle();
         this.showMsg('图片已上传，并且已复制，请到公众号编辑器粘贴。');
@@ -447,13 +475,12 @@ export class NotePreview extends ItemView {
             // 获取token
             const token = await this.getToken();
             if (token === '') {
-                this.showMsg('获取token失败');
                 return;
             }
             //上传图片
-            await uploadLocalImage(this.app.vault, token);
+            await this.imageRenderer.uploadLocalImage(token);
             // 替换图片链接
-            replaceImages(this.articleDiv);
+            this.imageRenderer.replaceImages(this.articleDiv);
             // 上传封面
             let mediaId = '';
             if (this.useLocalCover.checked) {
@@ -486,5 +513,33 @@ export class NotePreview extends ItemView {
         } catch (error) {
             this.showMsg('发布失败!'+error.message);
         }
+    }
+
+    updateMath(id: string, svg: string): void {
+        const span = this.articleDiv.querySelector('#'+id) as HTMLElement;
+        if (!span) return;
+        const doc = sanitizeHTMLToDom(svg);
+        span.empty();
+        if (doc.firstChild) {
+            span.appendChild(doc.firstChild);
+        }
+        else {
+            span.innerText = '渲染失败';
+        }
+    }
+
+    updateElementByID(id:string, html:string):void {
+        const item = this.articleDiv.querySelector('#'+id) as HTMLElement;
+        if (!item) return;
+        const doc = sanitizeHTMLToDom(html);
+        item.empty();
+        if (doc.hasChildNodes()) {
+            for (const child of doc.childNodes) {
+                item.appendChild(child);
+            }
+        }
+        else {
+            item.innerText = '渲染失败';
+        } 
     }
 }

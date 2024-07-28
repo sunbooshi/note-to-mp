@@ -19,7 +19,7 @@
  * Bear 的默认样式表。通过调整各个颜色变量的取值，就可以得到不同的 bear 主题。
  * Bear 的配色方案位于 src/themes/bear-palettes 目录下。
  */
-.mweb-panic {
+.note-to-mp {
   font-family: AvenirNext-Regular, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
   font-size: 16px;
   color: rgb(246, 247, 238);
@@ -30,42 +30,42 @@
   padding: 1em 1em;
   /* 代码块 */
 }
-.mweb-panic * {
+.note-to-mp * {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-.mweb-panic > *:first-child {
+.note-to-mp > *:first-child {
   margin-top: 0 !important;
 }
-.mweb-panic > *:last-child {
+.note-to-mp > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-panic p,
-.mweb-panic pre,
-.mweb-panic dl,
-.mweb-panic form,
-.mweb-panic details,
-.mweb-panic dl,
-.mweb-panic blockquote,
-.mweb-panic table,
-.mweb-panic xmp,
-.mweb-panic plaintext,
-.mweb-panic listing,
-.mweb-panic figure {
+.note-to-mp p,
+.note-to-mp pre,
+.note-to-mp dl,
+.note-to-mp form,
+.note-to-mp details,
+.note-to-mp dl,
+.note-to-mp blockquote,
+.note-to-mp table,
+.note-to-mp xmp,
+.note-to-mp plaintext,
+.note-to-mp listing,
+.note-to-mp figure {
   margin: 0.75em 0 0.45em;
 }
-.mweb-panic hr {
+.note-to-mp hr {
   margin: 0.75em auto;
 }
-.mweb-panic h1,
-.mweb-panic h2,
-.mweb-panic h3,
-.mweb-panic h4,
-.mweb-panic h5,
-.mweb-panic h6 {
+.note-to-mp h1,
+.note-to-mp h2,
+.note-to-mp h3,
+.note-to-mp h4,
+.note-to-mp h5,
+.note-to-mp h6 {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   margin-left: 0;
@@ -75,139 +75,139 @@
   line-height: 1.5em;
   color: rgb(249, 181, 55);
 }
-.mweb-panic h1 {
+.note-to-mp h1 {
   font-size: 1.5em;
 }
-.mweb-panic h2 {
+.note-to-mp h2 {
   font-size: 1.3em;
 }
-.mweb-panic h3 {
+.note-to-mp h3 {
   font-size: 1.1em;
 }
-.mweb-panic h4 {
+.note-to-mp h4 {
   font-size: 1em;
 }
-.mweb-panic h5 {
+.note-to-mp h5 {
   font-size: 1em;
 }
-.mweb-panic h6 {
+.note-to-mp h6 {
   font-size: 1em;
 }
-.mweb-panic hr {
+.note-to-mp hr {
   height: 1px;
   border: 0;
   background-color: rgb(45, 69, 98);
   border-style: inset;
   border-width: 1px;
 }
-.mweb-panic p {
+.note-to-mp p {
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-panic pre,
-.mweb-panic pre[class*=language-] {
+.note-to-mp pre,
+.note-to-mp pre[class*=language-] {
   padding: 0;
   border: 0;
 }
-.mweb-panic blockquote {
+.note-to-mp blockquote {
   display: block;
   padding-left: 0.8em;
   border-left: 0.2em solid rgb(249, 181, 55);
   color: rgb(246, 247, 238);
 }
-.mweb-panic blockquote > :first-child {
+.note-to-mp blockquote > :first-child {
   margin-top: 0;
 }
-.mweb-panic blockquote > :last-child {
+.note-to-mp blockquote > :last-child {
   margin-bottom: 0;
 }
-.mweb-panic li {
+.note-to-mp li {
   word-wrap: break-all;
 }
-.mweb-panic ul {
+.note-to-mp ul {
   margin-left: 1.3em;
   padding: 0;
 }
-.mweb-panic li::marker {
+.note-to-mp li::marker {
   color: rgb(249, 181, 55);
 }
-.mweb-panic li > p {
+.note-to-mp li > p {
   margin: 0;
 }
-.mweb-panic ol {
+.note-to-mp ol {
   margin-left: 1.3em;
   padding: 0;
   list-style-type: decimal;
 }
-.mweb-panic .task-list-item {
+.note-to-mp .task-list-item {
   list-style-type: none;
   text-indent: -1.5em;
 }
-.mweb-panic .task-list-item:before {
+.note-to-mp .task-list-item:before {
   content: "";
   display: static;
   margin-right: 0px;
 }
-.mweb-panic .task-list-item > input[type=checkbox] {
+.note-to-mp .task-list-item > input[type=checkbox] {
   text-indent: -1.7em;
 }
-.mweb-panic img {
+.note-to-mp img {
   max-width: 100%;
   height: auto;
 }
-.mweb-panic u {
+.note-to-mp u {
   text-decoration: none;
   background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 50%, rgb(249, 181, 55) 50%);
   background-repeat: repeat-x;
   background-size: 2px 2px;
   background-position: 0 1em;
 }
-.mweb-panic a {
+.note-to-mp a {
   color: rgb(84, 193, 220);
   text-decoration: none;
 }
-.mweb-panic a:hover, .mweb-panic a:focus, .mweb-panic a:active {
+.note-to-mp a:hover, .note-to-mp a:focus, .note-to-mp a:active {
   text-decoration: underline;
 }
-.mweb-panic a img {
+.note-to-mp a img {
   border: none;
 }
-.mweb-panic b,
-.mweb-panic strong {
+.note-to-mp b,
+.note-to-mp strong {
   font-weight: bold;
 }
-.mweb-panic i,
-.mweb-panic cite,
-.mweb-panic em,
-.mweb-panic var,
-.mweb-panic address,
-.mweb-panic dfn {
+.note-to-mp i,
+.note-to-mp cite,
+.note-to-mp em,
+.note-to-mp var,
+.note-to-mp address,
+.note-to-mp dfn {
   font-style: italic;
 }
-.mweb-panic del,
-.mweb-panic s {
+.note-to-mp del,
+.note-to-mp s {
   color: rgb(176, 176, 176);
 }
-.mweb-panic pre,
-.mweb-panic xmp,
-.mweb-panic plaintext,
-.mweb-panic listing,
-.mweb-panic code,
-.mweb-panic kbd,
-.mweb-panic tt,
-.mweb-panic samp {
+.note-to-mp pre,
+.note-to-mp xmp,
+.note-to-mp plaintext,
+.note-to-mp listing,
+.note-to-mp code,
+.note-to-mp kbd,
+.note-to-mp tt,
+.note-to-mp samp {
   font-family: Menlo-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
-.mweb-panic mark {
+.note-to-mp mark {
   color: inherit;
   display: inline;
   padding: 0.2em 0.5em;
   background-color: rgb(45, 78, 120);
 }
-.mweb-panic figcaption {
+.note-to-mp figcaption {
   text-align: center;
 }
-.mweb-panic table {
+.note-to-mp table {
   color: rgb(246, 247, 238);
   border-collapse: collapse;
   background-color: rgb(23, 33, 52);
@@ -216,53 +216,54 @@
   border: 1px;
   border-spacing: 0;
 }
-.mweb-panic th,
-.mweb-panic td {
+.note-to-mp th,
+.note-to-mp td {
   padding: 0.7em 1em;
   font-size: 0.9em;
   border: 1px solid rgb(45, 69, 98);
 }
-.mweb-panic caption,
-.mweb-panic th,
-.mweb-panic td {
+.note-to-mp caption,
+.note-to-mp th,
+.note-to-mp td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
 }
-.mweb-panic div[id^=mweb-chart-ele] svg {
+.note-to-mp div[id^=mweb-chart-ele] svg {
   background-color: white;
 }
-.mweb-panic .footnotes > ol li {
+.note-to-mp .footnotes > ol li {
   text-indent: 0;
 }
-.mweb-panic .footnotes > ol li::before {
+.note-to-mp .footnotes > ol li::before {
   float: left;
 }
-.mweb-panic .footnotes hr {
+.note-to-mp .footnotes hr {
   margin-top: 4em;
   margin-bottom: 0.5em;
 }
-.mweb-panic code {
+.note-to-mp code {
   display: inline;
   color: rgb(246, 247, 238);
 }
-.mweb-panic .code-section {
+.note-to-mp .code-section {
   display: flex;
   border: solid 1px rgb(45, 69, 98);
   background-color: rgb(23, 33, 52);
 }
-.mweb-panic section pre {
+.note-to-mp .code-section pre {
   margin: 0;
   overflow-x: auto;
 }
-.mweb-panic section code {
+.note-to-mp .code-section code {
   display: block;
   padding: 0.9em;
   font-size: 0.9em;
   line-height: 1.6em;
   text-wrap: nowrap;
+  background-color: rgb(23, 33, 52);
 }
-.mweb-panic section ul {
+.note-to-mp .code-section ul {
   flex-shrink: 0;
   counter-reset: line;
   margin: 0;
@@ -270,7 +271,7 @@
   white-space: normal;
   width: fit-content;
 }
-.mweb-panic section ul > li {
+.note-to-mp .code-section ul > li {
   position: relative;
   margin: 0;
   padding: 0;
@@ -284,6 +285,6 @@
   list-style-type: none;
   color: rgb(246, 247, 238);
 }
-.mweb-panic section ul > li::marker {
+.note-to-mp .code-section ul > li::marker {
   content: none;
 }

@@ -1,5 +1,5 @@
 /* MWeb：增大字体，便于阅读 */
-.mweb-typo {
+.note-to-mp {
   font-size: 16px;
   min-width: 200px;
   max-width: 760px;
@@ -45,81 +45,76 @@
   /* Responsive images */
   /* 代码片断 */
 }
-.mweb-typo dl,
-.mweb-typo dt,
-.mweb-typo dd,
-.mweb-typo ul,
-.mweb-typo ol,
-.mweb-typo li,
-.mweb-typo h1,
-.mweb-typo h2,
-.mweb-typo h3,
-.mweb-typo h4,
-.mweb-typo h5,
-.mweb-typo h6,
-.mweb-typo pre,
-.mweb-typo code,
-.mweb-typo form,
-.mweb-typo fieldset,
-.mweb-typo legend,
-.mweb-typo input,
-.mweb-typo textarea,
-.mweb-typo p,
-.mweb-typo blockquote,
-.mweb-typo th,
-.mweb-typo td,
-.mweb-typo hr,
-.mweb-typo button,
-.mweb-typo article,
-.mweb-typo aside,
-.mweb-typo details,
-.mweb-typo figcaption,
-.mweb-typo figure,
-.mweb-typo footer,
-.mweb-typo header,
-.mweb-typo menu,
-.mweb-typo nav,
-.mweb-typo section {
+.note-to-mp dl,
+.note-to-mp dt,
+.note-to-mp dd,
+.note-to-mp ul,
+.note-to-mp ol,
+.note-to-mp li,
+.note-to-mp h1,
+.note-to-mp h2,
+.note-to-mp h3,
+.note-to-mp h4,
+.note-to-mp h5,
+.note-to-mp h6,
+.note-to-mp pre,
+.note-to-mp code,
+.note-to-mp form,
+.note-to-mp fieldset,
+.note-to-mp legend,
+.note-to-mp input,
+.note-to-mp textarea,
+.note-to-mp p,
+.note-to-mp blockquote,
+.note-to-mp th,
+.note-to-mp td,
+.note-to-mp hr,
+.note-to-mp button,
+.note-to-mp article,
+.note-to-mp aside,
+.note-to-mp details,
+.note-to-mp figcaption,
+.note-to-mp figure,
+.note-to-mp footer,
+.note-to-mp header,
+.note-to-mp menu,
+.note-to-mp nav,
+.note-to-mp section {
   margin: 0;
   padding: 0;
 }
-.mweb-typo article,
-.mweb-typo aside,
-.mweb-typo details,
-.mweb-typo figcaption,
-.mweb-typo figure,
-.mweb-typo footer,
-.mweb-typo header,
-.mweb-typo menu,
-.mweb-typo nav,
-.mweb-typo section {
+.note-to-mp article,
+.note-to-mp aside,
+.note-to-mp details,
+.note-to-mp figcaption,
+.note-to-mp figure,
+.note-to-mp footer,
+.note-to-mp header,
+.note-to-mp menu,
+.note-to-mp nav,
+.note-to-mp section {
   display: block;
 }
-.mweb-typo audio,
-.mweb-typo canvas,
-.mweb-typo video {
+.note-to-mp audio,
+.note-to-mp canvas,
+.note-to-mp video {
   display: inline-block;
 }
-.mweb-typo button,
-.mweb-typo input,
-.mweb-typo select,
-.mweb-typo textarea {
+.note-to-mp button,
+.note-to-mp input,
+.note-to-mp select,
+.note-to-mp textarea {
   font: 300 1em/1.8 PingFang SC, Lantinghei SC, Microsoft Yahei, Hiragino Sans GB, Microsoft Sans Serif, WenQuanYi Micro Hei, sans-serif;
 }
-.mweb-typo button::-moz-focus-inner,
-.mweb-typo input::-moz-focus-inner {
-  padding: 0;
-  border: 0;
-}
-.mweb-typo table {
+.note-to-mp table {
   border-collapse: collapse;
   border-spacing: 0;
 }
-.mweb-typo fieldset,
-.mweb-typo img {
+.note-to-mp fieldset,
+.note-to-mp img {
   border: 0;
 }
-.mweb-typo blockquote {
+.note-to-mp blockquote {
   position: relative;
   color: #999;
   font-weight: 400;
@@ -128,261 +123,261 @@
   margin: 1em 3em 1em 2em;
 }
 @media only screen and (max-width: 640px) {
-  .mweb-typo blockquote {
+  .note-to-mp blockquote {
     margin: 1em 0;
   }
 }
-.mweb-typo acronym,
-.mweb-typo abbr {
+.note-to-mp acronym,
+.note-to-mp abbr {
   border-bottom: 1px dotted;
   font-variant: normal;
   text-decoration: none;
 }
-.mweb-typo abbr {
+.note-to-mp abbr {
   cursor: help;
 }
-.mweb-typo del {
+.note-to-mp del {
   text-decoration: line-through;
 }
-.mweb-typo address,
-.mweb-typo caption,
-.mweb-typo cite,
-.mweb-typo code,
-.mweb-typo dfn,
-.mweb-typo em,
-.mweb-typo th,
-.mweb-typo var {
+.note-to-mp address,
+.note-to-mp caption,
+.note-to-mp cite,
+.note-to-mp code,
+.note-to-mp dfn,
+.note-to-mp em,
+.note-to-mp th,
+.note-to-mp var {
   font-style: normal;
   font-weight: 400;
 }
-.mweb-typo ul,
-.mweb-typo ol {
+.note-to-mp ul,
+.note-to-mp ol {
   list-style: none;
 }
-.mweb-typo caption,
-.mweb-typo th {
+.note-to-mp caption,
+.note-to-mp th {
   text-align: left;
 }
-.mweb-typo q:before,
-.mweb-typo q:after {
+.note-to-mp q:before,
+.note-to-mp q:after {
   content: "";
 }
-.mweb-typo sub,
-.mweb-typo sup {
+.note-to-mp sub,
+.note-to-mp sup {
   font-size: 75%;
   line-height: 0;
   position: relative;
 }
-.mweb-typo :root sub,
-.mweb-typo :root sup {
+.note-to-mp :root sub,
+.note-to-mp :root sup {
   vertical-align: baseline;
   /* for ie9 and other modern browsers */
 }
-.mweb-typo sup {
+.note-to-mp sup {
   top: -0.5em;
 }
-.mweb-typo sub {
+.note-to-mp sub {
   bottom: -0.25em;
 }
-.mweb-typo a {
+.note-to-mp a {
   color: #1abc9c;
 }
-.mweb-typo a:hover {
+.note-to-mp a:hover {
   text-decoration: underline;
 }
-.mweb-typo a {
+.note-to-mp a {
   border-bottom: 1px solid #1abc9c;
 }
-.mweb-typo a:hover {
+.note-to-mp a:hover {
   border-bottom-color: #555;
   color: #555;
   text-decoration: none;
 }
-.mweb-typo ins,
-.mweb-typo a {
+.note-to-mp ins,
+.note-to-mp a {
   text-decoration: none;
 }
-.mweb-typo u,
-.mweb-typo .typo-u {
+.note-to-mp u,
+.note-to-mp .typo-u {
   text-decoration: underline;
 }
-.mweb-typo mark {
+.note-to-mp mark {
   background: #fffdd1;
   border-bottom: 1px solid #ffedce;
   padding: 2px;
   /* margin: 0 5px; */
 }
-.mweb-typo hr {
+.note-to-mp hr {
   border: none;
   border-bottom: 1px solid #cfcfcf;
   margin-bottom: 0.8em;
   height: 10px;
 }
-.mweb-typo small,
-.mweb-typo .typo-small,
-.mweb-typo figcaption {
+.note-to-mp small,
+.note-to-mp .typo-small,
+.note-to-mp figcaption {
   font-size: 0.9em;
   color: #888;
 }
-.mweb-typo strong,
-.mweb-typo b {
+.note-to-mp strong,
+.note-to-mp b {
   font-weight: bold;
   color: #000;
 }
-.mweb-typo [draggable] {
+.note-to-mp [draggable] {
   cursor: move;
 }
-.mweb-typo .clearfix:before,
-.mweb-typo .clearfix:after {
+.note-to-mp .clearfix:before,
+.note-to-mp .clearfix:after {
   content: "";
   display: table;
 }
-.mweb-typo .clearfix:after {
+.note-to-mp .clearfix:after {
   clear: both;
 }
-.mweb-typo .clearfix {
+.note-to-mp .clearfix {
   zoom: 1;
 }
-.mweb-typo .textwrap,
-.mweb-typo .textwrap td,
-.mweb-typo .textwrap th {
+.note-to-mp .textwrap,
+.note-to-mp .textwrap td,
+.note-to-mp .textwrap th {
   word-wrap: break-word;
   word-break: break-all;
 }
-.mweb-typo .textwrap-table {
+.note-to-mp .textwrap-table {
   table-layout: fixed;
 }
-.mweb-typo .serif {
+.note-to-mp .serif {
   font-family: Palatino, Optima, Georgia, serif;
 }
-.mweb-typo p,
-.mweb-typo pre,
-.mweb-typo ul,
-.mweb-typo ol,
-.mweb-typo dl,
-.mweb-typo form,
-.mweb-typo hr,
-.mweb-typo table,
-.mweb-typo .typo-p,
-.mweb-typo .typo-pre,
-.mweb-typo .typo-ul,
-.mweb-typo .typo-ol,
-.mweb-typo .typo-dl,
-.mweb-typo .typo-form,
-.mweb-typo .typo-hr,
-.mweb-typo .typo-table,
-.mweb-typo blockquote {
+.note-to-mp p,
+.note-to-mp pre,
+.note-to-mp ul,
+.note-to-mp ol,
+.note-to-mp dl,
+.note-to-mp form,
+.note-to-mp hr,
+.note-to-mp table,
+.note-to-mp .typo-p,
+.note-to-mp .typo-pre,
+.note-to-mp .typo-ul,
+.note-to-mp .typo-ol,
+.note-to-mp .typo-dl,
+.note-to-mp .typo-form,
+.note-to-mp .typo-hr,
+.note-to-mp .typo-table,
+.note-to-mp blockquote {
   margin-bottom: 1.2em;
 }
-.mweb-typo h1,
-.mweb-typo h2,
-.mweb-typo h3,
-.mweb-typo h4,
-.mweb-typo h5,
-.mweb-typo h6 {
+.note-to-mp h1,
+.note-to-mp h2,
+.note-to-mp h3,
+.note-to-mp h4,
+.note-to-mp h5,
+.note-to-mp h6 {
   font-family: PingFang SC, Verdana, Helvetica Neue, Microsoft Yahei, Hiragino Sans GB, Microsoft Sans Serif, WenQuanYi Micro Hei, sans-serif;
   font-weight: lighter;
   color: #000;
   line-height: 1.35;
 }
-.mweb-typo h1,
-.mweb-typo h2,
-.mweb-typo h3,
-.mweb-typo h4,
-.mweb-typo h5,
-.mweb-typo h6,
-.mweb-typo .typo-h1,
-.mweb-typo .typo-h2,
-.mweb-typo .typo-h3,
-.mweb-typo .typo-h4,
-.mweb-typo .typo-h5,
-.mweb-typo .typo-h6 {
+.note-to-mp h1,
+.note-to-mp h2,
+.note-to-mp h3,
+.note-to-mp h4,
+.note-to-mp h5,
+.note-to-mp h6,
+.note-to-mp .typo-h1,
+.note-to-mp .typo-h2,
+.note-to-mp .typo-h3,
+.note-to-mp .typo-h4,
+.note-to-mp .typo-h5,
+.note-to-mp .typo-h6 {
   margin-top: 1.2em;
   margin-bottom: 0.6em;
   line-height: 1.35;
 }
-.mweb-typo h1,
-.mweb-typo .typo-h1 {
+.note-to-mp h1,
+.note-to-mp .typo-h1 {
   font-size: 2em;
 }
-.mweb-typo h2,
-.mweb-typo .typo-h2 {
+.note-to-mp h2,
+.note-to-mp .typo-h2 {
   font-size: 1.8em;
 }
-.mweb-typo h3,
-.mweb-typo .typo-h3 {
+.note-to-mp h3,
+.note-to-mp .typo-h3 {
   font-size: 1.6em;
 }
-.mweb-typo h4,
-.mweb-typo .typo-h4 {
+.note-to-mp h4,
+.note-to-mp .typo-h4 {
   font-size: 1.4em;
 }
-.mweb-typo h5,
-.mweb-typo h6,
-.mweb-typo .typo-h5,
-.mweb-typo .typo-h6 {
+.note-to-mp h5,
+.note-to-mp h6,
+.note-to-mp .typo-h5,
+.note-to-mp .typo-h6 {
   font-size: 1.2em;
 }
-.mweb-typo ul,
-.mweb-typo .typo-ul {
+.note-to-mp ul,
+.note-to-mp .typo-ul {
   margin-left: 1.3em;
   list-style: disc;
 }
-.mweb-typo ol,
-.mweb-typo .typo-ol {
+.note-to-mp ol,
+.note-to-mp .typo-ol {
   list-style: decimal;
   margin-left: 1.9em;
 }
-.mweb-typo li ul,
-.mweb-typo li ol,
-.mweb-typo .typo-ul ul,
-.mweb-typo .typo-ul ol,
-.mweb-typo .typo-ol ul,
-.mweb-typo .typo-ol ol {
+.note-to-mp li ul,
+.note-to-mp li ol,
+.note-to-mp .typo-ul ul,
+.note-to-mp .typo-ul ol,
+.note-to-mp .typo-ol ul,
+.note-to-mp .typo-ol ol {
   margin-bottom: 0.8em;
   margin-left: 2em;
 }
-.mweb-typo li ul,
-.mweb-typo .typo-ul ul,
-.mweb-typo .typo-ol ul {
+.note-to-mp li ul,
+.note-to-mp .typo-ul ul,
+.note-to-mp .typo-ol ul {
   list-style: circle;
 }
-.mweb-typo table th,
-.mweb-typo table td,
-.mweb-typo .typo-table th,
-.mweb-typo .typo-table td,
-.mweb-typo table caption {
+.note-to-mp table th,
+.note-to-mp table td,
+.note-to-mp .typo-table th,
+.note-to-mp .typo-table td,
+.note-to-mp table caption {
   border: 1px solid #ddd;
   padding: 0.5em 1em;
   color: #666;
 }
-.mweb-typo table th,
-.mweb-typo .typo-table th {
+.note-to-mp table th,
+.note-to-mp .typo-table th {
   background: #fbfbfb;
 }
-.mweb-typo table thead th,
-.mweb-typo .typo-table thead th {
+.note-to-mp table thead th,
+.note-to-mp .typo-table thead th {
   background: #f1f1f1;
 }
-.mweb-typo table caption {
+.note-to-mp table caption {
   border-bottom: none;
 }
-.mweb-typo .typo-input,
-.mweb-typo .typo-textarea {
+.note-to-mp .typo-input,
+.note-to-mp .typo-textarea {
   -webkit-appearance: none;
   border-radius: 0;
 }
-.mweb-typo .typo-em,
-.mweb-typo em,
-.mweb-typo legend,
-.mweb-typo caption {
+.note-to-mp .typo-em,
+.note-to-mp em,
+.note-to-mp legend,
+.note-to-mp caption {
   color: #000;
   font-weight: inherit;
 }
-.mweb-typo .typo-em {
+.note-to-mp .typo-em {
   position: relative;
 }
-.mweb-typo .typo-em:after {
+.note-to-mp .typo-em:after {
   position: absolute;
   top: 0.65em;
   left: 0;
@@ -391,43 +386,44 @@
   white-space: nowrap;
   content: "・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・";
 }
-.mweb-typo img {
+.note-to-mp img {
   max-width: 100%;
 }
-.mweb-typo .footnotes hr {
+.note-to-mp .footnotes hr {
   margin-top: 4em;
   margin-bottom: 0.5em;
 }
-.mweb-typo pre,
-.mweb-typo code,
-.mweb-typo pre tt {
+.note-to-mp pre,
+.note-to-mp code,
+.note-to-mp pre tt {
   font-family: Courier, "Courier New", monospace;
 }
-.mweb-typo pre {
+.note-to-mp pre {
   padding: 1em 1.5em;
   display: block;
   -webkit-overflow-scrolling: touch;
 }
-.mweb-typo .code-section {
+.note-to-mp .code-section {
   display: flex;
   background: #f8f8f8;
   border: 1px solid #ddd;
 }
-.mweb-typo section pre {
+.note-to-mp .code-section pre {
   margin: 0;
   display: block;
   padding: 1em;
   overflow-x: auto;
 }
-.mweb-typo section pre code {
+.note-to-mp .code-section pre code {
   border: none;
+  background: #f8f8f8;
   font-size: 1em;
   line-height: 1.8em;
   padding: 0 !important;
   margin: 0 !important;
   text-wrap: nowrap;
 }
-.mweb-typo section ul {
+.note-to-mp .code-section ul {
   flex-shrink: 0;
   counter-reset: line;
   margin: 0;
@@ -435,7 +431,7 @@
   white-space: normal;
   width: fit-content;
 }
-.mweb-typo section ul > li {
+.note-to-mp .code-section ul > li {
   position: relative;
   margin: 0;
   padding: 0;
@@ -448,6 +444,6 @@
   list-style-type: none;
   text-wrap: nowrap;
 }
-.mweb-typo section ul > li::marker {
+.note-to-mp .code-section ul > li::marker {
   content: none;
 }

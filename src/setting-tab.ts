@@ -1,6 +1,7 @@
-import { App, TextAreaComponent, PluginSettingTab, Setting, Notice } from 'obsidian';
+import { App, TextAreaComponent, PluginSettingTab, Setting, Notice, FileSystemAdapter, sanitizeHTMLToDom } from 'obsidian';
 import NoteToMpPlugin from './main';
 import { wxGetToken,wxEncrypt } from './weixin-api';
+import { cleanMathCache } from './markdown/math';
 
 export class NoteToMpSettingTab extends PluginSettingTab {
 	plugin: NoteToMpPlugin;
@@ -166,6 +167,17 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
+			.setName('在工具栏展示样式选择')
+			.setDesc('建议在移动端关闭，可以增大文章预览区域')
+			.addToggle(toggle => {
+			    toggle.setValue(this.plugin.settings.showStyleUI);
+				toggle.onChange(async (value) => {
+				    this.plugin.settings.showStyleUI = value;
+					await this.plugin.saveSettings();
+				});
+			});
+
+		new Setting(containerEl)
 			.setName('链接展示样式')
 			.addDropdown(dropdown => {
 				dropdown.addOption('inline', '内嵌');
@@ -173,6 +185,31 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 				dropdown.setValue(this.plugin.settings.linkStyle);
 				dropdown.onChange(async (value) => {
 				    this.plugin.settings.linkStyle = value;
+					await this.plugin.saveSettings();
+				});
+			});
+
+		new Setting(containerEl)
+			.setName('文件嵌入展示样式')
+			.addDropdown(dropdown => {
+				dropdown.addOption('quote', '引用');
+			    dropdown.addOption('content', '正文');
+				dropdown.setValue(this.plugin.settings.embedStyle);
+				dropdown.onChange(async (value) => {
+				    this.plugin.settings.embedStyle = value;
+					await this.plugin.saveSettings();
+				});
+			});
+
+		new Setting(containerEl)
+			.setName('数学公式语法')
+			.addDropdown(dropdown => {
+				dropdown.addOption('latex', 'latex');
+			    dropdown.addOption('asciimath', 'asciimath');
+				dropdown.setValue(this.plugin.settings.math);
+				dropdown.onChange(async (value) => {
+				    this.plugin.settings.math = value;
+					cleanMathCache();
 					await this.plugin.saveSettings();
 				});
 			});
@@ -197,6 +234,12 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 					button.setButtonText('下载完成');
 				});
 			})
+			.addButton(button => {
+				button.setIcon('folder-open');
+				button.onClick(async () => {
+					await this.plugin.themesManager.openAssets();
+				});
+			});
 
 		new Setting(containerEl)
 			.setName('清空主题')
@@ -208,15 +251,45 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 			})
+
+		new Setting(containerEl)
+			.setName('CSS代码片段')
+			.addToggle(toggle => {
+			    toggle.setValue(this.plugin.settings.useCustomCss);
+				toggle.onChange(async (value) => {
+				    this.plugin.settings.useCustomCss = value;
+					await this.plugin.saveSettings();
+				});
+			})
+			.addButton(button => {
+				button.setIcon('refresh-ccw');
+				button.onClick(async () => {
+					await this.plugin.themesManager.loadCustomCSS();
+					new Notice('刷新成功');
+				});
+			})
+			.addButton(button => {
+				button.setIcon('folder-open');
+				button.onClick(async () => {
+					await this.plugin.themesManager.openAssets();
+				});
+			});
 		
+		// const descHtml = '有效期至：aaaaa <br/>详情说明：<a href="https://mp.weixin.qq.com/s/LYujo4ODEYLuq0OkzkkoCw">https://mp.weixin.qq.com/s/LYujo4ODEYLuq0OkzkkoCw</a>';
+		let descHtml = '详情说明：<a href="https://mp.weixin.qq.com/s/LYujo4ODEYLuq0OkzkkoCw">https://mp.weixin.qq.com/s/LYujo4ODEYLuq0OkzkkoCw</a>';
+		if (this.plugin.settings.expireat) {
+			const timestr = this.plugin.settings.expireat.toLocaleString();
+			descHtml = `有效期至：${timestr} <br/>${descHtml}`
+		}
 		new Setting(containerEl)
 			.setName('注册码（AuthKey）')
-			.setDesc('详情请参考：https://doc.booshi.tech/info.html')
+			.setDesc(sanitizeHTMLToDom(descHtml))
 			.addText(text => {
 			    text.setPlaceholder('请输入注册码')
 					.setValue(this.plugin.settings.authKey)
 					.onChange(async (value) => {
-					    this.plugin.settings.authKey = value;
+					    this.plugin.settings.authKey = value.trim();
+						this.plugin.settings.getExpiredDate();
 						await this.plugin.saveSettings();
 					})
 					.inputEl.setAttr('style', 'width: 320px;')

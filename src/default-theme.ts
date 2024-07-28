@@ -2,7 +2,7 @@ const css = `
 /* =========================================================== */
 /* Obsidian的默认样式                                            */
 /* =========================================================== */
-.obsidian-light {
+.note-to-mp {
     padding: 20px 20px;
     user-select: text;
     -webkit-user-select: text;
@@ -11,15 +11,15 @@ const css = `
     font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
 }
 
-.obsidian-light:last-child {
+.note-to-mp:last-child {
     margin-bottom: 0;
 }
 
-.obsidian-light .fancybox-img {
+.note-to-mp .fancybox-img {
     border: none;
 }
 
-.obsidian-light .fancybox-img:hover {
+.note-to-mp .fancybox-img:hover {
     opacity: none;
     border: none;
 }
@@ -29,7 +29,7 @@ const css = `
 Heading 
 ==================================
 */
-.obsidian-light h1 {
+.note-to-mp h1 {
     color: #222;
     font-weight: 700;
     font-size: 1.802em;
@@ -38,7 +38,7 @@ Heading
     margin-block-end: 0;
 }
 
-.obsidian-light h2 {
+.note-to-mp h2 {
     color: inherit;
     font-weight: 600;
     font-size: 1.602em;
@@ -47,7 +47,7 @@ Heading
     margin-block-end: 0;
 }
 
-.obsidian-light h3 {
+.note-to-mp h3 {
     color: inherit;
     font-weight: 600;
     font-size: 1.424em;
@@ -56,7 +56,7 @@ Heading
     margin-block-end: 0;
 }
 
-.obsidian-light h4 {
+.note-to-mp h4 {
     color: inherit;
     font-weight: 600;
     font-size: 1.266em;
@@ -65,13 +65,13 @@ Heading
     margin-block-end: 0;
 }
 
-.obsidian-light h5 {
+.note-to-mp h5 {
     color: inherit;
     margin-block-start: 1em;
     margin-block-end: 0;
 }
 
-.obsidian-light h6 {
+.note-to-mp h6 {
     color: inherit;
     margin-block-start: 1em;
     margin-block-end: 0;
@@ -82,7 +82,7 @@ Heading
 Horizontal Rules
 ==================================
     */
-.obsidian-light hr {
+.note-to-mp hr {
     border-color: #e0e0e0;
     margin-top: 3em;
     margin-bottom: 3em;
@@ -93,7 +93,7 @@ Horizontal Rules
 Paragraphs
 ==================================
     */
-.obsidian-light p {
+.note-to-mp p {
     line-height: 1.6em;
     margin: 1em 0;
 }
@@ -103,17 +103,17 @@ Paragraphs
 Emphasis
 ==================================
     */
-.obsidian-light strong {
+.note-to-mp strong {
     color: #222222;
     font-weight: 600;
 }
 
-.obsidian-light em {
+.note-to-mp em {
     color: inherit;
     font-style: italic;
 }
 
-.obsidian-light s {
+.note-to-mp s {
     color: inherit;
 }
 
@@ -122,7 +122,7 @@ Emphasis
     Blockquotes
 ==================================
     */
-.obsidian-light blockquote {
+.note-to-mp blockquote {
     font-size: 1rem;
     display: block;
     margin: 2em 0;
@@ -132,15 +132,15 @@ Emphasis
     border-left: 0.15rem solid #7852ee;
 }
 
-.obsidian-light blockquote blockquote {
+.note-to-mp blockquote blockquote {
     margin: 0 0;
 }
 
-.obsidian-light blockquote p {
+.note-to-mp blockquote p {
     margin: 0;
 }
 
-.obsidian-light blockquote footer strong {
+.note-to-mp blockquote footer strong {
     margin-right: 0.5em;
 }
 
@@ -149,29 +149,29 @@ Emphasis
 List
 ==================================
 */
-.obsidian-light ul {
+.note-to-mp ul {
     margin: 0;
     margin-top: 1.25em;
     margin-bottom: 1.25em;
 }
 
-.obsidian-light ul>li {
+.note-to-mp ul>li {
     /* position: relative; */
     /* padding-left: 1.75rem; */
     margin-top: 0.1em;
     margin-bottom: 0.1em;
 }
 
-.obsidian-light ul>li::marker {
+.note-to-mp ul>li::marker {
     color: #ababab;
     /* font-size: 1.5em; */
 }
 
-.obsidian-light li>p {
+.note-to-mp li>p {
     margin: 0;
 }
 
-.obsidian-light ol {
+.note-to-mp ol {
     margin: 0;
     padding: 0;
     margin-top: 1.25em;
@@ -179,7 +179,7 @@ List
     list-style-type: decimal;
 }
 
-.obsidian-light ol>li {
+.note-to-mp ol>li {
     position: relative;
     padding-left: 0.1em;
     margin-left: 2em;
@@ -192,7 +192,7 @@ List
 Link
 ==================================
 */
-.obsidian-light a {
+.note-to-mp a {
     color: #7852ee;
     text-decoration: none;
     font-weight: 500;
@@ -201,7 +201,7 @@ Link
     transition: border 0.3s ease-in-out;
 }
 
-.obsidian-light a:hover {
+.note-to-mp a:hover {
     color: #7952eebb;
     border-bottom: 1px solid #7952eebb;
 }
@@ -211,7 +211,7 @@ Link
 Table
 ==================================
 */
-.obsidian-light table {
+.note-to-mp table {
     width: 100%;
     table-layout: auto;
     text-align: left;
@@ -224,13 +224,13 @@ Table
     text-indent: 0;
 }
 
-.obsidian-light table thead {
+.note-to-mp table thead {
     color: #000;
     font-weight: 600;
     border: #e0e0e0 1px solid;
 }
 
-.obsidian-light table thead th {
+.note-to-mp table thead th {
     vertical-align: bottom;
     padding-right: 0.5714286em;
     padding-bottom: 0.5714286em;
@@ -238,24 +238,24 @@ Table
     border: #e0e0e0 1px solid;
 }
 
-.obsidian-light table thead th:first-child {
+.note-to-mp table thead th:first-child {
     padding-left: 0.5em;
 }
 
-.obsidian-light table thead th:last-child {
+.note-to-mp table thead th:last-child {
     padding-right: 0.5em;
 }
 
-.obsidian-light table tbody tr {
+.note-to-mp table tbody tr {
     border-style: solid;
     border: #e0e0e0 1px solid;
 }
 
-.obsidian-light table tbody tr:last-child {
+.note-to-mp table tbody tr:last-child {
     border-bottom-width: 0;
 }
 
-.obsidian-light table tbody td {
+.note-to-mp table tbody td {
     vertical-align: top;
     padding-top: 0.5714286em;
     padding-right: 0.5714286em;
@@ -264,11 +264,11 @@ Table
     border: #e0e0e0 1px solid;
 }
 
-.obsidian-light table tbody td:first-child {
+.note-to-mp table tbody td:first-child {
     padding-left: 0;
 }
 
-.obsidian-light table tbody td:last-child {
+.note-to-mp table tbody td:last-child {
     padding-right: 0;
 }
 
@@ -277,12 +277,12 @@ Table
 Images
 ==================================
 */
-.obsidian-light img {
+.note-to-mp img {
     margin-top: 2em;
     margin-bottom: 2em;
 }
 
-.obsidian-light .footnotes hr {
+.note-to-mp .footnotes hr {
     margin-top: 4em;
     margin-bottom: 0.5em;
 }
@@ -292,13 +292,13 @@ Images
 Code
 ==================================
 */
-.obsidian-light .code-section {
+.note-to-mp .code-section {
     display: flex;
     background-color: rgb(250, 250, 250);
     border: rgb(240, 240, 240) 1px solid;
 }
 
-.obsidian-light section ul {
+.note-to-mp .code-section ul {
     flex-shrink: 0;
     counter-reset: line;
     margin: 0;
@@ -307,7 +307,7 @@ Code
     width: fit-content;
 }
 
-.obsidian-light section ul>li {
+.note-to-mp .code-section ul>li {
     font-family: Consolas, ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", "Courier New", monospace;
     position: relative;
     margin: 0;
@@ -322,13 +322,13 @@ Code
     text-wrap: nowrap;
 }
 
-.obsidian-light section pre {
+.note-to-mp .code-section pre {
     margin: 0;
     padding: 0;
     overflow: auto;
 }
 
-.obsidian-light code {
+.note-to-mp .code-section code {
     font-family: Consolas, ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", "Courier New", monospace;
     color: #5c5c5c;
     background-color: #fafafa;
@@ -337,11 +337,12 @@ Code
     padding: 0 0.5em;
 }    
 
-.obsidian-light pre code {
+.note-to-mp .code-section pre code {
     display: block;
     text-wrap: nowrap;
     line-height: 1.75em;
     padding: 1em;
+    backgroud: unset;
 }
 `
 

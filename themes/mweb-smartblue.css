@@ -1,4 +1,4 @@
-.mweb-smartblue {
+.note-to-mp {
   color: #595959;
   font-size: 15px;
   font-family: -apple-system, system-ui, BlinkMacSystemFont, Helvetica Neue, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
@@ -24,115 +24,115 @@
   /* 表格 */
   /* 代码 */
 }
-.mweb-smartblue p {
+.note-to-mp p {
   color: #595959;
   font-size: 15px;
   line-height: 2;
   font-weight: 400;
 }
-.mweb-smartblue p + p {
+.note-to-mp p + p {
   margin-top: 16px;
 }
-.mweb-smartblue h1,
-.mweb-smartblue h2,
-.mweb-smartblue h3,
-.mweb-smartblue h4,
-.mweb-smartblue h5,
-.mweb-smartblue h6 {
+.note-to-mp h1,
+.note-to-mp h2,
+.note-to-mp h3,
+.note-to-mp h4,
+.note-to-mp h5,
+.note-to-mp h6 {
   padding: 30px 0;
   margin: 0;
   color: #135ce0;
   font-weight: 600;
 }
-.mweb-smartblue h1 {
+.note-to-mp h1 {
   position: relative;
   text-align: center;
   font-size: 22px;
   margin: 50px 0;
 }
-.mweb-smartblue h2 {
+.note-to-mp h2 {
   position: relative;
   font-size: 20px;
   border-left: 4px solid;
   padding: 0 0 0 10px;
   margin: 30px 0;
 }
-.mweb-smartblue h3 {
+.note-to-mp h3 {
   font-size: 16px;
 }
-.mweb-smartblue ul {
+.note-to-mp ul {
   list-style: disc outside;
   margin-left: 2em;
   margin-top: 1em;
 }
-.mweb-smartblue li {
+.note-to-mp li {
   line-height: 2;
   color: #595959;
   margin-bottom: 0;
   list-style: inherit;
 }
-.mweb-smartblue img {
+.note-to-mp img {
   max-width: 100%;
 }
-.mweb-smartblue img.loaded {
+.note-to-mp img.loaded {
   margin: 0 auto;
   display: block;
 }
-.mweb-smartblue blockquote {
+.note-to-mp blockquote {
   background: #fff9f9;
   margin: 2em 0;
   padding: 2px 20px;
   border-left: 4px solid #b2aec5;
 }
-.mweb-smartblue blockquote p {
+.note-to-mp blockquote p {
   color: #666;
   line-height: 2;
 }
-.mweb-smartblue a {
+.note-to-mp a {
   color: #036aca;
   border-bottom: 1px solid rgba(3, 106, 202, 0.8);
   font-weight: 400;
   text-decoration: none;
 }
-.mweb-smartblue strong {
+.note-to-mp strong {
   color: #036aca;
 }
-.mweb-smartblue em strong {
+.note-to-mp em strong {
   color: #036aca;
 }
-.mweb-smartblue hr {
+.note-to-mp hr {
   border-top: 1px solid #135ce0;
 }
-.mweb-smartblue table {
+.note-to-mp table {
   border-collapse: collapse;
   margin: 1rem 0;
   overflow-x: auto;
 }
-.mweb-smartblue table th,
-.mweb-smartblue table td {
+.note-to-mp table th,
+.note-to-mp table td {
   border: 1px solid #dfe2e5;
   padding: 0.6em 1em;
 }
-.mweb-smartblue table tr {
+.note-to-mp table tr {
   border-top: 1px solid #dfe2e5;
 }
-.mweb-smartblue table tr:nth-child(2n) {
+.note-to-mp table tr:nth-child(2n) {
   background-color: #f6f8fa;
 }
-.mweb-smartblue .footnotes hr {
+.note-to-mp .footnotes hr {
   margin-bottom: 0.5em;
 }
-.mweb-smartblue pre {
+.note-to-mp pre {
   overflow: auto;
 }
-.mweb-smartblue pre,
-.mweb-smartblue code {
+.note-to-mp pre,
+.note-to-mp code {
   overflow: auto;
   position: relative;
   line-height: 1.75;
   font-family: Menlo, Monaco, Consolas, Courier New, monospace;
 }
-.mweb-smartblue pre > code {
+.note-to-mp pre > code {
   /* font-size: 12px; */
   padding: 15px 12px;
   margin: 0;
@@ -142,7 +142,7 @@
   color: #333;
   background: #f8f8f8;
 }
-.mweb-smartblue code {
+.note-to-mp code {
   word-break: break-word;
   border-radius: 2px;
   overflow-x: auto;
@@ -151,25 +151,26 @@
   font-size: 0.87em;
   padding: 0.065em 0.4em;
 }
-.mweb-smartblue .code-section {
+.note-to-mp .code-section {
   display: flex;
   background: #f8f8f8;
 }
-.mweb-smartblue section pre {
+.note-to-mp .code-section pre {
   margin: 0;
   display: block;
   padding: 1em;
   overflow-x: auto;
 }
-.mweb-smartblue section pre code {
+.note-to-mp .code-section pre code {
   border: none;
+  background: #f8f8f8;
   font-size: 1em;
   line-height: 1.8em;
   padding: 0 !important;
   margin: 0 !important;
   text-wrap: nowrap;
 }
-.mweb-smartblue section ul {
+.note-to-mp .code-section ul {
   flex-shrink: 0;
   counter-reset: line;
   margin: 0;
@@ -177,7 +178,7 @@
   white-space: normal;
   width: fit-content;
 }
-.mweb-smartblue section ul > li {
+.note-to-mp .code-section ul > li {
   position: relative;
   margin: 0;
   padding: 0;
@@ -191,6 +192,6 @@
   color: #ff502c;
   text-wrap: nowrap;
 }
-.mweb-smartblue section ul > li::marker {
+.note-to-mp .code-section ul > li::marker {
   content: none;
 }

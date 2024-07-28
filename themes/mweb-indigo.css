@@ -13,10 +13,10 @@
  * 各个属性的默认值为 chrome 的默认样式，见 variables/default.scss。
  */
 /**
- * MWeb 包裹 markdown 的容器是 .mweb-indigo
+ * MWeb 包裹 markdown 的容器是 .note-to-mp
  * Typora 中是 #write
  */
-.mweb-indigo {
+.note-to-mp {
   line-height: 1.6em;
   -webkit-text-size-adjust: 100%;
   margin: 0px 0px;
@@ -32,22 +32,22 @@
   /* table */
   /* svg */
 }
-.mweb-indigo * {
+.note-to-mp * {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
-.mweb-indigo > *:first-child {
+.note-to-mp > *:first-child {
   margin-top: 0 !important;
 }
-.mweb-indigo > *:last-child {
+.note-to-mp > *:last-child {
   margin-top: 0 !important;
 }
-.mweb-indigo p, .mweb-indigo details, .mweb-indigo dl, .mweb-indigo ol, .mweb-indigo ul, .mweb-indigo pre, .mweb-indigo xmp, .mweb-indigo plaintext, .mweb-indigo listing, .mweb-indigo blockquote, .mweb-indigo table, .mweb-indigo figure, .mweb-indigo hr {
+.note-to-mp p, .note-to-mp details, .note-to-mp dl, .note-to-mp ol, .note-to-mp ul, .note-to-mp pre, .note-to-mp xmp, .note-to-mp plaintext, .note-to-mp listing, .note-to-mp blockquote, .note-to-mp table, .note-to-mp figure, .note-to-mp hr {
   margin-top: 0.75em;
   margin-bottom: 0.75em;
 }
-.mweb-indigo h1 {
+.note-to-mp h1 {
   font-size: 2em;
   font-weight: bold;
   margin-top: 1.5em;
@@ -55,7 +55,7 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-indigo h2 {
+.note-to-mp h2 {
   font-size: 1.5em;
   font-weight: bold;
   margin-top: 1.5em;
@@ -63,7 +63,7 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-indigo h3 {
+.note-to-mp h3 {
   font-size: 1.17em;
   font-weight: bold;
   margin-top: 1.5em;
@@ -71,7 +71,7 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-indigo h4 {
+.note-to-mp h4 {
   font-size: 1em;
   font-weight: bold;
   margin-top: 1.5em;
@@ -79,7 +79,7 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-indigo h5 {
+.note-to-mp h5 {
   font-size: 0.83em;
   font-weight: bold;
   margin-top: 1.5em;
@@ -87,7 +87,7 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-indigo h6 {
+.note-to-mp h6 {
   font-size: 0.67em;
   font-weight: bold;
   margin-top: 1.5em;
@@ -95,90 +95,90 @@
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-indigo p {
+.note-to-mp p {
   margin-left: 0;
   margin-right: 0;
 }
-.mweb-indigo pre, .mweb-indigo xmp, .mweb-indigo plaintext, .mweb-indigo listing {
+.note-to-mp pre, .note-to-mp xmp, .note-to-mp plaintext, .note-to-mp listing {
   font-family: monospace, Menlo-Regular, Menlo, Monaco, Consolas, "Courier New";
 }
-.mweb-indigo blockquote > :first-child {
+.note-to-mp blockquote > :first-child {
   margin-top: 0;
 }
-.mweb-indigo blockquote > :last-child {
+.note-to-mp blockquote > :last-child {
   margin-bottom: 0;
 }
-.mweb-indigo hr {
+.note-to-mp hr {
   border-style: inset;
   border-width: 1px;
 }
-.mweb-indigo img {
+.note-to-mp img {
   max-width: 100%;
   height: auto;
 }
-.mweb-indigo li {
+.note-to-mp li {
   word-wrap: break-all;
 }
-.mweb-indigo li + li {
+.note-to-mp li + li {
   margin-top: 0.25em;
 }
-.mweb-indigo ul ul, .mweb-indigo ol ul, .mweb-indigo ul ol, .mweb-indigo ol ol {
+.note-to-mp ul ul, .note-to-mp ol ul, .note-to-mp ul ol, .note-to-mp ol ol {
   margin-top: 0;
   margin-bottom: 0;
 }
-.mweb-indigo .task-list-item {
+.note-to-mp .task-list-item {
   list-style-type: none;
 }
-.mweb-indigo a {
+.note-to-mp a {
   color: -webkit-link;
   text-decoration: underline;
 }
-.mweb-indigo a img {
+.note-to-mp a img {
   border: none;
 }
-.mweb-indigo b, .mweb-indigo strong {
+.note-to-mp b, .note-to-mp strong {
   font-weight: bold;
 }
-.mweb-indigo i, .mweb-indigo cite, .mweb-indigo em, .mweb-indigo var, .mweb-indigo address, .mweb-indigo dfn {
+.note-to-mp i, .note-to-mp cite, .note-to-mp em, .note-to-mp var, .note-to-mp address, .note-to-mp dfn {
   font-style: italic;
 }
-.mweb-indigo code, .mweb-indigo kbd, .mweb-indigo tt, .mweb-indigo samp {
+.note-to-mp code, .note-to-mp kbd, .note-to-mp tt, .note-to-mp samp {
   font-family: monospace, Menlo-Regular, Menlo, Monaco, Consolas, "Courier New";
 }
-.mweb-indigo mark {
+.note-to-mp mark {
   padding: 0.2em 0;
   background-color: yellow;
 }
-.mweb-indigo del, .mweb-indigo s {
+.note-to-mp del, .note-to-mp s {
   color: inherit;
 }
-.mweb-indigo table {
+.note-to-mp table {
   color: black;
   border-collapse: collapse;
   background-color: white;
   border-spacing: 2px;
   font-size: 1em;
 }
-.mweb-indigo th, .mweb-indigo td {
+.note-to-mp th, .note-to-mp td {
   border-color: gray;
   border-width: 1px;
   border-style: solid;
 }
-.mweb-indigo th {
+.note-to-mp th {
   padding: 4px 8px;
   font-size: 1em;
   font-weight: bold;
 }
-.mweb-indigo td {
+.note-to-mp td {
   padding: 4px 8px;
   font-size: 1em;
   font-weight: normal;
 }
-.mweb-indigo div[id^=mweb-chart-ele] svg {
+.note-to-mp div[id^=mweb-chart-ele] svg {
   background-color: white;
 }
 
-.mweb-indigo {
+.note-to-mp {
   padding: 1em;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
   color: #595959;
@@ -194,7 +194,7 @@
   /* 代码块特殊处理 */
   /* 布局 end */
 }
-.mweb-indigo blockquote {
+.note-to-mp blockquote {
   margin-left: 0;
   background-color: #ebf4ff;
   border-color: #7f9cf5;
@@ -202,34 +202,34 @@
   padding-bottom: 0.5rem;
   color: #667eea;
 }
-.mweb-indigo strong {
+.note-to-mp strong {
   color: #5a67d8;
 }
-.mweb-indigo a {
+.note-to-mp a {
   border-color: #667eea;
 }
-.mweb-indigo blockquote,
-.mweb-indigo details,
-.mweb-indigo dl,
-.mweb-indigo ol,
-.mweb-indigo p,
-.mweb-indigo pre,
-.mweb-indigo table,
-.mweb-indigo ul {
+.note-to-mp blockquote,
+.note-to-mp details,
+.note-to-mp dl,
+.note-to-mp ol,
+.note-to-mp p,
+.note-to-mp pre,
+.note-to-mp table,
+.note-to-mp ul {
   margin-bottom: 1rem;
 }
-.mweb-indigo ol {
+.note-to-mp ol {
   list-style: decimal;
 }
-.mweb-indigo ul {
+.note-to-mp ul {
   list-style: disc;
 }
-.mweb-indigo ol,
-.mweb-indigo ul {
+.note-to-mp ol,
+.note-to-mp ul {
   padding-left: 2em;
 }
-.mweb-indigo h1,
-.mweb-indigo h2 {
+.note-to-mp h1,
+.note-to-mp h2 {
   border-color: #5a67d8;
   border-style: solid;
   border-top-width: 0px;
@@ -239,50 +239,50 @@
   padding-bottom: 0.25rem;
   padding-left: 0.75rem;
 }
-.mweb-indigo h1,
-.mweb-indigo h2 {
+.note-to-mp h1,
+.note-to-mp h2 {
   border-bottom: 1px solid #eaecef !important;
   border-left-width: 6px;
 }
-.mweb-indigo h1,
-.mweb-indigo h2,
-.mweb-indigo h3,
-.mweb-indigo h4,
-.mweb-indigo h5,
-.mweb-indigo h6 {
+.note-to-mp h1,
+.note-to-mp h2,
+.note-to-mp h3,
+.note-to-mp h4,
+.note-to-mp h5,
+.note-to-mp h6 {
   margin-bottom: 16px;
   line-height: 1.25;
 }
-.mweb-indigo blockquote {
+.note-to-mp blockquote {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   padding-left: 1rem;
   padding-right: 1rem;
   border-left: 0.25em solid;
 }
-.mweb-indigo blockquote > :last-child {
+.note-to-mp blockquote > :last-child {
   margin-bottom: 0;
 }
-.mweb-indigo blockquote > :first-child {
+.note-to-mp blockquote > :first-child {
   margin-top: 0;
 }
-.mweb-indigo strong {
+.note-to-mp strong {
   font-weight: bold;
 }
-.mweb-indigo strong::before {
+.note-to-mp strong::before {
   content: "「";
 }
-.mweb-indigo strong::after {
+.note-to-mp strong::after {
   content: "」";
 }
-.mweb-indigo a {
+.note-to-mp a {
   text-decoration: none;
   border-bottom: 1px solid;
 }
-.mweb-indigo .footnote-ref {
+.note-to-mp .footnote-ref {
   border-width: 0px;
 }
-.mweb-indigo picture img {
+.note-to-mp picture img {
   border-radius: 6px;
   display: block;
   margin: 10px auto;
@@ -290,7 +290,7 @@
   object-fit: contain;
   box-shadow: 2px 4px 7px #999;
 }
-.mweb-indigo img {
+.note-to-mp img {
   max-width: 100%;
   display: block;
   margin: 10px auto;
@@ -298,7 +298,7 @@
   border-radius: 6px;
   box-shadow: 2px 4px 7px #999;
 }
-.mweb-indigo picture {
+.note-to-mp picture {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -306,35 +306,35 @@
   margin-top: 6px;
   margin-bottom: 6px;
 }
-.mweb-indigo .svg-markmap-box {
+.note-to-mp .svg-markmap-box {
   min-height: 20rem;
   width: 100%;
 }
-.mweb-indigo .footnotes {
+.note-to-mp .footnotes {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
 }
-.mweb-indigo .footnotes hr {
+.note-to-mp .footnotes hr {
   margin-top: 4em;
   margin-bottom: 0.5em;
 }
-.mweb-indigo code,
-.mweb-indigo a {
+.note-to-mp code,
+.note-to-mp a {
   color: #5a67d8;
 }
-.mweb-indigo a {
+.note-to-mp a {
   border-color: #667eea;
 }
-.mweb-indigo code {
+.note-to-mp code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   background-color: #ebf4ff;
 }
-.mweb-indigo .code-section {
+.note-to-mp .code-section {
   display: flex;
   border: solid 1px #5a67d8;
   background-color: #ebf4ff;
 }
-.mweb-indigo section pre {
+.note-to-mp .code-section pre {
   display: block;
   overflow-x: auto;
   padding: 0.9em;
@@ -342,15 +342,16 @@
   font-size: 1em;
   margin: 0;
 }
-.mweb-indigo section code {
+.note-to-mp .code-section code {
   font-size: 1em;
   line-height: 1.6em;
   text-wrap: nowrap;
   padding: 0 !important;
   margin: 0 !important;
   display: block;
+  background-color: #ebf4ff;
 }
-.mweb-indigo section ul {
+.note-to-mp .code-section ul {
   flex-shrink: 0;
   counter-reset: line;
   margin: 0;
@@ -358,7 +359,7 @@
   white-space: normal;
   width: fit-content;
 }
-.mweb-indigo section ul > li {
+.note-to-mp .code-section ul > li {
   position: relative;
   margin: 0;
   padding: 0;
@@ -373,6 +374,6 @@
   color: rgba(0, 0, 0, 0.25);
   text-wrap: nowrap;
 }
-.mweb-indigo section ul > li::marker {
+.note-to-mp .code-section ul > li::marker {
   content: none;
 }
