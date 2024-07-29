@@ -1,5 +1,5 @@
 import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, sanitizeHTMLToDom, apiVersion } from 'obsidian';
-import { CSSProcess, parseCSS, ruleToStyle, applyCSS } from './utils';
+import { applyCSS } from './utils';
 import { markedParse, ParseOptions } from './markdown/parser';
 import { PreviewSetting } from './settings';
 import ThemesManager from './themes';
@@ -386,6 +386,16 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         this.renderMarkdown();
     }
 
+    getMetadata() {
+        const file = this.app.workspace.getActiveFile();
+        if (!file) return {digest: '', crop: false};
+        const metadata = this.app.metadataCache.getFileCache(file); 
+        return {
+            digest: metadata?.frontmatter?.digest ?? '',
+            crop: metadata?.frontmatter?.crop ?? false
+        };
+    }
+
     async uploadLocalCover(token: string) {
         const fileInput = this.coverEl;
         if (!fileInput.files || fileInput.files.length === 0) {
@@ -497,11 +507,14 @@ export class NotePreview extends ItemView implements MDRendererCallback {
 
             const content = this.getArticleContent();
 
+            const {digest, crop} = this.getMetadata();
             // 创建草稿
             const res = await wxAddDraft(token, {
                 title: this.title,
                 content: content,
+                digest: digest,
                 thumb_media_id: mediaId,
+                ... crop && { pic_crop_235_1: '0_0_1_0.5', pic_crop_1_1: '0_0.525_0.404_1'}
             });
 
             if (res.status != 200) {

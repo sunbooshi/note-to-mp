@@ -89,8 +89,11 @@ export async function wxUploadImage(data: Blob, filename: string, token: string,
 // 新建草稿
 interface DraftArticle {
     title: string;
+    digest: string;
     content: string;
     thumb_media_id: string;
+    pic_crop_235_1?: string;
+    pic_crop_1_1?: string;
 }
 
 export async function wxAddDraft(token: string, data: DraftArticle) {
@@ -98,7 +101,10 @@ export async function wxAddDraft(token: string, data: DraftArticle) {
     const body = {articles:[{
         title: data.title,
         content: data.content,
-        thumb_media_id: data.thumb_media_id
+        digest: data.digest,
+        thumb_media_id: data.thumb_media_id,
+        ... data.pic_crop_235_1 && {pic_crop_235_1: data.pic_crop_235_1},
+        ... data.pic_crop_1_1 && {pic_crop_1_1: data.pic_crop_1_1},
     }]};
 
     const res = await requestUrl({
