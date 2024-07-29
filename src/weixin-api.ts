@@ -104,10 +104,11 @@ export async function wxAddDraft(token: string, data: DraftArticle) {
     const res = await requestUrl({
         method: 'POST',
         url: url,
+        throw: false,
         body: JSON.stringify(body)
     });
 
-    return await res.json;
+    return res;
 }
 
 export async function wxBatchGetMaterial(token: string, type: string, offset: number = 0, count: number = 10) {
@@ -121,6 +122,7 @@ export async function wxBatchGetMaterial(token: string, type: string, offset: nu
     const res = await requestUrl({
         method: 'POST',
         url: url,
+        throw: false,
         body: JSON.stringify(body)
     });
 

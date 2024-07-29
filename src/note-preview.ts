@@ -498,16 +498,24 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             const content = this.getArticleContent();
 
             // 创建草稿
-            const draft = await wxAddDraft(token, {
+            const res = await wxAddDraft(token, {
                 title: this.title,
                 content: content,
                 thumb_media_id: mediaId,
             });
 
+            if (res.status != 200) {
+                console.error(res.text);
+                this.showMsg(`创建草稿失败, https状态码: ${res.status} 可能是文章包含异常内容，请尝试手动复制到公众号编辑器！`);
+                return;
+            }
+
+            const draft = res.json;
             if (draft.media_id) {
                 this.showMsg('发布成功!');
             }
             else {
+                console.error(JSON.stringify(draft));
                 this.showMsg('发布失败!'+draft.errmsg);
             }
         } catch (error) {
