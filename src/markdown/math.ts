@@ -1,6 +1,7 @@
 import { MarkedExtension, Token, Tokens } from "marked";
 import { requestUrl } from "obsidian";
-import { Extension } from "./extension";
+import { Extension, MDRendererCallback } from "./extension";
+import { NMPSettings } from "src/settings";
 
 const inlineRule = /^(\${1,2})(?!\$)((?:\\.|[^\\\n])*?(?:\\.|[^\\\n\$]))\1/;
 const blockRule = /^(\${1,2})\n((?:\\[^]|[^\\])+?)\n\1(?:\n|$)/;
@@ -11,14 +12,22 @@ export function cleanMathCache() {
     svgCache.clear();
 }
 
-class RendererQueue {
+export class MathRendererQueue {
     private queue: (() => Promise<any>)[] = [];
     private isProcessing: boolean = false;
     private host = 'https://obplugin.sunboshi.tech';
-    private authkey: string;
+    private static instance: MathRendererQueue;
+    private mathIndex: number = 0;
 
-    constructor (authkey: string) {
-        this.authkey = authkey;
+    // 静态方法，用于获取实例
+    public static getInstance(): MathRendererQueue {
+        if (!MathRendererQueue.instance) {
+            MathRendererQueue.instance = new MathRendererQueue();
+        }
+        return MathRendererQueue.instance;
+    }
+
+    private constructor () {
     }
 
     getMathSVG(expression:string, inline:boolean, type:string, callback:(svg:string)=>void) {
@@ -38,7 +47,7 @@ class RendererQueue {
                     method: 'POST',
                     contentType: 'application/json',
                     headers: {
-                        authkey: this.authkey
+                        authkey: NMPSettings.getInstance().authKey
                     },
                     body: JSON.stringify({
                         expression,
@@ -65,6 +74,7 @@ class RendererQueue {
        })}
        this.enqueue(req);
     }
+
     // 添加请求到队列
     enqueue(request: () => Promise<any>): void {
         this.queue.push(request);
@@ -92,48 +102,42 @@ class RendererQueue {
     
         this.isProcessing = false;
     }
-}
-
-let rendererQueue: RendererQueue|null = null;
-
-
-export class MathRenderer extends Extension {
-    mathIndex: number = 0;
-
-    async prepare(): Promise<void> {
-        if (!rendererQueue) {
-            rendererQueue = new RendererQueue(this.settings.authKey);
-        }
-    }
 
     generateId() {
         this.mathIndex += 1;
         return `math-id-${this.mathIndex}`;
     }
 
-    addToQueue(expression: string, inline: boolean, type:string, id: string) {
-        rendererQueue?.getMathSVG(expression, inline, type, (svg: string)=>{
-            svgCache.set(expression, svg);
-            this.callback.updateElementByID(id, svg); 
-        })
-    }
-
-    renderer(token: Tokens.Generic, inline: boolean, type: string = '') {
-        if (type === '') {
-            type = this.settings.math;
+    render(token: Tokens.Generic, inline: boolean, type: string, callback: MDRendererCallback) {
+        if (!NMPSettings.getInstance().isAuthKeyVaild()) {
+            return '<span>注册码无效或已过期</span>';
         }
 
         const id = this.generateId();
         let svg = '渲染中';
+        const expression = token.text;
         if (svgCache.has(token.text)) {
-            svg = svgCache.get(token.text) as string;
+            svg = svgCache.get(expression) as string;
         }
         else {
-            this.addToQueue(token.text, false, type, id);
+            this.getMathSVG(expression, inline, type, (svg: string)=>{
+                svgCache.set(expression, svg);
+                callback.updateElementByID(id, svg); 
+            })
         }
 
         let className = inline? 'inline-math-svg' : 'block-math-svg';
         return `<span id="${id}" class="${className}">${svg}</span>`;
+    }
+}
+
+
+export class MathRenderer extends Extension {
+    renderer(token: Tokens.Generic, inline: boolean, type: string = '') {
+        if (type === '') {
+            type = this.settings.math;
+        }
+        return MathRendererQueue.getInstance().render(token, inline, type, this.callback);
     }
 
     markedExtension(): MarkedExtension {

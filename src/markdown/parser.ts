@@ -42,32 +42,25 @@ export class MarkedParser {
 	marked: Marked;
 	app: App;
     vault: Vault;
-    callback: MDRendererCallback;
-	localFile: LocalFile;
 
     constructor(app: App, callback: MDRendererCallback) {
         this.app = app;
         this.vault = app.vault;
-        this.callback = callback;
 
 		const settings = NMPSettings.getInstance();
 		const assetsManager = AssetsManager.getInstance();
 
-		this.localFile = new LocalFile(app, settings, assetsManager, callback);
-		this.extensions.push(this.localFile);
+		this.extensions.push(new LocalFile(app, settings, assetsManager, callback));
 		this.extensions.push(new CalloutRenderer(app, settings, assetsManager, callback));
 		this.extensions.push(new CodeHighlight(app, settings, assetsManager, callback));
 		this.extensions.push(new EmbedBlockMark(app, settings, assetsManager, callback));
 		this.extensions.push(new SVGIcon(app, settings, assetsManager, callback));
 		this.extensions.push(new LinkRenderer(app, settings, assetsManager, callback));
 		this.extensions.push(new TextHighlight(app, settings, assetsManager, callback));
-		const mathRenderer = settings.authKey.length > 0 
-							 ? new MathRenderer(app, settings, assetsManager, callback)
-							 : null;
-		if (mathRenderer) this.extensions.push(mathRenderer);
-		const codeRenderer = new CodeRenderer(app, settings, assetsManager, callback);
-		codeRenderer.mathRenderer = mathRenderer;
-		this.extensions.push(codeRenderer);
+		this.extensions.push(new CodeRenderer(app, settings, assetsManager, callback));
+		if (settings.isAuthKeyVaild()) {
+			this.extensions.push(new MathRenderer(app, settings, assetsManager, callback));
+		}
     }
 
 	async buildMarked() {

@@ -116,4 +116,10 @@ export class NMPSettings {
             }
         })
     }
+
+    isAuthKeyVaild() {
+        if (this.authKey.length == 0) return false;
+        if (this.expireat == null) return false;
+        return this.expireat > new Date();
+    }
 }

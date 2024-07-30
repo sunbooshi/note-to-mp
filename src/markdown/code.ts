@@ -1,5 +1,5 @@
 import { Tokens } from "marked";
-import { MathRenderer } from "./math";
+import { MathRendererQueue } from "./math";
 import { Extension } from "./extension";
 
 export class CardDataManager {
@@ -42,7 +42,6 @@ export class CardDataManager {
 
 export class CodeRenderer extends Extension {
 	showLineNumber: boolean;
-	mathRenderer: MathRenderer|null;
 
 	codeRenderer(code: string, infostring: string | undefined): string {
 		const lang = (infostring || '').match(/^\S*/)?.[0];
@@ -121,10 +120,10 @@ export class CodeRenderer extends Extension {
 			name: 'code',
 			level: 'block',
 			renderer: (token: Tokens.Code) => {
-				if (this.mathRenderer) {
+				if (this.settings.isAuthKeyVaild()) {
 					const type = CodeRenderer.getMathType(token.lang??'');
 					if (type) {
-						return this.mathRenderer.renderer(token, false, type);
+						return MathRendererQueue.getInstance().render(token, false, type, this.callback);
 					}
 				}
 				if (token.lang && token.lang.trim().toLocaleLowerCase() =='mpcard') {
