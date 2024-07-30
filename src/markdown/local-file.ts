@@ -1,7 +1,7 @@
-import { Token, Tokens, Parser, Lexer } from "marked";
-import { App, Notice, TAbstractFile, TFile } from "obsidian";
+import { Token, Tokens, MarkedExtension } from "marked";
+import { Notice, TAbstractFile, TFile, Vault } from "obsidian";
 import { wxUploadImage } from "../weixin-api";
-import { MDRendererCallback } from "./callback";
+import { Extension } from "./extension";
 
 declare module 'obsidian' {
     interface Vault {
@@ -13,8 +13,7 @@ declare module 'obsidian' {
     }
 }
 
-
-const LocalImageRegex = /^!\[\[(.*?)\]\]/;
+const LocalFileRegex = /^!\[\[(.*?)\]\]/;
 
 interface ImageInfo {
     resUrl: string;
@@ -22,16 +21,75 @@ interface ImageInfo {
     url: string | null;
 }
 
-export class LocalImageRenderer {
-    allImages = new Map<string, ImageInfo>();
-    app: App;
-    index: number = 0;
-    callback: MDRendererCallback
+export class LocalImageManager {
+    private images: Map<string, ImageInfo>;
+    private static instance: LocalImageManager;
 
-    constructor(app: App, callback: MDRendererCallback) {
-        this.app = app;
-        this.callback = callback;
+    private constructor() {
+        this.images = new Map<string, ImageInfo>();
     }
+
+    // 静态方法，用于获取实例
+    public static getInstance(): LocalImageManager {
+        if (!LocalImageManager.instance) {
+            LocalImageManager.instance = new LocalImageManager();
+        }
+        return LocalImageManager.instance;
+    }
+
+    public setImage(path: string, info: ImageInfo): void {
+        if (!this.images.has(path)) {
+            this.images.set(path, info);
+        } 
+    }
+
+    async uploadLocalImage(token: string, vault: Vault) {
+        const keys = this.images.keys();
+        for (let key of keys) {
+            const value = this.images.get(key);
+            if (value == null) continue;
+            if (value.url != null) continue;
+            const file = vault.getFileByPath(value.filePath);
+            if (file == null) continue;
+            const fileData = await vault.readBinary(file);
+            const res = await wxUploadImage(new Blob([fileData]), file.name, token);
+            if (res.errcode != 0) {
+                const msg = `上传图片失败: ${res.errcode} ${res.errmsg}`;
+                new Notice(msg);
+                console.error(msg);
+            }
+            value.url = res.url;
+        }
+    }
+
+    replaceImages(root: HTMLElement) {
+        const images = root.getElementsByTagName('img');
+        const keys = this.images.keys();
+        for (let key of keys) {
+            const value = this.images.get(key);
+            if (value == null) continue;
+            if (value.url == null) continue;
+            for (let i = 0; i < images.length; i++) {
+                const img = images[i];
+                if (img.src.startsWith('http')) {
+                    continue;
+                }
+                if (img.src === key) {
+                    img.setAttribute('src', value.url);
+                    break;
+                }
+            }
+        }
+    }
+
+    async cleanup() {
+        this.images.clear(); 
+    }
+}
+
+  
+export class LocalFile extends Extension{
+    index: number = 0;
 
     generateId() {
         this.index += 1;
@@ -47,13 +105,12 @@ export class LocalImageRenderer {
         }
 
         const resPath = this.app.vault.getResourcePath(file as TFile);
-        if (!this.allImages.has(resPath)) {
-            this.allImages.set(resPath, {
-                resUrl: resPath,
-                filePath: file.path,
-                url: null
-            })
-        }
+        const info = {
+            resUrl: resPath,
+            filePath: file.path,
+            url: null
+        };
+        LocalImageManager.getInstance().setImage(resPath, info);
         return resPath;
     }
 
@@ -265,29 +322,21 @@ export class LocalImageRenderer {
         }
 
         const content = await this.getFileContent(file, header, block);
-        const markedOptiones = {
-            gfm: true,
-            breaks: true,
-        };
-        const lexer = new Lexer(markedOptiones);
-        const tokens = lexer.lex(content);
-        const parser = new Parser(markedOptiones);
-        const body = parser.parse(tokens);
+        const body = await this.marked.parse(content);
         this.callback.updateElementByID(id, body);
     }
 
-    localImageExtension() {
-        this.allImages.clear();
-        return {
+    markedExtension(): MarkedExtension {
+        return {extensions:[{
             name: 'LocalImage',
             level: 'inline',
             start: (src: string) => {
-                const index = src.indexOf('![[')
-                if (index === -1) return
-                return index
+                const index = src.indexOf('![[');
+                if (index === -1) return;
+                return index;
             },
-            tokenizer: (src: string, tokens: Token[]) => {
-                const matches = src.match(LocalImageRegex);
+            tokenizer: (src: string) => {
+                const matches = src.match(LocalFileRegex);
                 if (matches == null) return;
                 const token: Token = {
                     type: 'LocalImage',
@@ -295,7 +344,7 @@ export class LocalImageRenderer {
                     href: matches[1],
                     text: matches[1]
                 };
-                return token
+                return token;
             },
             renderer: (token: Tokens.Image) => {
                 // 渲染本地图片
@@ -313,54 +362,6 @@ export class LocalImageRenderer {
                     return `<${tag} class="note-embed-file" id="${id}">渲染中</${tag}>`
                 }
             }
-        }
-    }
-
-    async uploadLocalImage(token: string) {
-        const vault = this.app.vault;
-        const keys = this.allImages.keys();
-        for (let key of keys) {
-            const value = this.allImages.get(key);
-            if (value == null) continue;
-            if (value.url != null) continue;
-            const file = vault.getFileByPath(value.filePath);
-            if (file == null) continue;
-            const fileData = await vault.readBinary(file);
-            const res = await wxUploadImage(new Blob([fileData]), file.name, token);
-            if (res.errcode != 0) {
-                const msg = `上传图片失败: ${res.errcode} ${res.errmsg}`;
-                new Notice(msg);
-                console.error(msg);
-            }
-            value.url = res.url;
-        }
-    }
-
-    replaceImages(root: HTMLElement) {
-        const images = root.getElementsByTagName('img');
-        const keys = this.allImages.keys();
-        for (let key of keys) {
-            const value = this.allImages.get(key);
-            if (value == null) continue;
-            if (value.url == null) continue;
-            for (let i = 0; i < images.length; i++) {
-                const img = images[i];
-                if (img.src.startsWith('http')) {
-                    continue;
-                }
-                if (img.src === key) {
-                    img.setAttribute('src', value.url);
-                    break;
-                }
-            }
-        }
-    }
-
-    async uploadCover(file: File, token: string) {
-        const res = await wxUploadImage(file, file.name, token, 'image');
-        if (res.media_id) {
-            return res.media_id;
-        }
-        console.error('upload cover fail: ' + res.errmsg);
+        }]};
     }
 }

@@ -1,22 +1,55 @@
 import { Tokens } from "marked";
 import { MathRenderer } from "./math";
+import { Extension } from "./extension";
 
-export class CodeRenderer {
+export class CardDataManager {
+	private cardData: Map<string, string>;
+    private static instance: CardDataManager;
+
+    private constructor() {
+       this.cardData = new Map<string, string>();
+    }
+
+    // 静态方法，用于获取实例
+    public static getInstance(): CardDataManager {
+        if (!CardDataManager.instance) {
+            CardDataManager.instance = new CardDataManager();
+        }
+        return CardDataManager.instance;
+    }
+
+	public setCardData(id: string, cardData: string ) {
+		this.cardData.set(id, cardData);
+	}
+
+	public cleanup() {
+		this.cardData.clear();
+	}
+
+	public restoreCard(html: string) {
+		for (const [key, value] of this.cardData.entries()) {
+			const exp = `<section[^>]*\\sdata-id="${key}"[^>]*>(.*?)<\\/section>`;
+			console.log(exp);
+			const regex = new RegExp(exp, 'gs');
+			if (!regex.test(html)) {
+				console.error('未能正确替换公众号卡片');
+			}
+			html = html.replace(regex, value);
+		}
+		return html;
+	}
+}
+
+export class CodeRenderer extends Extension {
 	showLineNumber: boolean;
 	mathRenderer: MathRenderer|null;
-	cardData: string | null;
-
-    constructor(showLineNumber: boolean, mathRenderer: MathRenderer|null) {
-		this.showLineNumber = showLineNumber;
-		this.mathRenderer = mathRenderer;
-	}
 
 	codeRenderer(code: string, infostring: string | undefined): string {
 		const lang = (infostring || '').match(/^\S*/)?.[0];
 		code = code.replace(/\n$/, '') + '\n';
 	
 		let codeSection = '';
-		if (this.showLineNumber) {
+		if (this.settings.lineNumber) {
 			const lines = code.split('\n');
 			
 			let liItems = '';
@@ -56,15 +89,18 @@ export class CodeRenderer {
 	}
 
 	parseCard(htmlString: string) {
+		const id = /data-id="([^"]+)"/;
 		const headimgRegex = /data-headimg="([^"]+)"/;
 		const nicknameRegex = /data-nickname="([^"]+)"/;
 		const signatureRegex = /data-signature="([^"]+)"/;
 	
+		const idMatch = htmlString.match(id);
 		const headimgMatch = htmlString.match(headimgRegex);
 		const nicknameMatch = htmlString.match(nicknameRegex);
 		const signatureMatch = htmlString.match(signatureRegex);
 	
 		return {
+			id: idMatch ? idMatch[1] : '',
 			headimg: headimgMatch ? headimgMatch[1] : '',
 			nickname: nicknameMatch ? nicknameMatch[1] : '公众号名称',
 			signature: signatureMatch ? signatureMatch[1] : '公众号介绍'
@@ -72,24 +108,16 @@ export class CodeRenderer {
 	}
 
 	renderCard(token: Tokens.Code) {
-		this.cardData = token.text;
-		const { headimg, nickname, signature } = this.parseCard(token.text);
-		return `<section class="note-mpcard-wrapper"><div class="note-mpcard-content"><img class="note-mpcard-headimg" width="54" height="54" src="${headimg}"></img><div class="note-mpcard-info"><div class="note-mpcard-nickname">${nickname}</div><div class="note-mpcard-signature">${signature}</div></div></div><div class="note-mpcard-foot">公众号</div></section>`;
-	}
-
-	restoreCard(html: string) {
-		if (this.cardData) {
-			const divRegex = /<section class="note-mpcard-wrapper"[\s\S]*?<\/section>/;
-			if (!divRegex.test(html)) {
-				console.error('未能正确替换公众号卡片');
-			}
-			return html.replace(divRegex, this.cardData);
+		const { id, headimg, nickname, signature } = this.parseCard(token.text);
+		if (id === '') {
+			return '<span>公众号卡片数据错误，没有id</span>';
 		}
-		return html;
+		CardDataManager.getInstance().setCardData(id, token.text);
+		return `<section data-id="${id}" class="note-mpcard-wrapper"><div class="note-mpcard-content"><img class="note-mpcard-headimg" width="54" height="54" src="${headimg}"></img><div class="note-mpcard-info"><div class="note-mpcard-nickname">${nickname}</div><div class="note-mpcard-signature">${signature}</div></div></div><div class="note-mpcard-foot">公众号</div></section>`;
 	}
 
-	codeExtension() {
-		return {
+	markedExtension() {
+		return {extensions:[{
 			name: 'code',
 			level: 'block',
 			renderer: (token: Tokens.Code) => {
@@ -104,7 +132,7 @@ export class CodeRenderer {
 				}
 				return this.codeRenderer(token.text, token.lang);
 			},
-		}
+		}]}
 	}
 }
 

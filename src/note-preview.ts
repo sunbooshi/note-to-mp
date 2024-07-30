@@ -1,14 +1,14 @@
 import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, sanitizeHTMLToDom, apiVersion } from 'obsidian';
 import { applyCSS } from './utils';
-import { markedParse, ParseOptions } from './markdown/parser';
+import { wxUploadImage } from './weixin-api';
 import { PreviewSetting } from './settings';
-import ThemesManager from './themes';
+import AssetsManager from './assets';
 import InlineCSS from './inline-css';
-import { LocalImageRenderer } from './markdown/img-extension';
 import { wxGetToken, wxAddDraft, wxBatchGetMaterial } from './weixin-api';
-import { MathRenderer } from './markdown/math';
-import { MDRendererCallback } from './markdown/callback';
-import { CodeRenderer } from './markdown/code';
+import { MDRendererCallback } from './markdown/extension';
+import { MarkedParser } from './markdown/parser';
+import { LocalImageManager } from './markdown/local-file';
+import { CardDataManager } from './markdown/code';
 
 export const VIEW_TYPE_NOTE_PREVIEW = 'note-preview';
 
@@ -21,6 +21,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
     toolbar: HTMLDivElement;
     renderDiv: HTMLDivElement;
     articleDiv: HTMLDivElement;
+    styleEl: HTMLElement;
     coverEl: HTMLInputElement;
     useDefaultCover: HTMLInputElement;
     useLocalCover: HTMLInputElement;
@@ -28,28 +29,23 @@ export class NotePreview extends ItemView implements MDRendererCallback {
     listeners: EventRef[];
     container: Element;
     settings: PreviewSetting;
-    themeManager: ThemesManager;
+    assetsManager: AssetsManager;
     articleHTML: string;
     title: string;
     currentTheme: string;
     currentHighlight: string;
     currentAppId: string;
-    mathRenderer: MathRenderer|null = null;
-    imageRenderer: LocalImageRenderer;
-    codeRenderer: CodeRenderer;
+    markedParser: MarkedParser;
 
-    constructor(leaf: WorkspaceLeaf, settings: PreviewSetting, themeManager: ThemesManager) {
+
+    constructor(leaf: WorkspaceLeaf, settings: PreviewSetting, assetsManager: AssetsManager) {
         super(leaf);
         this.workspace = this.app.workspace;
         this.settings = settings
-        this.themeManager = themeManager;
+        this.assetsManager = assetsManager;
         this.currentTheme = this.settings.defaultStyle;
         this.currentHighlight = this.settings.defaultHighlight;
-        if (settings.authKey.length > 0) {
-            this.mathRenderer = new MathRenderer(this, settings);
-        }
-        this.imageRenderer = new LocalImageRenderer(this.app, this);
-        this.codeRenderer = new CodeRenderer(settings.lineNumber, this.mathRenderer);
+        this.markedParser = new MarkedParser(this.app, settings, assetsManager, this);
     }
 
     getViewType() {
@@ -79,11 +75,13 @@ export class NotePreview extends ItemView implements MDRendererCallback {
 
     onAppIdChanged() {
         // 清理上传过的图片
-        this.imageRenderer.allImages.clear();
+        LocalImageManager.getInstance().cleanup();
+        CardDataManager.getInstance().cleanup();
     }
 
     async update() {
-        this.codeRenderer.cardData = null;
+        LocalImageManager.getInstance().cleanup();
+        CardDataManager.getInstance().cleanup();
         this.renderMarkdown();
     }
 
@@ -110,20 +108,8 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             if (md.startsWith('---')) {
                 md = md.replace(FRONT_MATTER_REGEX, '');
             }
-            const op: ParseOptions = {
-                lineNumber: this.settings.lineNumber,
-                linkStyle: this.settings.linkStyle as 'footnote' | 'inline',
-            }
 
-            const extensions = [];
-            if (this.mathRenderer) {
-                extensions.push(this.mathRenderer.blockMath());
-                extensions.push(this.mathRenderer.inlineMath());
-            }
-            extensions.push(this.imageRenderer.localImageExtension());
-            extensions.push(this.codeRenderer.codeExtension());
-
-            this.articleHTML = await markedParse(md, op, extensions);
+            this.articleHTML = await this.markedParser.parse(md);
 
             this.setArticle(this.articleHTML);
         }
@@ -134,12 +120,13 @@ export class NotePreview extends ItemView implements MDRendererCallback {
     }
 
     isOldTheme() {
-        const theme = this.themeManager.getTheme(this.currentTheme);
+        const theme = this.assetsManager.getTheme(this.currentTheme);
         if (theme) {
             return theme.css.indexOf('.note-to-mp') < 0;
         }
         return false;
     }
+
     setArticle(article: string) {
         this.articleDiv.empty();
         let className = 'note-to-mp';
@@ -148,11 +135,15 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             className = this.currentTheme;
         }
         const html = `<section class="${className}" id="article-section">${article}</section>`;
-        const node = applyCSS(html, this.getCSS());
-        if (node) {
-            this.articleDiv.appendChild(node);
-            this.imageRenderer.replaceImages(this.articleDiv);
+        const doc = sanitizeHTMLToDom(html);
+        if (doc.firstChild) {
+            this.articleDiv.appendChild(doc.firstChild);
         }
+    }
+
+    setStyle(css: string) {
+        this.styleEl.empty();
+        this.styleEl.appendChild(document.createTextNode(css));
     }
 
     getArticleSection() {
@@ -161,14 +152,15 @@ export class NotePreview extends ItemView implements MDRendererCallback {
 
     getArticleContent() {
         const content = this.articleDiv.innerHTML;
-        return this.codeRenderer.restoreCard(content);
+        const html = applyCSS(content, this.getCSS());
+        return CardDataManager.getInstance().restoreCard(html);
     }
 
     getCSS() {
         try {
-            const theme = this.themeManager.getTheme(this.currentTheme);
-            const highlight = this.themeManager.getHighlight(this.currentHighlight);
-            const customCSS = this.settings.useCustomCss ? this.themeManager.customCSS : '';
+            const theme = this.assetsManager.getTheme(this.currentTheme);
+            const highlight = this.assetsManager.getHighlight(this.currentHighlight);
+            const customCSS = this.settings.useCustomCss ? this.assetsManager.customCSS : '';
             return `${InlineCSS}\n\n${highlight!.css}\n\n${theme!.css}\n\n${customCSS}`;
         } catch (error) {
             console.error(error);
@@ -333,7 +325,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
                 this.updateStyle(selectBtn.value);
             }
 
-            for (let s of this.themeManager.themes) {
+            for (let s of this.assetsManager.themes) {
                 const op = selectBtn.createEl('option');
                 op.value = s.className;
                 op.text = s.name;
@@ -351,7 +343,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
                 this.updateHighLight(highlightStyleBtn.value);
             }
 
-            for (let s of this.themeManager.highlights) {
+            for (let s of this.assetsManager.highlights) {
                 const op = highlightStyleBtn.createEl('option');
                 op.value = s.name;
                 op.text = s.name;
@@ -372,18 +364,21 @@ export class NotePreview extends ItemView implements MDRendererCallback {
 
         this.renderDiv = this.mainDiv.createDiv({cls: 'render-div'});
         this.renderDiv.id = 'render-div';
-        this.renderDiv.setAttribute('style', '-webkit-user-select: text; user-select: text;')
+        this.renderDiv.setAttribute('style', '-webkit-user-select: text; user-select: text;');
+        this.styleEl = this.renderDiv.createEl('style');
+        this.styleEl.setAttr('title', 'note-to-mp-style');
+        this.setStyle(this.getCSS());
         this.articleDiv = this.renderDiv.createEl('div');
     }
 
     updateStyle(styleName: string) {
         this.currentTheme = styleName;
-        this.renderMarkdown();
+        this.setStyle(this.getCSS());
     }
 
     updateHighLight(styleName: string) {
         this.currentHighlight = styleName;
-        this.renderMarkdown();
+        this.setStyle(this.getCSS());
     }
 
     getMetadata() {
@@ -406,7 +401,12 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             return '';
         }
 
-        return await this.imageRenderer.uploadCover(file, token);
+        const res = await wxUploadImage(file, file.name, token, 'image');
+        if (res.media_id) {
+            return res.media_id;
+        }
+        console.error('upload cover fail: ' + res.errmsg);
+        return '';
     }
 
     async getDefaultCover(token: string) {
@@ -446,10 +446,12 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         if (token === '') {
             return;
         }
+
+        const lm = LocalImageManager.getInstance();
         // 上传图片
-        await this.imageRenderer.uploadLocalImage(token);
+        await lm.uploadLocalImage(token, this.app.vault);
         // 替换图片链接
-        this.imageRenderer.replaceImages(this.articleDiv);
+        lm.replaceImages(this.articleDiv);
 
         await this.copyArticle();
         this.showMsg('图片已上传，并且已复制，请到公众号编辑器粘贴。');
@@ -487,10 +489,11 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             if (token === '') {
                 return;
             }
-            //上传图片
-            await this.imageRenderer.uploadLocalImage(token);
+            const lm = LocalImageManager.getInstance();
+            // 上传图片
+            await lm.uploadLocalImage(token, this.app.vault);
             // 替换图片链接
-            this.imageRenderer.replaceImages(this.articleDiv);
+            lm.replaceImages(this.articleDiv);
             // 上传封面
             let mediaId = '';
             if (this.useLocalCover.checked) {
@@ -506,7 +509,6 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             }
 
             const content = this.getArticleContent();
-
             const {digest, crop} = this.getMetadata();
             // 创建草稿
             const res = await wxAddDraft(token, {
@@ -536,27 +538,14 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         }
     }
 
-    updateMath(id: string, svg: string): void {
-        const span = this.articleDiv.querySelector('#'+id) as HTMLElement;
-        if (!span) return;
-        const doc = sanitizeHTMLToDom(svg);
-        span.empty();
-        if (doc.firstChild) {
-            span.appendChild(doc.firstChild);
-        }
-        else {
-            span.innerText = '渲染失败';
-        }
-    }
-
     updateElementByID(id:string, html:string):void {
         const item = this.articleDiv.querySelector('#'+id) as HTMLElement;
         if (!item) return;
         const doc = sanitizeHTMLToDom(html);
         item.empty();
-        if (doc.hasChildNodes()) {
-            for (const child of doc.childNodes) {
-                item.appendChild(child);
+        if (doc.childElementCount > 0) {
+            for (const child of doc.children) {
+                item.appendChild(child.cloneNode(true)); // 使用 cloneNode 复制节点以避免移动它
             }
         }
         else {

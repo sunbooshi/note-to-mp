@@ -1,152 +1,105 @@
-import { Token, Tokens, Marked, options, Lexer} from "marked";
-import { markedHighlight } from "marked-highlight";
-import hljs from "highlight.js";
-import {calloutRender} from "./callouts";
+import { Marked } from "marked";
+import { PreviewSetting } from "src/settings";
+import { App, Vault } from "obsidian";
+import AssetsManager from "../assets";
+import { Extension, MDRendererCallback } from "./extension";
+import { CalloutRenderer} from "./callouts";
+import { CodeHighlight } from "./code-highlight";
 import { CodeRenderer } from "./code";
-import { bgHighlight } from "./bghighlight";
+import { EmbedBlockMark } from "./embed-block-mark";
+import { SVGIcon } from "./icons";
+import { LinkRenderer } from "./link";
+import { LocalFile } from "./local-file";
+import { MathRenderer } from "./math";
+import { TextHighlight } from "./text-highlight";
 
-export interface ParseOptions {
-    lineNumber: boolean;
-	linkStyle: 'footnote' | 'inline';
-};
 
-
-const BlockMarkRegex = /^\^[0-9A-Za-z-]+$/;
-
-let AllLinks:string[] = [];
-const parseOptions:ParseOptions = {
-    lineNumber: true,
-	linkStyle: 'footnote'
-};
 const markedOptiones = {
     gfm: true,
     breaks: true,
 };
 
-function walkTokens(token:Token) {
-	if (token.type == 'link') {
-		const link = token as Tokens.Link;
-		if (token.text.indexOf(token.href) === -1 && !(token.href.indexOf('https://mp.weixin.qq.com/s/') === 0)) {
-			AllLinks.push(link.href);
-			if (parseOptions.linkStyle == 'footnote') {
-				const txtToken:Tokens.Text = {type: 'text', raw: link.text, text: link.text};
-				token.tokens = [txtToken, ... this.Lexer.lexInline(`<sup>[${AllLinks.length}]</sup>`)];
-			}
-			else {
-				for (const t of link.tokens) {
-					if (t.type == 'text') {
-						t.text = link.text + '[' + link.href + ']';
-					}
-				}
-			}
+const customRenderer = {
+	heading(text: string, level: number, raw: string): string {
+		// ignore IDs
+		return `<h${level}><span class="h-prefix"></span><span class="h-content">${text}</span><span class="h-suffix"></span></h${level}>`;
+	},
+	hr(): string {
+		return '<hr>';
+	},
+	list(body: string, ordered: boolean, start: number | ''): string {
+		const type = ordered ? 'ol' : 'ul';
+		const startatt = (ordered && start !== 1) ? (' start="' + start + '"') : '';
+		return '<' + type + startatt + '>' + body + '</' + type + '>';
+	},
+	listitem(text: string, task: boolean, checked: boolean): string {
+		return `<li>${text}</li>`;
+	}
+};
+
+export class MarkedParser {
+	extensions: Extension[] = [];
+	marked: Marked;
+	app: App;
+    vault: Vault;
+    assetsManager: AssetsManager
+    settings: PreviewSetting;
+    callback: MDRendererCallback;
+	localFile: LocalFile;
+
+    constructor(app: App, settings: PreviewSetting, assetsManager: AssetsManager, callback: MDRendererCallback) {
+        this.app = app;
+        this.vault = app.vault;
+        this.settings = settings;
+        this.assetsManager = assetsManager;
+        this.callback = callback;
+
+		this.localFile = new LocalFile(app, settings, assetsManager, callback);
+		this.extensions.push(this.localFile);
+		this.extensions.push(new CalloutRenderer(app, settings, assetsManager, callback));
+		this.extensions.push(new CodeHighlight(app, settings, assetsManager, callback));
+		this.extensions.push(new EmbedBlockMark(app, settings, assetsManager, callback));
+		this.extensions.push(new SVGIcon(app, settings, assetsManager, callback));
+		this.extensions.push(new LinkRenderer(app, settings, assetsManager, callback));
+		this.extensions.push(new MathRenderer(app, settings, assetsManager, callback));
+		this.extensions.push(new TextHighlight(app, settings, assetsManager, callback));
+		const mathRenderer = this.settings.authKey.length > 0 
+							 ? new MathRenderer(app, settings, assetsManager, callback)
+							 : null;
+		if (mathRenderer) this.extensions.push(mathRenderer);
+		const codeRenderer = new CodeRenderer(app, settings, assetsManager, callback);
+		codeRenderer.mathRenderer = mathRenderer;
+		this.extensions.push(codeRenderer);
+    }
+
+	async buildMarked() {
+	    this.marked = new Marked();
+		this.marked.use(markedOptiones);
+		for (const ext of this.extensions) {
+			this.marked.use(ext.markedExtension());
+			ext.marked = this.marked;
+			await ext.prepare();
 		}
+		this.marked.use({renderer: customRenderer});
 	}
-}
 
-function footnoteLinks() {
-	if (AllLinks.length == 0) {
-	    return '';
+	async prepare() {
+	    this.extensions.forEach(async ext => await ext.prepare());
 	}
-	
-	const links = AllLinks.map((href, i) => {
-		return `<li>${href}&nbsp;↩</li>`;
-	});
-	return `<seciton class="footnotes"><hr><ol>${links.join('')}</ol></section>`;
-}
 
-function EmbedBlockMark() {
-	return {
-		name: 'EmbedBlockMark',
-		level: 'inline',
-		start(src: string) {
-			let index = src.indexOf('^');
-			if (index === -1) {
-			    return;
-			}
-			return index;
-		},
-		tokenizer(src: string, tokens: Token[]) {
-			const match = src.match(BlockMarkRegex);
-			if (match) {
-				return {
-					type: 'EmbedBlockMark',
-					raw: match[0],
-					text: match[0]
-				};
-			}
-		},
-		renderer: (token: Tokens.Generic) => {
-			return `<span data-txt="${token.text}"></span}`;
+	async postprocess(html: string) {
+		let result = html;
+		for (let ext of this.extensions) {
+			result = await ext.postprocess(result);
 		}
+		return result;
 	}
-}
 
-export async function markedParse(content:string, op:ParseOptions, extensions:any[])  {
-	parseOptions.lineNumber = op.lineNumber;
-	parseOptions.linkStyle = op.linkStyle;
-
-	const m = new Marked(
-	    markedHighlight({
-	    langPrefix: 'hljs language-',
-	    highlight(code, lang, info) {
-			const type = CodeRenderer.getMathType(lang)
-			if (type) return code;
-			if (lang && lang.trim().toLocaleLowerCase() == 'mpcard') return code;
-
-		  	if (lang && hljs.getLanguage(lang)) {
-				try {
-					const result = hljs.highlight(code, {language: lang});
-					return result.value;
-				} catch (err) {}
-		  	}
-		  
-			try {
-				const result = hljs.highlightAuto(code);
-				return result.value;
-			} catch (err) {}
-			
-			return ''; // use external default escaping
-	    }
-	  })
-	);
-	AllLinks = [];
-	m.use(markedOptiones);
-	m.use({walkTokens});
-	m.use({
-		extensions: [
-		{
-			name: 'blockquote',
-			level: 'block',
-			renderer(token) {
-				return calloutRender.call(this, token as Tokens.Blockquote);
-			}, 
-		},
-		bgHighlight(),
-		EmbedBlockMark(),
-		... extensions
-	]});
-
-	const renderer = {
-		heading(text: string, level: number, raw: string): string {
-			// ignore IDs
-			return `<h${level}><span class="h-prefix"></span><span class="h-content">${text}</span><span class="h-suffix"></span></h${level}>`;
-		},
-		hr(): string {
-			return '<hr>';
-		},
-		list(body: string, ordered: boolean, start: number | ''): string {
-			const type = ordered ? 'ol' : 'ul';
-			const startatt = (ordered && start !== 1) ? (' start="' + start + '"') : '';
-			return '<' + type + startatt + '>' + body + '</' + type + '>';
-		},
-		listitem(text: string, task: boolean, checked: boolean): string {
-			return `<li>${text}</li>`;
-		}
-	};
-	m.use({renderer});
-	const html = await m.parse(content);
-	if (parseOptions.linkStyle == 'footnote') {
-	    return html + footnoteLinks();
+	async parse(content: string) {
+		if (!this.marked) await this.buildMarked();
+		await this.prepare();
+		let html = await this.marked.parse(content);	
+		html = await this.postprocess(html);
+		return html;
 	}
-	return html;
 }

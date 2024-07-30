@@ -1,7 +1,6 @@
-import { Token, Tokens } from "marked";
+import { MarkedExtension, Token, Tokens } from "marked";
 import { requestUrl } from "obsidian";
-import { PreviewSetting } from "../settings";
-import { MDRendererCallback } from "./callback";
+import { Extension } from "./extension";
 
 const inlineRule = /^(\${1,2})(?!\$)((?:\\.|[^\\\n])*?(?:\\.|[^\\\n\$]))\1/;
 const blockRule = /^(\${1,2})\n((?:\\[^]|[^\\])+?)\n\1(?:\n|$)/;
@@ -10,111 +9,6 @@ const svgCache = new Map<string, string>();
 
 export function cleanMathCache() {
     svgCache.clear();
-}
-
-export class MathRenderer {
-    callback: MDRendererCallback;
-    mathIndex: number;
-    rendererQueue: RendererQueue;
-    setting: PreviewSetting;
-
-
-    constructor(callback: MDRendererCallback, setting: PreviewSetting) {
-        this.callback = callback;
-        this.mathIndex = 0;
-        this.setting = setting;
-        this.rendererQueue = new RendererQueue(setting.authKey);
-    }
-
-    generateId() {
-        this.mathIndex += 1;
-        return `math-id-${this.mathIndex}`;
-    }
-
-    addToQueue(expression: string, inline: boolean, type:string, id: string) {
-        this.rendererQueue.getMathSVG(expression, inline, type, (svg: string)=>{
-            svgCache.set(expression, svg);
-            this.callback.updateElementByID(id, svg); 
-        })
-    }
-
-    renderer(token: Tokens.Generic, inline: boolean, type: string = '') {
-        if (type === '') {
-            type = this.setting.math;
-        }
-
-        const id = this.generateId();
-        let svg = '渲染中';
-        if (svgCache.has(token.text)) {
-            svg = svgCache.get(token.text) as string;
-        }
-        else {
-            this.addToQueue(token.text, false, type, id);
-        }
-
-        let className = inline? 'inline-math-svg' : 'block-math-svg';
-        return `<span id="${id}" class="${className}">${svg}</span>`;
-    }
-
-    inlineMath() {
-        return {
-            name: 'InlineMath',
-            level: 'inline',
-            start(src: string) {
-                let index;
-                let indexSrc = src;
-
-                while (indexSrc) {
-                    index = indexSrc.indexOf('$');
-                    if (index === -1) {
-                        return;
-                    }
-
-                    const possibleKatex = indexSrc.substring(index);
-
-                    if (possibleKatex.match(inlineRule)) {
-                        return index;
-                    }
-
-                    indexSrc = indexSrc.substring(index + 1).replace(/^\$+/, '');
-                }
-            },
-            tokenizer(src: string, tokens: Token[]) {
-                const match = src.match(inlineRule);
-                if (match) {
-                    return {
-                        type: 'InlineMath',
-                        raw: match[0],
-                        text: match[2].trim(),
-                        displayMode: match[1].length === 2
-                    };
-                }
-            },
-            renderer: (token: Tokens.Generic) => {
-               return this.renderer(token, true);
-            }
-        }
-    }
-    blockMath() {
-        return {
-            name: 'BlockMath',
-            level: 'block',
-            tokenizer(src: string, tokens: Token[]) {
-                const match = src.match(blockRule);
-                if (match) {
-                    return {
-                        type: 'BlockMath',
-                        raw: match[0],
-                        text: match[2].trim(),
-                        displayMode: match[1].length === 2
-                    };
-                }
-            },
-            renderer: (token: Tokens.Generic) => {
-                return this.renderer(token, false);
-            }
-        };
-    }
 }
 
 class RendererQueue {
@@ -197,5 +91,117 @@ class RendererQueue {
         }
     
         this.isProcessing = false;
+    }
+}
+
+let rendererQueue: RendererQueue|null = null;
+
+
+export class MathRenderer extends Extension {
+    mathIndex: number = 0;
+
+    async prepare(): Promise<void> {
+        if (!rendererQueue) {
+            rendererQueue = new RendererQueue(this.settings.authKey);
+        }
+    }
+
+    generateId() {
+        this.mathIndex += 1;
+        return `math-id-${this.mathIndex}`;
+    }
+
+    addToQueue(expression: string, inline: boolean, type:string, id: string) {
+        rendererQueue?.getMathSVG(expression, inline, type, (svg: string)=>{
+            svgCache.set(expression, svg);
+            this.callback.updateElementByID(id, svg); 
+        })
+    }
+
+    renderer(token: Tokens.Generic, inline: boolean, type: string = '') {
+        if (type === '') {
+            type = this.settings.math;
+        }
+
+        const id = this.generateId();
+        let svg = '渲染中';
+        if (svgCache.has(token.text)) {
+            svg = svgCache.get(token.text) as string;
+        }
+        else {
+            this.addToQueue(token.text, false, type, id);
+        }
+
+        let className = inline? 'inline-math-svg' : 'block-math-svg';
+        return `<span id="${id}" class="${className}">${svg}</span>`;
+    }
+
+    markedExtension(): MarkedExtension {
+        return {
+            extensions: [
+                this.inlineMath(),
+                this.blockMath()
+            ]
+        }
+    }
+
+    inlineMath() {
+        return {
+            name: 'InlineMath',
+            level: 'inline',
+            start(src: string) {
+                let index;
+                let indexSrc = src;
+
+                while (indexSrc) {
+                    index = indexSrc.indexOf('$');
+                    if (index === -1) {
+                        return;
+                    }
+
+                    const possibleKatex = indexSrc.substring(index);
+
+                    if (possibleKatex.match(inlineRule)) {
+                        return index;
+                    }
+
+                    indexSrc = indexSrc.substring(index + 1).replace(/^\$+/, '');
+                }
+            },
+            tokenizer(src: string, tokens: Token[]) {
+                const match = src.match(inlineRule);
+                if (match) {
+                    return {
+                        type: 'InlineMath',
+                        raw: match[0],
+                        text: match[2].trim(),
+                        displayMode: match[1].length === 2
+                    };
+                }
+            },
+            renderer: (token: Tokens.Generic) => {
+               return this.renderer(token, true);
+            }
+        }
+    }
+    blockMath() {
+        return {
+            name: 'BlockMath',
+            level: 'block',
+            tokenizer(src: string) {
+                const match = src.match(blockRule);
+                if (match) {
+                    return {
+                        type: 'BlockMath',
+                        raw: match[0],
+                        text: match[2].trim(),
+                        displayMode: match[1].length === 2
+                    };
+                }
+            },
+            renderer: (token: Tokens.Generic) => {
+                return this.renderer(token, false);
+            }
+        };
     }
 }

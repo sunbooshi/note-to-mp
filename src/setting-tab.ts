@@ -1,4 +1,4 @@
-import { App, TextAreaComponent, PluginSettingTab, Setting, Notice, FileSystemAdapter, sanitizeHTMLToDom } from 'obsidian';
+import { App, TextAreaComponent, PluginSettingTab, Setting, Notice, sanitizeHTMLToDom } from 'obsidian';
 import NoteToMpPlugin from './main';
 import { wxGetToken,wxEncrypt } from './weixin-api';
 import { cleanMathCache } from './markdown/math';
@@ -141,7 +141,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName('默认样式')
 			.addDropdown(dropdown => {
-                const styles = this.plugin.themesManager.themes;
+                const styles = this.plugin.assetsManager.themes;
                 for (let s of styles) {
 				    dropdown.addOption(s.className, s.name);
                 }
@@ -155,7 +155,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName('代码高亮')
 			.addDropdown(dropdown => {
-                const styles = this.plugin.themesManager.highlights;
+                const styles = this.plugin.assetsManager.highlights;
                 for (let s of styles) {
 				    dropdown.addOption(s.name, s.name);
                 }
@@ -230,14 +230,14 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			    button.setButtonText('下载');
 				button.onClick(async () => {
 					button.setButtonText('下载中...');
-					await this.plugin.themesManager.downloadThemes();
+					await this.plugin.assetsManager.downloadThemes();
 					button.setButtonText('下载完成');
 				});
 			})
 			.addButton(button => {
 				button.setIcon('folder-open');
 				button.onClick(async () => {
-					await this.plugin.themesManager.openAssets();
+					await this.plugin.assetsManager.openAssets();
 				});
 			});
 
@@ -246,7 +246,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			.addButton(button => {
 			    button.setButtonText('清空');
 				button.onClick(async () => {
-					await this.plugin.themesManager.removeThemes();
+					await this.plugin.assetsManager.removeThemes();
 					this.plugin.settings.resetStyelAndHighlight();
 					await this.plugin.saveSettings();
 				});
@@ -264,14 +264,14 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			.addButton(button => {
 				button.setIcon('refresh-ccw');
 				button.onClick(async () => {
-					await this.plugin.themesManager.loadCustomCSS();
+					await this.plugin.assetsManager.loadCustomCSS();
 					new Notice('刷新成功');
 				});
 			})
 			.addButton(button => {
 				button.setIcon('folder-open');
 				button.onClick(async () => {
-					await this.plugin.themesManager.openAssets();
+					await this.plugin.assetsManager.openAssets();
 				});
 			});
 		

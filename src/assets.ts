@@ -17,7 +17,7 @@ export interface Highlight {
     css: string
 }
 
-export default class ThemesManager {
+export default class AssetsManager {
     app: App;
     defaultTheme: Theme = DefaultTheme;
     manifest: PluginManifest;
@@ -30,6 +30,7 @@ export default class ThemesManager {
     themeCfg: string;
     hilightCfg: string;
     customCSSPath: string;
+    iconsPath: string;
 
     constructor(app: App, manifest: PluginManifest) {
         this.app = app;
@@ -40,6 +41,7 @@ export default class ThemesManager {
         this.themeCfg = this.assetsPath + 'themes.json';
         this.hilightCfg = this.assetsPath + 'highlights.json';
         this.customCSSPath = this.assetsPath + 'custom.css';
+        this.iconsPath = this.assetsPath + 'icons/';
     }
 
     async loadAssets() {
@@ -121,6 +123,18 @@ export default class ThemesManager {
             console.error(error);
             new Notice('highlights.json解析失败！');
         }
+    }
+
+    async loadIcon(name: string) {
+        const icon = this.iconsPath + name + '.svg';
+        if (!await this.app.vault.adapter.exists(icon)) {
+            return '';
+        }
+        const iconContent = await this.app.vault.adapter.read(icon);
+        if (iconContent) {
+            return iconContent;
+        }
+        return '';
     }
 
     getTheme(themeName: string) {
