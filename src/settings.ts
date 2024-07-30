@@ -1,7 +1,6 @@
-import { App } from 'obsidian';
 import { wxKeyInfo } from './weixin-api';
 
-export class PreviewSetting {
+export class NMPSettings {
     defaultStyle: string;
     defaultHighlight: string;
     showStyleUI: boolean;
@@ -11,12 +10,20 @@ export class PreviewSetting {
     authKey: string;
     useCustomCss: boolean;
     wxInfo: {name:string, appid:string, secret:string}[];
-    app: App;
     math: string;
     expireat: Date | null = null;
 
-    constructor(app: App) {
-        this.app = app;
+    private static instance: NMPSettings;
+
+    // 静态方法，用于获取实例
+    public static getInstance(): NMPSettings {
+        if (!NMPSettings.instance) {
+            NMPSettings.instance = new NMPSettings();
+        }
+        return NMPSettings.instance;
+    }
+
+    private constructor() {
         this.defaultStyle = 'obsidian-light';
         this.defaultHighlight = '默认';
         this.showStyleUI = true;
@@ -34,7 +41,7 @@ export class PreviewSetting {
         this.defaultHighlight = '默认';
     }
 
-    loadSetting(data: any) {
+    public static loadSettings(data: any) {
         if (!data) {
             return
         }
@@ -51,51 +58,53 @@ export class PreviewSetting {
             useCustomCss,
         } = data;
 
+        const settings = NMPSettings.getInstance();
         if (defaultStyle) {
-            this.defaultStyle = defaultStyle;
+            settings.defaultStyle = defaultStyle;
         }
         if (defaultHighlight) {
-            this.defaultHighlight = defaultHighlight;
+            settings.defaultHighlight = defaultHighlight;
         }
         if (showStyleUI !== undefined) {
-            this.showStyleUI = showStyleUI;
+            settings.showStyleUI = showStyleUI;
         }
         if (linkStyle) {
-            this.linkStyle = linkStyle;
+            settings.linkStyle = linkStyle;
         }
         if (embedStyle) {
-            this.embedStyle = embedStyle;
+            settings.embedStyle = embedStyle;
         }
         if (lineNumber !== undefined) {
-            this.lineNumber = lineNumber;
+            settings.lineNumber = lineNumber;
         }
         if (authKey) {
-            this.authKey = authKey;
+            settings.authKey = authKey;
         }
         if (wxInfo) {
-            this.wxInfo = wxInfo;
+            settings.wxInfo = wxInfo;
         }
         if (math) {
-            this.math = math;
+            settings.math = math;
         }
         if (useCustomCss !== undefined) {
-            this.useCustomCss = useCustomCss;
+            settings.useCustomCss = useCustomCss;
         }
-        this.getExpiredDate();
+        settings.getExpiredDate();
     }
 
-    allSettings() {
+    public static allSettings() {
+        const settings = NMPSettings.getInstance();
         return {
-            'defaultStyle': this.defaultStyle,
-            'defaultHighlight': this.defaultHighlight,
-            'showStyleUI': this.showStyleUI,
-            'linkStyle': this.linkStyle,
-            'embedStyle': this.embedStyle,
-            'lineNumber': this.lineNumber,
-            'authKey': this.authKey,
-            'wxInfo': this.wxInfo,
-            'math': this.math,
-            'useCustomCss': this.useCustomCss,
+            'defaultStyle': settings.defaultStyle,
+            'defaultHighlight': settings.defaultHighlight,
+            'showStyleUI': settings.showStyleUI,
+            'linkStyle': settings.linkStyle,
+            'embedStyle': settings.embedStyle,
+            'lineNumber': settings.lineNumber,
+            'authKey': settings.authKey,
+            'wxInfo': settings.wxInfo,
+            'math': settings.math,
+            'useCustomCss': settings.useCustomCss,
         }
     }
 

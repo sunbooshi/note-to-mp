@@ -31,8 +31,21 @@ export default class AssetsManager {
     hilightCfg: string;
     customCSSPath: string;
     iconsPath: string;
+    private static instance: AssetsManager;
 
-    constructor(app: App, manifest: PluginManifest) {
+    // 静态方法，用于获取实例
+    public static getInstance(): AssetsManager {
+        if (!AssetsManager.instance) {
+            AssetsManager.instance = new AssetsManager();
+        }
+        return AssetsManager.instance;
+    }
+
+    public static setup(app: App, manifest: PluginManifest) {
+        AssetsManager.getInstance()._setup(app, manifest);
+    }
+
+    private _setup(app: App, manifest: PluginManifest) {
         this.app = app;
         this.manifest = manifest;
         this.assetsPath = this.app.vault.configDir + '/plugins/' + this.manifest.id + '/assets/';
@@ -42,6 +55,10 @@ export default class AssetsManager {
         this.hilightCfg = this.assetsPath + 'highlights.json';
         this.customCSSPath = this.assetsPath + 'custom.css';
         this.iconsPath = this.assetsPath + 'icons/';
+    }
+
+    private constructor() {
+
     }
 
     async loadAssets() {

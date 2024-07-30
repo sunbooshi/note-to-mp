@@ -1,10 +1,10 @@
-import { PreviewSetting } from "src/settings";
+import { NMPSettings } from "src/settings";
 import { Marked, MarkedExtension } from "marked";
 import { App, Vault } from "obsidian";
 import AssetsManager from "../assets";
 
 export interface MDRendererCallback {
-   settings: PreviewSetting;
+   settings: NMPSettings;
    updateElementByID(id:string, html:string):void;
 }
 
@@ -12,11 +12,11 @@ export abstract class Extension {
     app: App;
     vault: Vault;
     assetsManager: AssetsManager
-    settings: PreviewSetting;
+    settings: NMPSettings;
     callback: MDRendererCallback;
     marked: Marked;
 
-    constructor(app: App, settings: PreviewSetting, assetsManager: AssetsManager, callback: MDRendererCallback) {
+    constructor(app: App, settings: NMPSettings, assetsManager: AssetsManager, callback: MDRendererCallback) {
         this.app = app;
         this.vault = app.vault;
         this.settings = settings;

@@ -1,16 +1,17 @@
 import { Plugin, WorkspaceLeaf, App, PluginManifest } from 'obsidian';
 import { NotePreview, VIEW_TYPE_NOTE_PREVIEW } from './note-preview';
-import { PreviewSetting } from './settings';
+import { NMPSettings } from './settings';
 import { NoteToMpSettingTab } from './setting-tab';
 import AssetsManager from './assets';
 
 
 export default class NoteToMpPlugin extends Plugin {
-	settings: PreviewSetting;
+	settings: NMPSettings;
 	assetsManager: AssetsManager;
 	constructor(app: App, manifest: PluginManifest) {
 	    super(app, manifest);
-	    this.assetsManager = new AssetsManager(app, manifest);
+		AssetsManager.setup(app, manifest);
+	    this.assetsManager = AssetsManager.getInstance();
 	}
 
 	async onload() {
@@ -19,7 +20,7 @@ export default class NoteToMpPlugin extends Plugin {
 		await this.assetsManager.loadAssets();
 		this.registerView(
 			VIEW_TYPE_NOTE_PREVIEW,
-			(leaf) => new NotePreview(leaf, this.settings, this.assetsManager)
+			(leaf) => new NotePreview(leaf)
 		);
 
 		const ribbonIconEl = this.addRibbonIcon('clipboard-paste', '复制到公众号', (evt: MouseEvent) => {
@@ -43,12 +44,11 @@ export default class NoteToMpPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = new PreviewSetting(this.app);
-		this.settings.loadSetting(await this.loadData());
+		NMPSettings.loadSettings(await this.loadData());
 	}
 
 	async saveSettings() {
-		await this.saveData(this.settings.allSettings());
+		await this.saveData(NMPSettings.allSettings());
 	}
 
 	async activateView() {

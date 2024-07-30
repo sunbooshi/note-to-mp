@@ -1,7 +1,7 @@
 import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, sanitizeHTMLToDom, apiVersion } from 'obsidian';
 import { applyCSS } from './utils';
 import { wxUploadImage } from './weixin-api';
-import { PreviewSetting } from './settings';
+import { NMPSettings } from './settings';
 import AssetsManager from './assets';
 import InlineCSS from './inline-css';
 import { wxGetToken, wxAddDraft, wxBatchGetMaterial } from './weixin-api';
@@ -28,7 +28,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
     msgView: HTMLDivElement;
     listeners: EventRef[];
     container: Element;
-    settings: PreviewSetting;
+    settings: NMPSettings;
     assetsManager: AssetsManager;
     articleHTML: string;
     title: string;
@@ -38,14 +38,14 @@ export class NotePreview extends ItemView implements MDRendererCallback {
     markedParser: MarkedParser;
 
 
-    constructor(leaf: WorkspaceLeaf, settings: PreviewSetting, assetsManager: AssetsManager) {
+    constructor(leaf: WorkspaceLeaf) {
         super(leaf);
         this.workspace = this.app.workspace;
-        this.settings = settings
-        this.assetsManager = assetsManager;
+        this.settings = NMPSettings.getInstance();
+        this.assetsManager = AssetsManager.getInstance();
         this.currentTheme = this.settings.defaultStyle;
         this.currentHighlight = this.settings.defaultHighlight;
-        this.markedParser = new MarkedParser(this.app, settings, assetsManager, this);
+        this.markedParser = new MarkedParser(this.app, this);
     }
 
     getViewType() {
