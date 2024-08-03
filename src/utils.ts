@@ -1,5 +1,5 @@
-import * as postcss from "postcss";
 import { sanitizeHTMLToDom } from "obsidian";
+import * as postcss from "./postcss/postcss";
 
 function getStyleSheet() {
 	for (var i = 0; i < document.styleSheets.length; i++) {

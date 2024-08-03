@@ -29,7 +29,6 @@ export class CardDataManager {
 	public restoreCard(html: string) {
 		for (const [key, value] of this.cardData.entries()) {
 			const exp = `<section[^>]*\\sdata-id="${key}"[^>]*>(.*?)<\\/section>`;
-			console.log(exp);
 			const regex = new RegExp(exp, 'gs');
 			if (!regex.test(html)) {
 				console.error('未能正确替换公众号卡片');
