@@ -1,4 +1,27 @@
-import { Token, Tokens, Marked, options, Lexer} from "marked";
+/*
+ * Copyright (c) 2024 Sun Booshi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+import { Tokens, MarkedExtension} from "marked";
+import { Extension } from "./extension";
 
 const icon_note = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-pencil"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path><path d="m15 5 4 4"></path></svg>`
 const icon_abstract = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-clipboard-list"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M12 11h4"></path><path d="M12 16h4"></path><path d="M8 11h.01"></path><path d="M8 16h.01"></path></svg>`
@@ -169,39 +192,39 @@ function GetCalloutTitle(callout:string, text:string) {
 	return title;
 }
 
-export function calloutRender(token: Tokens.Blockquote) {
-	let callout = matchCallouts(token.text);
-	if (callout == '') {
-		const body = this.parser.parse(token.tokens);
-        return `<blockquote>\n${body}</blockquote>\n`;;
-	}
+export class CalloutRenderer extends Extension {
+    renderer(token: Tokens.Blockquote) {
+        let callout = matchCallouts(token.text);
+        if (callout == '') {
+            const body = this.marked.parser(token.tokens);
+            return `<blockquote>${body}</blockquote>`;;
+        }
+    
+        const title = GetCalloutTitle(callout, token.text);
+        let info = GetCallout(callout.toLowerCase());
+        if (info == null) {
+            info = GetCallout('note');
+        }
+        const index = token.text.indexOf('\n');
+        let body = '';
+        if (index > 0) {
+            token.text = token.text.slice(index+1)
+            token.tokens = this.marked.lexer(token.text);
+            body = this.marked.parser(token.tokens);
+        } 
+        
+        return `<section class="note-callout ${info?.style}"><section class="note-callout-title-wrap">${info?.icon}<span class="note-callout-title">${title}<span></section><section class="note-callout-content">${body}</section></section>`;
+     }
 
-    const markedOptiones = {
-        gfm: true,
-        breaks: true,
-    };
-	const title = GetCalloutTitle(callout, token.text);
-	let info = GetCallout(callout.toLowerCase());
-    if (info == null) {
-        info = GetCallout('note');
+    markedExtension(): MarkedExtension {
+        return {
+            extensions:[{
+                name: 'blockquote',
+                level: 'block',
+                renderer: (token)=> {
+                    return this.renderer(token as Tokens.Blockquote);
+                }, 
+            }]
+        }
     }
-	const lexer = new Lexer(markedOptiones);
-	const index = token.text.indexOf('\n');
-	let body = '';
-	if (index > 0) {
-		token.text = token.text.slice(index+1)
-		token.tokens = lexer.lex(token.text);
-		body = this.parser.parse(token.tokens);
-	} 
-	
-	return `
-		<section class="note-callout ${info?.style}">
-			<section class="note-callout-title-wrap">
-				${info?.icon}
-				<span class="note-callout-title">${title}<span>
-			</section>
-			<section class="note-callout-content">
-				${body}
-			</section>
-		</section>`;
 }

@@ -1,4 +1,26 @@
-import { App, PluginManifest, Notice, requestUrl, FileSystemAdapter } from "obsidian";
+/*
+ * Copyright (c) 2024 Sun Booshi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+import { App, PluginManifest, Notice, requestUrl, FileSystemAdapter, TAbstractFile } from "obsidian";
 import * as zip from "@zip.js/zip.js";
 import DefaultTheme from "./default-theme";
 import DefaultHighlight from "./default-highlight";
@@ -17,7 +39,7 @@ export interface Highlight {
     css: string
 }
 
-export default class ThemesManager {
+export default class AssetsManager {
     app: App;
     defaultTheme: Theme = DefaultTheme;
     manifest: PluginManifest;
@@ -30,8 +52,22 @@ export default class ThemesManager {
     themeCfg: string;
     hilightCfg: string;
     customCSSPath: string;
+    iconsPath: string;
+    private static instance: AssetsManager;
 
-    constructor(app: App, manifest: PluginManifest) {
+    // 静态方法，用于获取实例
+    public static getInstance(): AssetsManager {
+        if (!AssetsManager.instance) {
+            AssetsManager.instance = new AssetsManager();
+        }
+        return AssetsManager.instance;
+    }
+
+    public static setup(app: App, manifest: PluginManifest) {
+        AssetsManager.getInstance()._setup(app, manifest);
+    }
+
+    private _setup(app: App, manifest: PluginManifest) {
         this.app = app;
         this.manifest = manifest;
         this.assetsPath = this.app.vault.configDir + '/plugins/' + this.manifest.id + '/assets/';
@@ -40,6 +76,11 @@ export default class ThemesManager {
         this.themeCfg = this.assetsPath + 'themes.json';
         this.hilightCfg = this.assetsPath + 'highlights.json';
         this.customCSSPath = this.assetsPath + 'custom.css';
+        this.iconsPath = this.assetsPath + 'icons/';
+    }
+
+    private constructor() {
+
     }
 
     async loadAssets() {
@@ -121,6 +162,18 @@ export default class ThemesManager {
             console.error(error);
             new Notice('highlights.json解析失败！');
         }
+    }
+
+    async loadIcon(name: string) {
+        const icon = this.iconsPath + name + '.svg';
+        if (!await this.app.vault.adapter.exists(icon)) {
+            return '';
+        }
+        const iconContent = await this.app.vault.adapter.read(icon);
+        if (iconContent) {
+            return iconContent;
+        }
+        return '';
     }
 
     getTheme(themeName: string) {
@@ -224,4 +277,79 @@ export default class ThemesManager {
 		const { shell } = require('electron');
 		shell.openPath(dst);
 	}
+
+    searchFile(originPath: string): TAbstractFile | null {
+        const resolvedPath = this.resolvePath(originPath);
+        const vault= this.app.vault;
+        const attachmentFolderPath = vault.config.attachmentFolderPath || '';
+        let localPath = resolvedPath;
+        let file = null;
+
+        // 然后从根目录查找
+        file = vault.getFileByPath(resolvedPath);
+        if (file) {
+            return file; 
+        }
+
+        file = vault.getFileByPath(originPath);
+        if (file) {
+            return file; 
+        }
+
+        // 先从附件文件夹查找
+        if (attachmentFolderPath != '') {
+            localPath = attachmentFolderPath + '/' + originPath;
+            file = vault.getFileByPath(localPath)
+            if (file) {
+                return file;
+            }
+
+            localPath = attachmentFolderPath + '/' + resolvedPath;
+            file = vault.getFileByPath(localPath)
+            if (file) {
+                return file;
+            }
+        }
+
+        // 最后查找所有文件
+        const files = vault.getAllLoadedFiles();
+        for (let f of files) {
+            if (f.path.includes(originPath)) {
+                return f;
+            }
+        }
+
+        return null;
+    }
+
+    resolvePath(relativePath: string): string {
+        const basePath = this.getActiveFileDir();
+        if (!relativePath.includes('/')) {
+            return relativePath;
+        }
+        const stack = basePath.split("/");
+        const parts = relativePath.split("/");
+      
+        stack.pop(); // Remove the current file name (or empty string)
+    
+        for (const part of parts) {
+            if (part === ".") continue;
+            if (part === "..") stack.pop();
+            else stack.push(part);
+        }
+        return stack.join("/");
+    }
+
+    getActiveFileDir() {
+        const af = this.app.workspace.getActiveFile();
+        if (af == null) {
+            return '';
+        }
+        const parts = af.path.split('/');
+        parts.pop();
+        if (parts.length == 0) {
+            return '';
+        }
+        return parts.join('/');
+    }
 }

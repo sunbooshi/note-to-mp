@@ -1,7 +1,28 @@
-import { App } from 'obsidian';
+/*
+ * Copyright (c) 2024 Sun Booshi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 import { wxKeyInfo } from './weixin-api';
 
-export class PreviewSetting {
+export class NMPSettings {
     defaultStyle: string;
     defaultHighlight: string;
     showStyleUI: boolean;
@@ -11,12 +32,20 @@ export class PreviewSetting {
     authKey: string;
     useCustomCss: boolean;
     wxInfo: {name:string, appid:string, secret:string}[];
-    app: App;
     math: string;
     expireat: Date | null = null;
 
-    constructor(app: App) {
-        this.app = app;
+    private static instance: NMPSettings;
+
+    // 静态方法，用于获取实例
+    public static getInstance(): NMPSettings {
+        if (!NMPSettings.instance) {
+            NMPSettings.instance = new NMPSettings();
+        }
+        return NMPSettings.instance;
+    }
+
+    private constructor() {
         this.defaultStyle = 'obsidian-light';
         this.defaultHighlight = '默认';
         this.showStyleUI = true;
@@ -34,7 +63,7 @@ export class PreviewSetting {
         this.defaultHighlight = '默认';
     }
 
-    loadSetting(data: any) {
+    public static loadSettings(data: any) {
         if (!data) {
             return
         }
@@ -51,51 +80,53 @@ export class PreviewSetting {
             useCustomCss,
         } = data;
 
+        const settings = NMPSettings.getInstance();
         if (defaultStyle) {
-            this.defaultStyle = defaultStyle;
+            settings.defaultStyle = defaultStyle;
         }
         if (defaultHighlight) {
-            this.defaultHighlight = defaultHighlight;
+            settings.defaultHighlight = defaultHighlight;
         }
         if (showStyleUI !== undefined) {
-            this.showStyleUI = showStyleUI;
+            settings.showStyleUI = showStyleUI;
         }
         if (linkStyle) {
-            this.linkStyle = linkStyle;
+            settings.linkStyle = linkStyle;
         }
         if (embedStyle) {
-            this.embedStyle = embedStyle;
+            settings.embedStyle = embedStyle;
         }
         if (lineNumber !== undefined) {
-            this.lineNumber = lineNumber;
+            settings.lineNumber = lineNumber;
         }
         if (authKey) {
-            this.authKey = authKey;
+            settings.authKey = authKey;
         }
         if (wxInfo) {
-            this.wxInfo = wxInfo;
+            settings.wxInfo = wxInfo;
         }
         if (math) {
-            this.math = math;
+            settings.math = math;
         }
         if (useCustomCss !== undefined) {
-            this.useCustomCss = useCustomCss;
+            settings.useCustomCss = useCustomCss;
         }
-        this.getExpiredDate();
+        settings.getExpiredDate();
     }
 
-    allSettings() {
+    public static allSettings() {
+        const settings = NMPSettings.getInstance();
         return {
-            'defaultStyle': this.defaultStyle,
-            'defaultHighlight': this.defaultHighlight,
-            'showStyleUI': this.showStyleUI,
-            'linkStyle': this.linkStyle,
-            'embedStyle': this.embedStyle,
-            'lineNumber': this.lineNumber,
-            'authKey': this.authKey,
-            'wxInfo': this.wxInfo,
-            'math': this.math,
-            'useCustomCss': this.useCustomCss,
+            'defaultStyle': settings.defaultStyle,
+            'defaultHighlight': settings.defaultHighlight,
+            'showStyleUI': settings.showStyleUI,
+            'linkStyle': settings.linkStyle,
+            'embedStyle': settings.embedStyle,
+            'lineNumber': settings.lineNumber,
+            'authKey': settings.authKey,
+            'wxInfo': settings.wxInfo,
+            'math': settings.math,
+            'useCustomCss': settings.useCustomCss,
         }
     }
 
@@ -106,5 +137,11 @@ export class PreviewSetting {
                 this.expireat = new Date(res.json.expireat);
             }
         })
+    }
+
+    isAuthKeyVaild() {
+        if (this.authKey.length == 0) return false;
+        if (this.expireat == null) return false;
+        return this.expireat > new Date();
     }
 }

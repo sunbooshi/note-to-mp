@@ -1,25 +1,48 @@
+/*
+ * Copyright (c) 2024 Sun Booshi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 import { Plugin, WorkspaceLeaf, App, PluginManifest } from 'obsidian';
 import { NotePreview, VIEW_TYPE_NOTE_PREVIEW } from './note-preview';
-import { PreviewSetting } from './settings';
+import { NMPSettings } from './settings';
 import { NoteToMpSettingTab } from './setting-tab';
-import ThemesManager from './themes';
+import AssetsManager from './assets';
 
 
 export default class NoteToMpPlugin extends Plugin {
-	settings: PreviewSetting;
-	themesManager: ThemesManager;
+	settings: NMPSettings;
+	assetsManager: AssetsManager;
 	constructor(app: App, manifest: PluginManifest) {
 	    super(app, manifest);
-	    this.themesManager = new ThemesManager(app, manifest);
+		AssetsManager.setup(app, manifest);
+	    this.assetsManager = AssetsManager.getInstance();
 	}
 
 	async onload() {
 		console.log('Loading Note to MP');
 		await this.loadSettings();
-		await this.themesManager.loadAssets();
+		await this.assetsManager.loadAssets();
 		this.registerView(
 			VIEW_TYPE_NOTE_PREVIEW,
-			(leaf) => new NotePreview(leaf, this.settings, this.themesManager)
+			(leaf) => new NotePreview(leaf)
 		);
 
 		const ribbonIconEl = this.addRibbonIcon('clipboard-paste', '复制到公众号', (evt: MouseEvent) => {
@@ -43,12 +66,11 @@ export default class NoteToMpPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = new PreviewSetting(this.app);
-		this.settings.loadSetting(await this.loadData());
+		NMPSettings.loadSettings(await this.loadData());
 	}
 
 	async saveSettings() {
-		await this.saveData(this.settings.allSettings());
+		await this.saveData(NMPSettings.allSettings());
 	}
 
 	async activateView() {

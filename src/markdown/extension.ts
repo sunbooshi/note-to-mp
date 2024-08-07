@@ -20,31 +20,35 @@
  * THE SOFTWARE.
  */
 
-import fs from 'node:fs';
-import https from 'node:https';
+import { NMPSettings } from "src/settings";
+import { Marked, MarkedExtension } from "marked";
+import { App, Vault } from "obsidian";
+import AssetsManager from "../assets";
 
-const resPath = 'highlights';
-fs.mkdirSync(resPath, { recursive: true });
+export interface MDRendererCallback {
+   settings: NMPSettings;
+   updateElementByID(id:string, html:string):void;
+}
 
-fs.readFile('highlights.json', 'utf8', (err, data) => {
-    if (err) {
-        console.error(`Error reading file: ${err}`);
-        return;
+export abstract class Extension {
+    app: App;
+    vault: Vault;
+    assetsManager: AssetsManager
+    settings: NMPSettings;
+    callback: MDRendererCallback;
+    marked: Marked;
+
+    constructor(app: App, settings: NMPSettings, assetsManager: AssetsManager, callback: MDRendererCallback) {
+        this.app = app;
+        this.vault = app.vault;
+        this.settings = settings;
+        this.assetsManager = assetsManager;
+        this.callback = callback;
     }
 
-    const cssFiles = JSON.parse(data);
-    for (let file of cssFiles) {
-        downloadFile(file.url, `${resPath}/${file.name}.css`);
-    }
-});
-
-function downloadFile(url, dest) {
-    const file = fs.createWriteStream(dest);
-    https.get(url, (response) => {
-        response.pipe(file);
-        file.on('finish', () => file.close());
-    }).on('error', (err) => {
-        fs.unlink(dest);
-        console.error(`Error downloading file: ${err}`);
-    });
+    async prepare() { return; }
+    async postprocess(html:string) { return html; }
+    async beforePublish() { }
+    async cleanup() { return; }
+    abstract markedExtension(): MarkedExtension
 }

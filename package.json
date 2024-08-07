@@ -26,7 +26,6 @@
 		"@zip.js/zip.js": "^2.7.43",
 		"highlight.js": "^11.9.0",
 		"marked": "^12.0.1",
-		"marked-highlight": "^2.1.3",
-		"postcss": "^8.4.39"
+		"marked-highlight": "^2.1.3"
 	}
 }

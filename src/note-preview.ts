@@ -1,14 +1,36 @@
-import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, sanitizeHTMLToDom, apiVersion } from 'obsidian';
+/*
+ * Copyright (c) 2024 Sun Booshi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, sanitizeHTMLToDom, apiVersion, TFile, Platform } from 'obsidian';
 import { applyCSS } from './utils';
-import { markedParse, ParseOptions } from './markdown/parser';
-import { PreviewSetting } from './settings';
-import ThemesManager from './themes';
+import { wxUploadImage } from './weixin-api';
+import { NMPSettings } from './settings';
+import AssetsManager from './assets';
 import InlineCSS from './inline-css';
-import { LocalImageRenderer } from './markdown/img-extension';
-import { wxGetToken, wxAddDraft, wxBatchGetMaterial } from './weixin-api';
-import { MathRenderer } from './markdown/math';
-import { MDRendererCallback } from './markdown/callback';
-import { CodeRenderer } from './markdown/code';
+import { wxGetToken, wxAddDraft, wxBatchGetMaterial, DraftArticle } from './weixin-api';
+import { MDRendererCallback } from './markdown/extension';
+import { MarkedParser } from './markdown/parser';
+import { LocalImageManager } from './markdown/local-file';
+import { CardDataManager } from './markdown/code';
 
 export const VIEW_TYPE_NOTE_PREVIEW = 'note-preview';
 
@@ -21,35 +43,31 @@ export class NotePreview extends ItemView implements MDRendererCallback {
     toolbar: HTMLDivElement;
     renderDiv: HTMLDivElement;
     articleDiv: HTMLDivElement;
+    styleEl: HTMLElement;
     coverEl: HTMLInputElement;
     useDefaultCover: HTMLInputElement;
     useLocalCover: HTMLInputElement;
     msgView: HTMLDivElement;
     listeners: EventRef[];
     container: Element;
-    settings: PreviewSetting;
-    themeManager: ThemesManager;
+    settings: NMPSettings;
+    assetsManager: AssetsManager;
     articleHTML: string;
     title: string;
     currentTheme: string;
     currentHighlight: string;
     currentAppId: string;
-    mathRenderer: MathRenderer|null = null;
-    imageRenderer: LocalImageRenderer;
-    codeRenderer: CodeRenderer;
+    markedParser: MarkedParser;
 
-    constructor(leaf: WorkspaceLeaf, settings: PreviewSetting, themeManager: ThemesManager) {
+
+    constructor(leaf: WorkspaceLeaf) {
         super(leaf);
         this.workspace = this.app.workspace;
-        this.settings = settings
-        this.themeManager = themeManager;
+        this.settings = NMPSettings.getInstance();
+        this.assetsManager = AssetsManager.getInstance();
         this.currentTheme = this.settings.defaultStyle;
         this.currentHighlight = this.settings.defaultHighlight;
-        if (settings.authKey.length > 0) {
-            this.mathRenderer = new MathRenderer(this, settings);
-        }
-        this.imageRenderer = new LocalImageRenderer(this.app, this);
-        this.codeRenderer = new CodeRenderer(settings.lineNumber, this.mathRenderer);
+        this.markedParser = new MarkedParser(this.app, this);
     }
 
     getViewType() {
@@ -79,11 +97,13 @@ export class NotePreview extends ItemView implements MDRendererCallback {
 
     onAppIdChanged() {
         // 清理上传过的图片
-        this.imageRenderer.allImages.clear();
+        LocalImageManager.getInstance().cleanup();
+        CardDataManager.getInstance().cleanup();
     }
 
     async update() {
-        this.codeRenderer.cardData = null;
+        LocalImageManager.getInstance().cleanup();
+        CardDataManager.getInstance().cleanup();
         this.renderMarkdown();
     }
 
@@ -110,20 +130,8 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             if (md.startsWith('---')) {
                 md = md.replace(FRONT_MATTER_REGEX, '');
             }
-            const op: ParseOptions = {
-                lineNumber: this.settings.lineNumber,
-                linkStyle: this.settings.linkStyle as 'footnote' | 'inline',
-            }
 
-            const extensions = [];
-            if (this.mathRenderer) {
-                extensions.push(this.mathRenderer.blockMath());
-                extensions.push(this.mathRenderer.inlineMath());
-            }
-            extensions.push(this.imageRenderer.localImageExtension());
-            extensions.push(this.codeRenderer.codeExtension());
-
-            this.articleHTML = await markedParse(md, op, extensions);
+            this.articleHTML = await this.markedParser.parse(md);
 
             this.setArticle(this.articleHTML);
         }
@@ -134,12 +142,13 @@ export class NotePreview extends ItemView implements MDRendererCallback {
     }
 
     isOldTheme() {
-        const theme = this.themeManager.getTheme(this.currentTheme);
+        const theme = this.assetsManager.getTheme(this.currentTheme);
         if (theme) {
             return theme.css.indexOf('.note-to-mp') < 0;
         }
         return false;
     }
+
     setArticle(article: string) {
         this.articleDiv.empty();
         let className = 'note-to-mp';
@@ -148,11 +157,15 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             className = this.currentTheme;
         }
         const html = `<section class="${className}" id="article-section">${article}</section>`;
-        const node = applyCSS(html, this.getCSS());
-        if (node) {
-            this.articleDiv.appendChild(node);
-            this.imageRenderer.replaceImages(this.articleDiv);
+        const doc = sanitizeHTMLToDom(html);
+        if (doc.firstChild) {
+            this.articleDiv.appendChild(doc.firstChild);
         }
+    }
+
+    setStyle(css: string) {
+        this.styleEl.empty();
+        this.styleEl.appendChild(document.createTextNode(css));
     }
 
     getArticleSection() {
@@ -161,14 +174,15 @@ export class NotePreview extends ItemView implements MDRendererCallback {
 
     getArticleContent() {
         const content = this.articleDiv.innerHTML;
-        return this.codeRenderer.restoreCard(content);
+        const html = applyCSS(content, this.getCSS());
+        return CardDataManager.getInstance().restoreCard(html);
     }
 
     getCSS() {
         try {
-            const theme = this.themeManager.getTheme(this.currentTheme);
-            const highlight = this.themeManager.getHighlight(this.currentHighlight);
-            const customCSS = this.settings.useCustomCss ? this.themeManager.customCSS : '';
+            const theme = this.assetsManager.getTheme(this.currentTheme);
+            const highlight = this.assetsManager.getHighlight(this.currentHighlight);
+            const customCSS = this.settings.useCustomCss ? this.assetsManager.customCSS : '';
             return `${InlineCSS}\n\n${highlight!.css}\n\n${theme!.css}\n\n${customCSS}`;
         } catch (error) {
             console.error(error);
@@ -210,39 +224,47 @@ export class NotePreview extends ItemView implements MDRendererCallback {
 
     buildToolbar(parent: HTMLDivElement) {
         this.toolbar = parent.createDiv({ cls: 'preview-toolbar' });
+        let lineDiv;
 
-        let lineDiv = this.toolbar.createDiv({ cls: 'toolbar-line' });
         // 公众号
-        lineDiv.createDiv({ cls: 'style-label' }).innerText = '公众号:';
-        const wxSelect = lineDiv.createEl('select', { cls: 'style-select' })
-        wxSelect.setAttr('style', 'width: 200px');
-        wxSelect.onchange = async () => {
-            this.currentAppId = wxSelect.value;
-            this.onAppIdChanged();
-        }
-        const defautlOp =wxSelect.createEl('option');
-        defautlOp.value = '';
-        defautlOp.text = '请在设置里配置公众号';
-        for (let i = 0; i < this.settings.wxInfo.length; i++) {
-            const op = wxSelect.createEl('option');
-            const wx = this.settings.wxInfo[i];
-            op.value = wx.appid;
-            op.text = wx.name;
-            if (i== 0) {
-                op.selected = true
-                this.currentAppId = wx.appid;
+        if (this.settings.wxInfo.length > 1 || Platform.isDesktop) {
+            lineDiv = this.toolbar.createDiv({ cls: 'toolbar-line' });
+            lineDiv.createDiv({ cls: 'style-label' }).innerText = '公众号:';
+            const wxSelect = lineDiv.createEl('select', { cls: 'style-select' })
+            wxSelect.setAttr('style', 'width: 200px');
+            wxSelect.onchange = async () => {
+                this.currentAppId = wxSelect.value;
+                this.onAppIdChanged();
             }
+            const defautlOp =wxSelect.createEl('option');
+            defautlOp.value = '';
+            defautlOp.text = '请在设置里配置公众号';
+            for (let i = 0; i < this.settings.wxInfo.length; i++) {
+                const op = wxSelect.createEl('option');
+                const wx = this.settings.wxInfo[i];
+                op.value = wx.appid;
+                op.text = wx.name;
+                if (i== 0) {
+                    op.selected = true
+                    this.currentAppId = wx.appid;
+                }
+            }
+        }
+        else if (this.settings.wxInfo.length > 0) {
+            this.currentAppId = this.settings.wxInfo[0].appid;
         }
 
         // 复制，刷新，带图片复制，发草稿箱
         lineDiv = this.toolbar.createDiv({ cls: 'toolbar-line' });
-        const copyBtn = lineDiv.createEl('button', { cls: 'copy-button' }, async (button) => {
-            button.setText('复制');
-        })
+        if (Platform.isDesktop) {
+            const copyBtn = lineDiv.createEl('button', { cls: 'copy-button' }, async (button) => {
+                button.setText('复制');
+            })
 
-        copyBtn.onclick = async() => {
-            await this.copyArticle();
-            new Notice('复制成功，请到公众号编辑器粘贴。');
+            copyBtn.onclick = async() => {
+                await this.copyArticle();
+                new Notice('复制成功，请到公众号编辑器粘贴。');
+            }
         }
 
         const uploadImgBtn = lineDiv.createEl('button', { cls: 'copy-button' }, async (button) => {
@@ -333,7 +355,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
                 this.updateStyle(selectBtn.value);
             }
 
-            for (let s of this.themeManager.themes) {
+            for (let s of this.assetsManager.themes) {
                 const op = selectBtn.createEl('option');
                 op.value = s.className;
                 op.text = s.name;
@@ -351,7 +373,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
                 this.updateHighLight(highlightStyleBtn.value);
             }
 
-            for (let s of this.themeManager.highlights) {
+            for (let s of this.assetsManager.highlights) {
                 const op = highlightStyleBtn.createEl('option');
                 op.value = s.name;
                 op.text = s.name;
@@ -372,41 +394,98 @@ export class NotePreview extends ItemView implements MDRendererCallback {
 
         this.renderDiv = this.mainDiv.createDiv({cls: 'render-div'});
         this.renderDiv.id = 'render-div';
-        this.renderDiv.setAttribute('style', '-webkit-user-select: text; user-select: text;')
+        this.renderDiv.setAttribute('style', '-webkit-user-select: text; user-select: text;');
+        this.styleEl = this.renderDiv.createEl('style');
+        this.styleEl.setAttr('title', 'note-to-mp-style');
+        this.setStyle(this.getCSS());
         this.articleDiv = this.renderDiv.createEl('div');
     }
 
     updateStyle(styleName: string) {
         this.currentTheme = styleName;
-        this.renderMarkdown();
+        this.setStyle(this.getCSS());
     }
 
     updateHighLight(styleName: string) {
         this.currentHighlight = styleName;
-        this.renderMarkdown();
+        this.setStyle(this.getCSS());
     }
 
     getMetadata() {
+        let res: DraftArticle = {
+            title: '',
+            author: undefined,
+            digest: undefined,
+            content: '',
+            content_source_url: undefined,
+            cover: undefined,
+            thumb_media_id: '',
+            need_open_comment: undefined,
+            only_fans_can_comment: undefined,
+            pic_crop_235_1: undefined,
+            pic_crop_1_1: undefined
+        }
         const file = this.app.workspace.getActiveFile();
-        if (!file) return {digest: '', crop: false};
+        if (!file) return res;
         const metadata = this.app.metadataCache.getFileCache(file); 
-        return {
-            digest: metadata?.frontmatter?.digest ?? '',
-            crop: metadata?.frontmatter?.crop ?? false
-        };
+        if (metadata?.frontmatter) {
+            const frontmatter = metadata.frontmatter;
+            res.title = frontmatter['标题'];
+            res.author = frontmatter['作者'];
+            res.digest = frontmatter['摘要'];
+            res.content_source_url = frontmatter['原文地址'];
+            res.cover = frontmatter['封面'];
+            res.thumb_media_id = frontmatter['封面素材ID'];
+            res.need_open_comment = frontmatter['打开评论'];
+            res.only_fans_can_comment = frontmatter['仅粉丝可评论'];
+            if (frontmatter['封面裁剪']) {
+                res.pic_crop_235_1 = '0_0_1_0.5';
+                res.pic_crop_1_1 = '0_0.525_0.404_1';
+            }
+        }
+        return res;
+    }
+
+    async uploadVaultCover(name: string, token: string) {
+        const LocalFileRegex = /^!\[\[(.*?)\]\]/;
+        const matches = name.match(LocalFileRegex);
+        let fileName = '';
+        if (matches && matches.length > 1) {
+            fileName = matches[1];
+        }
+        else {
+            fileName = name;
+        }
+        const vault = this.app.vault;
+        const file = this.assetsManager.searchFile(fileName) as TFile;
+        if (!file) {
+            throw new Error('找不到封面文件: ' + fileName);
+        }
+        const fileData = await vault.readBinary(file);
+        
+        return await this.uploadCover(new Blob([fileData]), file.name, token);
     }
 
     async uploadLocalCover(token: string) {
         const fileInput = this.coverEl;
         if (!fileInput.files || fileInput.files.length === 0) {
-            return '';
+            throw new Error('请选择封面文件');
         }
         const file = fileInput.files[0];
         if (!file) {
-            return '';
+            throw new Error('请选择封面文件');
         }
 
-        return await this.imageRenderer.uploadCover(file, token);
+        return await this.uploadCover(file, file.name, token);
+    }
+
+    async uploadCover(data: Blob, filename: string, token: string,) {
+        const res = await wxUploadImage(data, filename, token, 'image');
+        if (res.media_id) {
+            return res.media_id;
+        }
+        console.error('upload cover fail: ' + res.errmsg);
+        throw new Error('上传封面失败: ' + res.errmsg);
     }
 
     async getDefaultCover(token: string) {
@@ -446,10 +525,12 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         if (token === '') {
             return;
         }
+
+        const lm = LocalImageManager.getInstance();
         // 上传图片
-        await this.imageRenderer.uploadLocalImage(token);
+        await lm.uploadLocalImage(token, this.app.vault);
         // 替换图片链接
-        this.imageRenderer.replaceImages(this.articleDiv);
+        lm.replaceImages(this.articleDiv);
 
         await this.copyArticle();
         this.showMsg('图片已上传，并且已复制，请到公众号编辑器粘贴。');
@@ -485,19 +566,28 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             // 获取token
             const token = await this.getToken();
             if (token === '') {
+                this.showMsg('获取token失败,请检查网络链接!');
                 return;
             }
-            //上传图片
-            await this.imageRenderer.uploadLocalImage(token);
+            let metadata = this.getMetadata();
+            const lm = LocalImageManager.getInstance();
+            // 上传图片
+            await lm.uploadLocalImage(token, this.app.vault);
             // 替换图片链接
-            this.imageRenderer.replaceImages(this.articleDiv);
+            lm.replaceImages(this.articleDiv);
             // 上传封面
-            let mediaId = '';
-            if (this.useLocalCover.checked) {
-                mediaId = await this.uploadLocalCover(token);
-            }
-            else {
-                mediaId = await this.getDefaultCover(token);
+            let mediaId = metadata.thumb_media_id;
+            if (!mediaId) {
+                if (metadata.cover) {
+                    // 上传仓库里的图片
+                    mediaId = await this.uploadVaultCover(metadata.cover, token);
+                }
+                else if (this.useLocalCover.checked) {
+                    mediaId = await this.uploadLocalCover(token);
+                }
+                else {
+                    mediaId = await this.getDefaultCover(token);
+                }
             }
 
             if (mediaId === '') {
@@ -505,17 +595,12 @@ export class NotePreview extends ItemView implements MDRendererCallback {
                 return;
             }
 
-            const content = this.getArticleContent();
+            metadata.title = metadata.title || this.title;
+            metadata.content = this.getArticleContent();
+            metadata.thumb_media_id = mediaId;
 
-            const {digest, crop} = this.getMetadata();
             // 创建草稿
-            const res = await wxAddDraft(token, {
-                title: this.title,
-                content: content,
-                digest: digest,
-                thumb_media_id: mediaId,
-                ... crop && { pic_crop_235_1: '0_0_1_0.5', pic_crop_1_1: '0_0.525_0.404_1'}
-            });
+            const res = await wxAddDraft(token, metadata);
 
             if (res.status != 200) {
                 console.error(res.text);
@@ -536,27 +621,14 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         }
     }
 
-    updateMath(id: string, svg: string): void {
-        const span = this.articleDiv.querySelector('#'+id) as HTMLElement;
-        if (!span) return;
-        const doc = sanitizeHTMLToDom(svg);
-        span.empty();
-        if (doc.firstChild) {
-            span.appendChild(doc.firstChild);
-        }
-        else {
-            span.innerText = '渲染失败';
-        }
-    }
-
     updateElementByID(id:string, html:string):void {
         const item = this.articleDiv.querySelector('#'+id) as HTMLElement;
         if (!item) return;
         const doc = sanitizeHTMLToDom(html);
         item.empty();
-        if (doc.hasChildNodes()) {
-            for (const child of doc.childNodes) {
-                item.appendChild(child);
+        if (doc.childElementCount > 0) {
+            for (const child of doc.children) {
+                item.appendChild(child.cloneNode(true)); // 使用 cloneNode 复制节点以避免移动它
             }
         }
         else {

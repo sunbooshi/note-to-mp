@@ -1,16 +1,41 @@
-import { App, TextAreaComponent, PluginSettingTab, Setting, Notice, FileSystemAdapter, sanitizeHTMLToDom } from 'obsidian';
+/*
+ * Copyright (c) 2024 Sun Booshi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+import { App, TextAreaComponent, PluginSettingTab, Setting, Notice, sanitizeHTMLToDom } from 'obsidian';
 import NoteToMpPlugin from './main';
 import { wxGetToken,wxEncrypt } from './weixin-api';
 import { cleanMathCache } from './markdown/math';
+import { NMPSettings } from './settings';
 
 export class NoteToMpSettingTab extends PluginSettingTab {
 	plugin: NoteToMpPlugin;
 	wxInfo: string;
 	wxTextArea: TextAreaComponent|null;
+	settings: NMPSettings;
 
 	constructor(app: App, plugin: NoteToMpPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
+		this.settings = NMPSettings.getInstance();
 		this.wxInfo = this.parseWXInfo();
 	}
 
@@ -19,7 +44,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 	}
 
 	parseWXInfo() {
-	    const wxInfo = this.plugin.settings.wxInfo;
+	    const wxInfo = this.settings.wxInfo;
 		if (wxInfo.length == 0) {
 			return '';
 		}
@@ -32,12 +57,12 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 	}
 
 	async testWXInfo() {
-		const authKey = this.plugin.settings.authKey;
+		const authKey = this.settings.authKey;
 		if (authKey.length == 0) {
 		    new Notice('请先设置authKey');
 		    return;
 		}
-	    const wxInfo = this.plugin.settings.wxInfo;
+	    const wxInfo = this.settings.wxInfo;
 		if (wxInfo.length == 0) {
 		    new Notice('请先设置公众号信息');
 			return;
@@ -69,7 +94,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			return false;
 		}
 
-		if (this.plugin.settings.wxInfo.length > 0) {
+		if (this.settings.wxInfo.length > 0) {
 		    new Notice('已经加密过了，请先清除！');
 		    return false;
 		}
@@ -97,7 +122,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 		}
 
 		try {
-			const res = await wxEncrypt(this.plugin.settings.authKey, wechat);
+			const res = await wxEncrypt(this.settings.authKey, wechat);
 			if (res.status != 200) {
 				const data = res.json;
 				new Notice(`${data.message}`);
@@ -109,7 +134,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 				wx.secret = data[wx.appid];
 			}
 
-			this.plugin.settings.wxInfo = wechat;
+			this.settings.wxInfo = wechat;
 			await this.plugin.saveSettings();
 			this.wxInfo = this.parseWXInfo();
 			this.displayWXInfo(this.wxInfo);
@@ -125,7 +150,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 	}
 
 	async clear() {
-		this.plugin.settings.wxInfo = [];
+		this.settings.wxInfo = [];
 		await this.plugin.saveSettings();
 		this.wxInfo = '';
 		this.displayWXInfo('')
@@ -141,13 +166,13 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName('默认样式')
 			.addDropdown(dropdown => {
-                const styles = this.plugin.themesManager.themes;
+                const styles = this.plugin.assetsManager.themes;
                 for (let s of styles) {
 				    dropdown.addOption(s.className, s.name);
                 }
-				dropdown.setValue(this.plugin.settings.defaultStyle);
+				dropdown.setValue(this.settings.defaultStyle);
                 dropdown.onChange(async (value) => {
-					this.plugin.settings.defaultStyle = value;
+					this.settings.defaultStyle = value;
 					await this.plugin.saveSettings();
                 });
 			});
@@ -155,13 +180,13 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName('代码高亮')
 			.addDropdown(dropdown => {
-                const styles = this.plugin.themesManager.highlights;
+                const styles = this.plugin.assetsManager.highlights;
                 for (let s of styles) {
 				    dropdown.addOption(s.name, s.name);
                 }
-				dropdown.setValue(this.plugin.settings.defaultHighlight);
+				dropdown.setValue(this.settings.defaultHighlight);
                 dropdown.onChange(async (value) => {
-					this.plugin.settings.defaultHighlight = value;
+					this.settings.defaultHighlight = value;
 					await this.plugin.saveSettings();
                 });
 			});
@@ -170,9 +195,9 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			.setName('在工具栏展示样式选择')
 			.setDesc('建议在移动端关闭，可以增大文章预览区域')
 			.addToggle(toggle => {
-			    toggle.setValue(this.plugin.settings.showStyleUI);
+			    toggle.setValue(this.settings.showStyleUI);
 				toggle.onChange(async (value) => {
-				    this.plugin.settings.showStyleUI = value;
+				    this.settings.showStyleUI = value;
 					await this.plugin.saveSettings();
 				});
 			});
@@ -182,9 +207,9 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			.addDropdown(dropdown => {
 				dropdown.addOption('inline', '内嵌');
 			    dropdown.addOption('footnote', '脚注');
-				dropdown.setValue(this.plugin.settings.linkStyle);
+				dropdown.setValue(this.settings.linkStyle);
 				dropdown.onChange(async (value) => {
-				    this.plugin.settings.linkStyle = value;
+				    this.settings.linkStyle = value;
 					await this.plugin.saveSettings();
 				});
 			});
@@ -194,9 +219,9 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			.addDropdown(dropdown => {
 				dropdown.addOption('quote', '引用');
 			    dropdown.addOption('content', '正文');
-				dropdown.setValue(this.plugin.settings.embedStyle);
+				dropdown.setValue(this.settings.embedStyle);
 				dropdown.onChange(async (value) => {
-				    this.plugin.settings.embedStyle = value;
+				    this.settings.embedStyle = value;
 					await this.plugin.saveSettings();
 				});
 			});
@@ -206,9 +231,9 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			.addDropdown(dropdown => {
 				dropdown.addOption('latex', 'latex');
 			    dropdown.addOption('asciimath', 'asciimath');
-				dropdown.setValue(this.plugin.settings.math);
+				dropdown.setValue(this.settings.math);
 				dropdown.onChange(async (value) => {
-				    this.plugin.settings.math = value;
+				    this.settings.math = value;
 					cleanMathCache();
 					await this.plugin.saveSettings();
 				});
@@ -217,9 +242,9 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName('显示代码行号')
 			.addToggle(toggle => {
-			    toggle.setValue(this.plugin.settings.lineNumber);
+			    toggle.setValue(this.settings.lineNumber);
 				toggle.onChange(async (value) => {
-				    this.plugin.settings.lineNumber = value;
+				    this.settings.lineNumber = value;
 					await this.plugin.saveSettings();
 				});
 			})
@@ -230,14 +255,14 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			    button.setButtonText('下载');
 				button.onClick(async () => {
 					button.setButtonText('下载中...');
-					await this.plugin.themesManager.downloadThemes();
+					await this.plugin.assetsManager.downloadThemes();
 					button.setButtonText('下载完成');
 				});
 			})
 			.addButton(button => {
 				button.setIcon('folder-open');
 				button.onClick(async () => {
-					await this.plugin.themesManager.openAssets();
+					await this.plugin.assetsManager.openAssets();
 				});
 			});
 
@@ -246,8 +271,8 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			.addButton(button => {
 			    button.setButtonText('清空');
 				button.onClick(async () => {
-					await this.plugin.themesManager.removeThemes();
-					this.plugin.settings.resetStyelAndHighlight();
+					await this.plugin.assetsManager.removeThemes();
+					this.settings.resetStyelAndHighlight();
 					await this.plugin.saveSettings();
 				});
 			})
@@ -255,30 +280,30 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName('CSS代码片段')
 			.addToggle(toggle => {
-			    toggle.setValue(this.plugin.settings.useCustomCss);
+			    toggle.setValue(this.settings.useCustomCss);
 				toggle.onChange(async (value) => {
-				    this.plugin.settings.useCustomCss = value;
+				    this.settings.useCustomCss = value;
 					await this.plugin.saveSettings();
 				});
 			})
 			.addButton(button => {
 				button.setIcon('refresh-ccw');
 				button.onClick(async () => {
-					await this.plugin.themesManager.loadCustomCSS();
+					await this.plugin.assetsManager.loadCustomCSS();
 					new Notice('刷新成功');
 				});
 			})
 			.addButton(button => {
 				button.setIcon('folder-open');
 				button.onClick(async () => {
-					await this.plugin.themesManager.openAssets();
+					await this.plugin.assetsManager.openAssets();
 				});
 			});
 		
 		// const descHtml = '有效期至：aaaaa <br/>详情说明：<a href="https://mp.weixin.qq.com/s/LYujo4ODEYLuq0OkzkkoCw">https://mp.weixin.qq.com/s/LYujo4ODEYLuq0OkzkkoCw</a>';
 		let descHtml = '详情说明：<a href="https://mp.weixin.qq.com/s/LYujo4ODEYLuq0OkzkkoCw">https://mp.weixin.qq.com/s/LYujo4ODEYLuq0OkzkkoCw</a>';
-		if (this.plugin.settings.expireat) {
-			const timestr = this.plugin.settings.expireat.toLocaleString();
+		if (this.settings.expireat) {
+			const timestr = this.settings.expireat.toLocaleString();
 			descHtml = `有效期至：${timestr} <br/>${descHtml}`
 		}
 		new Setting(containerEl)
@@ -286,17 +311,17 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			.setDesc(sanitizeHTMLToDom(descHtml))
 			.addText(text => {
 			    text.setPlaceholder('请输入注册码')
-					.setValue(this.plugin.settings.authKey)
+					.setValue(this.settings.authKey)
 					.onChange(async (value) => {
-					    this.plugin.settings.authKey = value.trim();
-						this.plugin.settings.getExpiredDate();
+					    this.settings.authKey = value.trim();
+						this.settings.getExpiredDate();
 						await this.plugin.saveSettings();
 					})
 					.inputEl.setAttr('style', 'width: 320px;')
 			}).descEl.setAttr('style', '-webkit-user-select: text; user-select: text;')
 				
 		
-		let isClear = this.plugin.settings.wxInfo.length > 0;
+		let isClear = this.settings.wxInfo.length > 0;
 		let isRealClear = false;
 		const buttonText = isClear ? '清空公众号信息' : '加密公众号信息';
 		new Setting(containerEl)
