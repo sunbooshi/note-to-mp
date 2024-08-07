@@ -87,11 +87,16 @@ export async function wxUploadImage(data: Blob, filename: string, token: string,
 }
 
 // 新建草稿
-interface DraftArticle {
+export interface DraftArticle {
     title: string;
-    digest: string;
+    author?: string;
+    digest?: string;
+    cover?: string;
     content: string;
+    content_source_url?: string;
     thumb_media_id: string;
+    need_open_comment?: number;
+    only_fans_can_comment?: number;
     pic_crop_235_1?: string;
     pic_crop_1_1?: string;
 }
@@ -105,6 +110,10 @@ export async function wxAddDraft(token: string, data: DraftArticle) {
         thumb_media_id: data.thumb_media_id,
         ... data.pic_crop_235_1 && {pic_crop_235_1: data.pic_crop_235_1},
         ... data.pic_crop_1_1 && {pic_crop_1_1: data.pic_crop_1_1},
+        ... data.content_source_url && {content_source_url: data.content_source_url},
+        ... data.need_open_comment !== undefined && {need_open_comment: data.need_open_comment},
+        ... data.only_fans_can_comment !== undefined && {only_fans_can_comment: data.only_fans_can_comment},
+        ... data.author && {author: data.author},
     }]};
 
     const res = await requestUrl({

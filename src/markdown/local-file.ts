@@ -97,7 +97,7 @@ export class LocalFile extends Extension{
     }
 
     getImagePath(path: string) {
-        const file = this.searchFile(path);
+        const file = this.assetsManager.searchFile(path);
 
         if (file == null) {
             console.error('找不到文件：' + path);
@@ -112,81 +112,6 @@ export class LocalFile extends Extension{
         };
         LocalImageManager.getInstance().setImage(resPath, info);
         return resPath;
-    }
-
-    searchFile(originPath: string): TAbstractFile | null {
-        const resolvedPath = this.resolvePath(originPath);
-        const vault= this.app.vault;
-        const attachmentFolderPath = vault.config.attachmentFolderPath || '';
-        let localPath = resolvedPath;
-        let file = null;
-
-        // 然后从根目录查找
-        file = vault.getFileByPath(resolvedPath);
-        if (file) {
-            return file; 
-        }
-
-        file = vault.getFileByPath(originPath);
-        if (file) {
-            return file; 
-        }
-
-        // 先从附件文件夹查找
-        if (attachmentFolderPath != '') {
-            localPath = attachmentFolderPath + '/' + originPath;
-            file = vault.getFileByPath(localPath)
-            if (file) {
-                return file;
-            }
-
-            localPath = attachmentFolderPath + '/' + resolvedPath;
-            file = vault.getFileByPath(localPath)
-            if (file) {
-                return file;
-            }
-        }
-
-        // 最后查找所有文件
-        const files = vault.getAllLoadedFiles();
-        for (let f of files) {
-            if (f.path.includes(originPath)) {
-                return f;
-            }
-        }
-
-        return null;
-    }
-
-    resolvePath(relativePath: string): string {
-        const basePath = this.getActiveFileDir();
-        if (!relativePath.includes('/')) {
-            return relativePath;
-        }
-        const stack = basePath.split("/");
-        const parts = relativePath.split("/");
-      
-        stack.pop(); // Remove the current file name (or empty string)
-    
-        for (const part of parts) {
-            if (part === ".") continue;
-            if (part === "..") stack.pop();
-            else stack.push(part);
-        }
-        return stack.join("/");
-    }
-
-    getActiveFileDir() {
-        const af = this.app.workspace.getActiveFile();
-        if (af == null) {
-            return '';
-        }
-        const parts = af.path.split('/');
-        parts.pop();
-        if (parts.length == 0) {
-            return '';
-        }
-        return parts.join('/');
     }
 
     isImage(file: string) {
@@ -311,7 +236,7 @@ export class LocalFile extends Extension{
             if (!path.endsWith('.md')) {
                 path = path + '.md';
             }
-            file = this.searchFile(path);
+            file = this.assetsManager.searchFile(path);
         }
 
         if (file == null) {

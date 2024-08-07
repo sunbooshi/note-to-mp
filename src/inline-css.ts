@@ -87,4 +87,15 @@ section .note-callout-quote {
 ul {
   list-style-type: disc;
 }
+
+.note-svg-icon {
+  min-width: 24px;
+  height: 24px;
+  display: inline-block;
+}
+
+.note-svg-icon svg {
+  width: 100%;
+  height: 100%;
+}
 `;

@@ -25,7 +25,7 @@ export class LinkRenderer extends Extension {
                 name: 'link',
                 level: 'inline',
                 renderer: (token: Tokens.Link) => {
-                    if (token.text.indexOf(token.href) === 0 || (token.href.indexOf('https://mp.weixin.qq.com/s/') === 0)) {
+                    if (token.text.indexOf(token.href) === 0 || (token.href.indexOf('https://mp.weixin.qq.com/s') === 0)) {
                         return `<a href="${token.href}">${token.text}</a>`;
                     }
                     this.allLinks.push(token.href);
