@@ -42,6 +42,17 @@ section .note-callout-title-wrap {
   font-weight: 600;
 }
 
+.note-callout-icon {
+  display: inline-block;
+  width: 18px;
+  height: 18px;  
+}
+
+.note-callout-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
 section .note-callout-title {
   margin-left: 0.25em;
 }

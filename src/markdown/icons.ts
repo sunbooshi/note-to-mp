@@ -80,6 +80,7 @@ export class SVGIcon extends Extension {
         const style = this.renderStyle(items);
         return `<span class="note-svg-icon" ${style}>${body}</span>`
     }
+    
     markedExtension(): MarkedExtension {
         return {
             async: true,

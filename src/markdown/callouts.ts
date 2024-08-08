@@ -188,12 +188,15 @@ function GetCalloutTitle(callout:string, text:string) {
 	let end = text.indexOf('\n');
 	if (end === -1)  end = text.length;
 	if (start >= end)  return title;
-	title = text.slice(start, end).trim();
+	const customTitle = text.slice(start, end).trim();
+	if (customTitle !== '') {
+		title = customTitle;
+	}
 	return title;
 }
 
 export class CalloutRenderer extends Extension {
-    renderer(token: Tokens.Blockquote) {
+    async renderer(token: Tokens.Blockquote) {
         let callout = matchCallouts(token.text);
         if (callout == '') {
             const body = this.marked.parser(token.tokens);
@@ -203,7 +206,13 @@ export class CalloutRenderer extends Extension {
         const title = GetCalloutTitle(callout, token.text);
         let info = GetCallout(callout.toLowerCase());
         if (info == null) {
-            info = GetCallout('note');
+            const svg = await this.assetsManager.loadIcon(callout);
+            if (svg) {
+                info = {icon: svg, style: 'note-callout-note'}
+            }
+            else {
+                info = GetCallout('note');
+            }
         }
         const index = token.text.indexOf('\n');
         let body = '';
@@ -213,16 +222,23 @@ export class CalloutRenderer extends Extension {
             body = this.marked.parser(token.tokens);
         } 
         
-        return `<section class="note-callout ${info?.style}"><section class="note-callout-title-wrap">${info?.icon}<span class="note-callout-title">${title}<span></section><section class="note-callout-content">${body}</section></section>`;
+        return `<section class="note-callout ${info?.style}"><section class="note-callout-title-wrap"><span class="note-callout-icon">${info?.icon}</span><span class="note-callout-title">${title}<span></section><section class="note-callout-content">${body}</section></section>`;
      }
 
     markedExtension(): MarkedExtension {
         return {
+            async: true,
+            walkTokens: async (token: Tokens.Generic) => {
+                if (token.type !== 'blockquote') {
+                    return;
+                }
+                token.html = await this.renderer(token as Tokens.Blockquote);
+            },
             extensions:[{
                 name: 'blockquote',
                 level: 'block',
-                renderer: (token)=> {
-                    return this.renderer(token as Tokens.Blockquote);
+                renderer: (token: Tokens.Generic)=> {
+                    return token.html;
                 }, 
             }]
         }
