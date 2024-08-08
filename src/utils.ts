@@ -104,14 +104,13 @@ function applyStyle(root: HTMLElement, cssRoot: postcss.Root) {
 		}
 	});
 
+	if (root.tagName === 'svg') {
+		return;
+	}
+
 	let element = root.firstElementChild;
 	while (element) {
-		if (element.tagName === 'svg') {
-			// pass
-		}
-		else {
-			applyStyle(element as HTMLElement, cssRoot);
-		}
+		applyStyle(element as HTMLElement, cssRoot);
 	  	element = element.nextElementSibling;
 	}
 }

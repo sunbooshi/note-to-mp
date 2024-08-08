@@ -188,7 +188,10 @@ function GetCalloutTitle(callout:string, text:string) {
 	let end = text.indexOf('\n');
 	if (end === -1)  end = text.length;
 	if (start >= end)  return title;
-	title = text.slice(start, end).trim();
+	const customTitle = text.slice(start, end).trim();
+	if (customTitle !== '') {
+		title = customTitle;
+	}
 	return title;
 }
 
@@ -203,10 +206,12 @@ export class CalloutRenderer extends Extension {
         const title = GetCalloutTitle(callout, token.text);
         let info = GetCallout(callout.toLowerCase());
         if (info == null) {
-            info = GetCallout('note');
             const svg = await this.assetsManager.loadIcon(callout);
-            if (svg && info) {
-                info.icon = svg;
+            if (svg) {
+                info = {icon: svg, style: 'note-callout-note'}
+            }
+            else {
+                info = GetCallout('note');
             }
         }
         const index = token.text.indexOf('\n');
