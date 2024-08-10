@@ -106,15 +106,15 @@
 在`new-style.css`追加定义样式，所有样式都应该写在`themes.json`中`className`定义的选择器下，以上面新增的样式举例，CSS应按如下所示编写：
 
 ```CSS
-.new-style strong {
+.note-to-mp strong {
   font-weight: 700
 }
-.new-style a {
+.note-to-mp a {
   color: #428bca;
   text-decoration: none;
   background: 0 0
 }
-.new-style p {
+.note-to-mp p {
   margin: 10px 0;
   line-height: 1.7
 }
