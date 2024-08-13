@@ -218,8 +218,7 @@ export class CalloutRenderer extends Extension {
         let body = '';
         if (index > 0) {
             token.text = token.text.slice(index+1)
-            token.tokens = this.marked.lexer(token.text);
-            body = this.marked.parser(token.tokens);
+            body = await this.marked.parse(token.text);
         } 
         
         return `<section class="note-callout ${info?.style}"><section class="note-callout-title-wrap"><span class="note-callout-icon">${info?.icon}</span><span class="note-callout-title">${title}<span></section><section class="note-callout-content">${body}</section></section>`;

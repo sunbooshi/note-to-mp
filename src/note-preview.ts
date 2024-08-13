@@ -288,6 +288,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         })
 
         refreshBtn.onclick = async () => {
+            this.setStyle(this.getCSS());
             await this.renderMarkdown();
         }
 

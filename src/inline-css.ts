@@ -131,4 +131,30 @@ ul {
   width: 100%;
   height: 100%;
 }
+
+.note-embed-excalidraw-left {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.note-embed-excalidraw-center {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+}
+
+.note-embed-excalidraw-right {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.note-embed-excalidraw {
+  width: 100%;
+  height: 100%;
+}
 `;

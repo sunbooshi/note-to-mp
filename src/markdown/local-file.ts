@@ -21,9 +21,10 @@
  */
 
 import { Token, Tokens, MarkedExtension } from "marked";
-import { Notice, TAbstractFile, TFile, Vault } from "obsidian";
+import { Notice, TAbstractFile, TFile, Vault, MarkdownView, requestUrl } from "obsidian";
 import { wxUploadImage } from "../weixin-api";
 import { Extension } from "./extension";
+import { NMPSettings } from "../settings";
 
 declare module 'obsidian' {
     interface Vault {
@@ -273,6 +274,120 @@ export class LocalFile extends Extension{
         this.callback.updateElementByID(id, body);
     }
 
+    async readBlob(src: string) {
+        return await fetch(src).then(response => response.blob())
+    }
+
+    async getExcalidrawUrl(data: string) {
+        const url = 'https://obplugin.sunboshi.tech/math/excalidraw';
+        const req = await requestUrl({
+            url,
+            method: 'POST',
+            contentType: 'application/json',
+            headers: {
+                authkey: NMPSettings.getInstance().authKey
+            },
+            body: JSON.stringify({ data })
+        });
+
+        if (req.status != 200) {
+            console.error(req.status);
+            return null;
+        }
+        return req.json.url;
+    }
+
+    parseExcalidrawLink(link: string) {
+        let file = '';
+        let style='';
+        let classname = 'note-embed-excalidraw-left';
+        const postions = new Map<string, string>([
+            ['left', 'note-embed-excalidraw-left'],
+            ['center', 'note-embed-excalidraw-center'],
+            ['right', 'note-embed-excalidraw-right']
+        ])
+        if (link.includes('|')) {
+            const items = link.split('|');
+            file = items[0];
+            let size = '';
+            if (items.length == 2) {
+                if (postions.has(items[1])) {
+                    classname = items[1];
+                }
+                else {
+                    size = items[1];
+                }
+            }
+            else if (items.length == 3) {
+                size = items[1];
+                classname = postions.get(items[2]) || classname;
+            }
+            if (size != '') {
+                const sizes = size.split('x');
+                if (sizes.length == 2) {
+                    style += `style="width:${sizes[0]}px;height:${sizes[1]}px;"`
+                }
+                else {
+                    style += `style="width:${sizes[0]}px;"`
+                }
+            }
+        }
+        else {
+            file = link;
+        }
+
+        if(file.endsWith('excalidraw') || file.endsWith('excalidraw.md')) {
+            return { file, style, classname };
+        }
+
+        return null;
+    }
+
+    async renderExcalidraw(name: string, id: string) {
+        try {
+            let container: HTMLElement | null = null;
+            const currentFile = this.app.workspace.getActiveFile();
+            const leaves = this.app.workspace.getLeavesOfType('markdown');
+            for (let leaf of leaves) {
+                const markdownView = leaf.view as MarkdownView;
+                if (markdownView.file?.path === currentFile?.path) {
+                    container = markdownView.containerEl;
+                }
+            }
+            if (container) {
+                const containers = container.querySelectorAll('.internal-embed');
+                for (let container of containers) {
+                    if (name !== container.getAttribute('src')) {
+                        continue;
+                    }
+
+                    const src = await this.getExcalidrawUrl(container.innerHTML);
+                    let svg = '';
+                    if (src === '') {
+                        svg = '渲染失败';
+                        console.log('Failed to get Excalidraw URL');
+                    }
+                    else {
+                        const blob = await this.readBlob(src);
+                        if (blob.type === 'image/svg+xml') {
+                            svg = await blob.text();
+                        }
+                        else {
+                            svg = '暂不支持' + blob.type;
+                        }
+                    }
+                    this.callback.updateElementByID(id, svg);
+                }
+            } else {
+                console.error('container is null ' + name);
+                this.callback.updateElementByID(id, '渲染失败');
+            }
+        } catch (error) {
+            console.error(error.message);
+            this.callback.updateElementByID(id, '渲染失败:' + error.message);
+        }
+    }
+
     markedExtension(): MarkedExtension {
         return {extensions:[{
             name: 'LocalImage',
@@ -302,12 +417,18 @@ export class LocalFile extends Extension{
                     const height = item.height? `height="${item.height}"` : '';
                     return `<img src="${src}" alt="${token.text}" ${width} ${height} />`;
                 }
-                else {
+
+                const info = this.parseExcalidrawLink(token.href);
+                if (info) {
                     const id = this.generateId();
-                    this.renderFile(token.href, id);
-                    const tag = this.callback.settings.embedStyle === 'quote' ? 'blockquote' : 'section';
-                    return `<${tag} class="note-embed-file" id="${id}">渲染中</${tag}>`
+                    this.renderExcalidraw(info.file, id);
+                    return `<section class="${info.classname}"><section class="note-embed-excalidraw" id="${id}" ${info.style}>渲染中</section></section>`
                 }
+
+                const id = this.generateId();
+                this.renderFile(token.href, id);
+                const tag = this.callback.settings.embedStyle === 'quote' ? 'blockquote' : 'section';
+                return `<${tag} class="note-embed-file" id="${id}">渲染中</${tag}>`
             }
         }]};
     }
