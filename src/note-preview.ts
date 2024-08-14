@@ -437,8 +437,8 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             res.content_source_url = frontmatter['原文地址'];
             res.cover = frontmatter['封面'];
             res.thumb_media_id = frontmatter['封面素材ID'];
-            res.need_open_comment = frontmatter['打开评论'];
-            res.only_fans_can_comment = frontmatter['仅粉丝可评论'];
+            res.need_open_comment = frontmatter['打开评论'] ? 1 : undefined;
+            res.only_fans_can_comment = frontmatter['仅粉丝可评论'] ? 1 : undefined;
             if (frontmatter['封面裁剪']) {
                 res.pic_crop_235_1 = '0_0_1_0.5';
                 res.pic_crop_1_1 = '0_0.525_0.404_1';
