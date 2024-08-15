@@ -30,7 +30,7 @@ import { wxGetToken, wxAddDraft, wxBatchGetMaterial, DraftArticle } from './weix
 import { MDRendererCallback } from './markdown/extension';
 import { MarkedParser } from './markdown/parser';
 import { LocalImageManager } from './markdown/local-file';
-import { CardDataManager } from './markdown/code';
+import { CardDataManager, CodeRenderer } from './markdown/code';
 
 export const VIEW_TYPE_NOTE_PREVIEW = 'note-preview';
 
@@ -532,6 +532,8 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         await lm.uploadLocalImage(token, this.app.vault);
         // 替换图片链接
         lm.replaceImages(this.articleDiv);
+        // 上传Mermaid图片
+        await CodeRenderer.uploadMermaidImages(this.articleDiv, token);
 
         await this.copyArticle();
         this.showMsg('图片已上传，并且已复制，请到公众号编辑器粘贴。');
@@ -576,6 +578,8 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             await lm.uploadLocalImage(token, this.app.vault);
             // 替换图片链接
             lm.replaceImages(this.articleDiv);
+            // 上传Mermaid图片
+            await CodeRenderer.uploadMermaidImages(this.articleDiv, token);
             // 上传封面
             let mediaId = metadata.thumb_media_id;
             if (!mediaId) {

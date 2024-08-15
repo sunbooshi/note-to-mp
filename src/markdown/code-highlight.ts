@@ -34,6 +34,7 @@ export class CodeHighlight extends Extension {
                 const type = CodeRenderer.getMathType(lang)
                 if (type) return code;
                 if (lang && lang.trim().toLocaleLowerCase() == 'mpcard') return code;
+                if (lang && lang.trim().toLocaleLowerCase() == 'mermaid') return code;
     
                   if (lang && hljs.getLanguage(lang)) {
                     try {
