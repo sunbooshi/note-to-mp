@@ -25,6 +25,7 @@ import { NotePreview, VIEW_TYPE_NOTE_PREVIEW } from './note-preview';
 import { NMPSettings } from './settings';
 import { NoteToMpSettingTab } from './setting-tab';
 import AssetsManager from './assets';
+import { setVersion, uevent } from './utils';
 
 
 export default class NoteToMpPlugin extends Plugin {
@@ -38,6 +39,8 @@ export default class NoteToMpPlugin extends Plugin {
 
 	async onload() {
 		console.log('Loading Note to MP');
+		setVersion(this.manifest.version);
+		uevent('load');
 		await this.loadSettings();
 		await this.assetsManager.loadAssets();
 		this.registerView(
