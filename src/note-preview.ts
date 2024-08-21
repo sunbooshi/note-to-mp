@@ -21,7 +21,7 @@
  */
 
 import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, sanitizeHTMLToDom, apiVersion, TFile, Platform } from 'obsidian';
-import { applyCSS } from './utils';
+import { applyCSS, uevent } from './utils';
 import { wxUploadImage } from './weixin-api';
 import { NMPSettings } from './settings';
 import AssetsManager from './assets';
@@ -30,7 +30,7 @@ import { wxGetToken, wxAddDraft, wxBatchGetMaterial, DraftArticle } from './weix
 import { MDRendererCallback } from './markdown/extension';
 import { MarkedParser } from './markdown/parser';
 import { LocalImageManager } from './markdown/local-file';
-import { CardDataManager } from './markdown/code';
+import { CardDataManager, CodeRenderer } from './markdown/code';
 
 export const VIEW_TYPE_NOTE_PREVIEW = 'note-preview';
 
@@ -89,10 +89,12 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         ];
 
         this.renderMarkdown();
+        uevent('open');
     }
 
     async onClose() {
         this.listeners.forEach(listener => this.workspace.offref(listener));
+        uevent('close');
     }
 
     onAppIdChanged() {
@@ -264,6 +266,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             copyBtn.onclick = async() => {
                 await this.copyArticle();
                 new Notice('复制成功，请到公众号编辑器粘贴。');
+                uevent('copy');
             }
         }
 
@@ -273,6 +276,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
 
         uploadImgBtn.onclick = async() => {
             await this.uploadImages();
+            uevent('upload');
         }
 
         const postBtn = lineDiv.createEl('button', { cls: 'copy-button' }, async (button) => {
@@ -281,6 +285,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
 
         postBtn.onclick = async() => {
             await this.postArticle();
+            uevent('pub');
         }
 
         const refreshBtn = lineDiv.createEl('button', { cls: 'refresh-button' }, async (button) => {
@@ -290,6 +295,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         refreshBtn.onclick = async () => {
             this.setStyle(this.getCSS());
             await this.renderMarkdown();
+            uevent('refresh');
         }
 
         // 封面
@@ -532,6 +538,8 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         await lm.uploadLocalImage(token, this.app.vault);
         // 替换图片链接
         lm.replaceImages(this.articleDiv);
+        // 上传Mermaid图片
+        await CodeRenderer.uploadMermaidImages(this.articleDiv, token);
 
         await this.copyArticle();
         this.showMsg('图片已上传，并且已复制，请到公众号编辑器粘贴。');
@@ -576,6 +584,8 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             await lm.uploadLocalImage(token, this.app.vault);
             // 替换图片链接
             lm.replaceImages(this.articleDiv);
+            // 上传Mermaid图片
+            await CodeRenderer.uploadMermaidImages(this.articleDiv, token);
             // 上传封面
             let mediaId = metadata.thumb_media_id;
             if (!mediaId) {

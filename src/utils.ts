@@ -20,8 +20,30 @@
  * THE SOFTWARE.
  */
 
-import { sanitizeHTMLToDom } from "obsidian";
+import { sanitizeHTMLToDom, requestUrl, Platform } from "obsidian";
 import * as postcss from "./postcss/postcss";
+
+let PluginVersion = "0.0.0";
+let PlugPlatform = "obsidian";
+
+export function setVersion(version: string) {
+	PluginVersion = version;
+	if (Platform.isWin) {
+		PlugPlatform = "win";
+	}
+	else if (Platform.isMacOS) {
+		PlugPlatform = "mac";
+	}
+	else if (Platform.isLinux) {
+		PlugPlatform = "linux";
+	}
+	else if (Platform.isIosApp) {
+		PlugPlatform = "ios";
+	}
+	else if (Platform.isAndroidApp) {
+		PlugPlatform = "android";
+	}
+}
 
 function getStyleSheet() {
 	for (var i = 0; i < document.styleSheets.length; i++) {
@@ -122,3 +144,11 @@ export function applyCSS(html: string, css: string) {
 	applyStyle(root, cssRoot);
 	return root.outerHTML;
 }
+
+export function uevent(name: string) {
+	const url = `https://u.sunboshi.tech/event?name=${name}&platform=${PlugPlatform}&v=${PluginVersion}`;
+	requestUrl(url).then().catch(error => {
+		console.error("Failed to send event: " + url, error);
+	});
+}
+ 
