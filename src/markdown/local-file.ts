@@ -299,7 +299,7 @@ export class LocalFile extends Extension{
 
     parseExcalidrawLink(link: string) {
         let file = '';
-        let style='';
+        let style='style="width:100%;height:100%"';
         let classname = 'note-embed-excalidraw-left';
         const postions = new Map<string, string>([
             ['left', 'note-embed-excalidraw-left'],
@@ -325,10 +325,10 @@ export class LocalFile extends Extension{
             if (size != '') {
                 const sizes = size.split('x');
                 if (sizes.length == 2) {
-                    style += `style="width:${sizes[0]}px;height:${sizes[1]}px;"`
+                    style = `style="width:${sizes[0]}px;height:${sizes[1]}px;"`
                 }
                 else {
-                    style += `style="width:${sizes[0]}px;"`
+                    style = `style="width:${sizes[0]}px;"`
                 }
             }
         }
@@ -420,6 +420,7 @@ export class LocalFile extends Extension{
 
                 const info = this.parseExcalidrawLink(token.href);
                 if (info) {
+                    console.log(JSON.stringify(info));
                     const id = this.generateId();
                     this.renderExcalidraw(info.file, id);
                     return `<section class="${info.classname}"><section class="note-embed-excalidraw" id="${id}" ${info.style}>渲染中</section></section>`
