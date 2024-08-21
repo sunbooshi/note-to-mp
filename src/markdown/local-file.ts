@@ -420,7 +420,6 @@ export class LocalFile extends Extension{
 
                 const info = this.parseExcalidrawLink(token.href);
                 if (info) {
-                    console.log(JSON.stringify(info));
                     const id = this.generateId();
                     this.renderExcalidraw(info.file, id);
                     return `<section class="${info.classname}"><section class="note-embed-excalidraw" id="${id}" ${info.style}>渲染中</section></section>`
