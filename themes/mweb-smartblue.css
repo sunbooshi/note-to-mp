@@ -62,7 +62,7 @@
 }
 .note-to-mp ul {
   list-style: disc outside;
-  margin-left: 2em;
+  padding-left: 2em;
   margin-top: 1em;
 }
 .note-to-mp li {

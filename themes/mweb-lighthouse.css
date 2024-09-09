@@ -125,8 +125,7 @@
   word-wrap: break-all;
 }
 .note-to-mp ul {
-  margin-left: 1.3em;
-  padding: 0;
+  padding-left: 1.3em;
 }
 .note-to-mp li::marker {
   color: rgb(209, 95, 38);
@@ -135,8 +134,7 @@
   margin: 0;
 }
 .note-to-mp ol {
-  margin-left: 1.3em;
-  padding: 0;
+  padding-left: 1.3em;
   list-style-type: decimal;
 }
 .note-to-mp .task-list-item {
