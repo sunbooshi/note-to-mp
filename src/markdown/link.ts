@@ -36,7 +36,7 @@ export class LinkRenderer extends Extension {
         }
         
         const links = this.allLinks.map((href, i) => {
-            return `<li>${href}&nbsp;↩</li>`;
+            return `<li>${href}</li>`;
         });
         return `${html}<seciton class="footnotes"><hr><ol>${links.join('')}</ol></section>`;
     }
