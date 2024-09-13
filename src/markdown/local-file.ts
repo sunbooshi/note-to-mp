@@ -113,6 +113,7 @@ export class LocalImageManager {
   
 export class LocalFile extends Extension{
     index: number = 0;
+    public static fileCache: Map<string, string> = new Map<string, string>();
 
     generateId() {
         this.index += 1;
@@ -297,22 +298,18 @@ export class LocalFile extends Extension{
         return req.json.url;
     }
 
-    parseExcalidrawLink(link: string) {
-        let file = '';
-        let style='style="width:100%;height:100%"';
-        let classname = 'note-embed-excalidraw-left';
-        const postions = new Map<string, string>([
-            ['left', 'note-embed-excalidraw-left'],
-            ['center', 'note-embed-excalidraw-center'],
-            ['right', 'note-embed-excalidraw-right']
-        ])
+    parseLinkStyle(link: string) {
+        let filename = '';
+        let style = 'style="width:100%;height:100%"';
+        let postion = 'left';
+        const postions = ['left', 'center', 'right'];
         if (link.includes('|')) {
             const items = link.split('|');
-            file = items[0];
+            filename = items[0];
             let size = '';
             if (items.length == 2) {
-                if (postions.has(items[1])) {
-                    classname = items[1];
+                if (postions.includes(items[1])) {
+                    postion = items[1];
                 }
                 else {
                     size = items[1];
@@ -320,7 +317,14 @@ export class LocalFile extends Extension{
             }
             else if (items.length == 3) {
                 size = items[1];
-                classname = postions.get(items[2]) || classname;
+                if (postions.includes(items[1])) {
+                    size = items[2];
+                    postion = items[1];
+                }
+                else {
+                    size = items[1];
+                    postion = items[2];
+                }
             }
             if (size != '') {
                 const sizes = size.split('x');
@@ -333,11 +337,24 @@ export class LocalFile extends Extension{
             }
         }
         else {
-            file = link;
+            filename = link;
         }
+        return { filename, style, postion };
+    }
 
-        if(file.endsWith('excalidraw') || file.endsWith('excalidraw.md')) {
-            return { file, style, classname };
+    parseExcalidrawLink(link: string) {
+        let classname = 'note-embed-excalidraw-left';
+        const postions = new Map<string, string>([
+            ['left', 'note-embed-excalidraw-left'],
+            ['center', 'note-embed-excalidraw-center'],
+            ['right', 'note-embed-excalidraw-right']
+        ])
+
+        let {filename, style, postion} = this.parseLinkStyle(link);
+        classname = postions.get(postion) || classname;
+
+        if(filename.endsWith('excalidraw') || filename.endsWith('excalidraw.md')) {
+            return { filename, style, classname };
         }
 
         return null;
@@ -371,6 +388,7 @@ export class LocalFile extends Extension{
                         const blob = await this.readBlob(src);
                         if (blob.type === 'image/svg+xml') {
                             svg = await blob.text();
+                            LocalFile.fileCache.set(name, svg);
                         }
                         else {
                             svg = '暂不支持' + blob.type;
@@ -386,6 +404,35 @@ export class LocalFile extends Extension{
             console.error(error.message);
             this.callback.updateElementByID(id, '渲染失败:' + error.message);
         }
+    }
+
+    parseSVGLink(link: string) {
+        let classname = 'note-embed-svg-left';
+        const postions = new Map<string, string>([
+            ['left', 'note-embed-svg-left'],
+            ['center', 'note-embed-svg-center'],
+            ['right', 'note-embed-svg-right']
+        ])
+
+        let {filename, style, postion} = this.parseLinkStyle(link);
+        classname = postions.get(postion) || classname;
+
+        return { filename, style, classname };
+    }
+
+    async renderSVGFile(filename: string, id: string) {
+        const file = this.assetsManager.searchFile(filename);
+
+        if (file == null) {
+            const msg = '找不到文件：' + file;
+            console.error(msg)
+            this.callback.updateElementByID(id, msg);
+            return;
+        }
+
+        const content = await this.getFileContent(file, null, null);
+        LocalFile.fileCache.set(filename, content);
+        this.callback.updateElementByID(id, content);
     }
 
     markedExtension(): MarkedExtension {
@@ -421,8 +468,29 @@ export class LocalFile extends Extension{
                 const info = this.parseExcalidrawLink(token.href);
                 if (info) {
                     const id = this.generateId();
-                    this.renderExcalidraw(info.file, id);
-                    return `<section class="${info.classname}"><section class="note-embed-excalidraw" id="${id}" ${info.style}>渲染中</section></section>`
+                    let svg = '渲染中';
+                    console.log(info.filename);
+                    if (LocalFile.fileCache.has(info.filename)) {
+                        svg = LocalFile.fileCache.get(info.filename) || '渲染失败';
+                    }
+                    else {
+                        this.renderExcalidraw(info.filename, id);
+                    }
+                    return `<section class="${info.classname}"><section class="note-embed-excalidraw" id="${id}" ${info.style}>${svg}</section></section>`
+                }
+
+                if (token.href.endsWith('.svg') || token.href.includes('.svg|')) {
+                    const info = this.parseSVGLink(token.href);
+                    const id = this.generateId();
+                    let svg = '渲染中';
+                    console.log(info.filename);
+                    if (LocalFile.fileCache.has(info.filename)) {
+                        svg = LocalFile.fileCache.get(info.filename) || '渲染失败';
+                    }
+                    else {
+                        this.renderSVGFile(info.filename, id);
+                    }
+                    return `<section class="${info.classname}"><section class="note-svg-excalidraw" id="${id}" ${info.style}>${svg}</section></section>`
                 }
 
                 const id = this.generateId();

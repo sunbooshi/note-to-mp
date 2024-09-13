@@ -25,7 +25,7 @@ import { NMPSettings } from "src/settings";
 import { App, Vault } from "obsidian";
 import AssetsManager from "../assets";
 import { Extension, MDRendererCallback } from "./extension";
-import { CalloutRenderer} from "./callouts";
+import { Blockquote} from "./blockquote";
 import { CodeHighlight } from "./code-highlight";
 import { CodeRenderer } from "./code";
 import { EmbedBlockMark } from "./embed-block-mark";
@@ -63,17 +63,17 @@ export class MarkedParser {
 	extensions: Extension[] = [];
 	marked: Marked;
 	app: App;
-    vault: Vault;
+  vault: Vault;
 
-    constructor(app: App, callback: MDRendererCallback) {
-        this.app = app;
-        this.vault = app.vault;
+	constructor(app: App, callback: MDRendererCallback) {
+		this.app = app;
+		this.vault = app.vault;
 
 		const settings = NMPSettings.getInstance();
 		const assetsManager = AssetsManager.getInstance();
 
 		this.extensions.push(new LocalFile(app, settings, assetsManager, callback));
-		this.extensions.push(new CalloutRenderer(app, settings, assetsManager, callback));
+		this.extensions.push(new Blockquote(app, settings, assetsManager, callback));
 		this.extensions.push(new CodeHighlight(app, settings, assetsManager, callback));
 		this.extensions.push(new EmbedBlockMark(app, settings, assetsManager, callback));
 		this.extensions.push(new SVGIcon(app, settings, assetsManager, callback));
@@ -83,7 +83,7 @@ export class MarkedParser {
 		if (settings.isAuthKeyVaild()) {
 			this.extensions.push(new MathRenderer(app, settings, assetsManager, callback));
 		}
-    }
+	}
 
 	async buildMarked() {
 	    this.marked = new Marked();
@@ -97,7 +97,7 @@ export class MarkedParser {
 	}
 
 	async prepare() {
-	    this.extensions.forEach(async ext => await ext.prepare());
+	  this.extensions.forEach(async ext => await ext.prepare());
 	}
 
 	async postprocess(html: string) {

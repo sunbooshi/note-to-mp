@@ -153,7 +153,30 @@ ul {
   width: 100%;
 }
 
-.note-embed-excalidraw {
-
+.note-embed-svg-left {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  width: 100%;
 }
+
+.note-embed-svg-center {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+}
+
+.note-embed-svg-right {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+svg {
+  width: 100%;
+  height: 100%;
+}
+
 `;

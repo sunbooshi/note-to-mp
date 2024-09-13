@@ -86,7 +86,7 @@ export default class NoteToMpPlugin extends Plugin {
 			leaf = leaves[0];
 		} else {
 		  	leaf = workspace.getRightLeaf(false);
-		  	await leaf?.setViewState({ type: VIEW_TYPE_NOTE_PREVIEW, active: true });
+		  	await leaf?.setViewState({ type: VIEW_TYPE_NOTE_PREVIEW, active: false });
 		}
 	
 		if (leaf) workspace.revealLeaf(leaf);
