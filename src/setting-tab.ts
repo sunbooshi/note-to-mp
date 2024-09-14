@@ -276,9 +276,22 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 			})
-
+		new Setting(containerEl)
+			.setName('全局CSS属性')
+			.setDesc('只能填写CSS属性，不能写选择器')
+			.addTextArea(text => {
+				this.wxTextArea = text;
+			    text.setPlaceholder('请输入CSS属性，如：background: #fff;padding: 10px;')
+				    .setValue(this.settings.baseCSS)
+					.onChange(async (value) => {
+					    this.settings.baseCSS = value;
+							await this.plugin.saveSettings();
+					})
+				    .inputEl.setAttr('style', 'width: 520px; height: 60px;');
+		})
 		new Setting(containerEl)
 			.setName('CSS代码片段')
+			.setDesc('优先级最高，可以覆盖默认样式和基本样式')
 			.addToggle(toggle => {
 			    toggle.setValue(this.settings.useCustomCss);
 				toggle.onChange(async (value) => {
@@ -300,8 +313,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 				});
 			});
 		
-		// const descHtml = '有效期至：aaaaa <br/>详情说明：<a href="https://mp.weixin.qq.com/s/LYujo4ODEYLuq0OkzkkoCw">https://mp.weixin.qq.com/s/LYujo4ODEYLuq0OkzkkoCw</a>';
-		let descHtml = '详情说明：<a href="https://mp.weixin.qq.com/s/LYujo4ODEYLuq0OkzkkoCw">https://mp.weixin.qq.com/s/LYujo4ODEYLuq0OkzkkoCw</a>';
+		let descHtml = '详情说明：<a href="https://sunboshi.tech/subscribe">https://sunboshi.tech/subscribe</a>';
 		if (this.settings.expireat) {
 			const timestr = this.settings.expireat.toLocaleString();
 			descHtml = `有效期至：${timestr} <br/>${descHtml}`

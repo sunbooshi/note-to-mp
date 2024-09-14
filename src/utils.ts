@@ -118,10 +118,15 @@ export function ruleToStyle(rule: postcss.Rule) {
 }
 
 function applyStyle(root: HTMLElement, cssRoot: postcss.Root) {
+	const cssText = root.style.cssText;
 	cssRoot.walkRules(rule => {
 		if (root.matches(rule.selector)) {
 			rule.walkDecls(decl => {
-				root.style.setProperty(decl.prop, decl.value);
+				// 如果已经设置了，则不覆盖
+				const setted = cssText.includes(decl.prop);
+				if (!setted || decl.important) {
+					root.style.setProperty(decl.prop, decl.value);
+				}
 			})
 		}
 	});
@@ -151,4 +156,27 @@ export function uevent(name: string) {
 		console.error("Failed to send event: " + url, error);
 	});
 }
- 
+
+/**
+ * 创建一个防抖函数
+ * @param func 要执行的函数
+ * @param wait 等待时间（毫秒）
+ * @returns 防抖处理后的函数
+ */
+export function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (...args: Parameters<T>) => void {
+	let timeout: NodeJS.Timeout | null = null;
+
+	return function(this: any, ...args: Parameters<T>) {
+		const context = this;
+
+		const later = () => {
+			timeout = null;
+			func.apply(context, args);
+		};
+
+		if (timeout !== null) {
+			clearTimeout(timeout);
+		}
+		timeout = setTimeout(later, wait);
+	};
+}

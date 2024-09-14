@@ -133,10 +133,8 @@ ul {
 }
 
 .note-embed-excalidraw-left {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  width: 100%;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .note-embed-excalidraw-center {
@@ -154,6 +152,38 @@ ul {
 }
 
 .note-embed-excalidraw {
-
+  display: inline-block;
 }
+
+.note-embed-excalidraw svg {
+  width: 100%;
+  height: 100%;
+}
+
+.note-embed-svg-left {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.note-embed-svg-center {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+}
+
+.note-embed-svg-right {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.note-embed-svg svg {
+  width: 100%;
+  height: 100%;
+}
+
 `;

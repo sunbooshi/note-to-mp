@@ -20,7 +20,8 @@
  * THE SOFTWARE.
  */
 
-import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, sanitizeHTMLToDom, apiVersion, TFile, Platform } from 'obsidian';
+import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, sanitizeHTMLToDom, apiVersion, TFile, Platform, Editor, MarkdownView, MarkdownFileInfo } from 'obsidian';
+import { EditorView } from "@codemirror/view";
 import { applyCSS, uevent } from './utils';
 import { wxUploadImage } from './weixin-api';
 import { NMPSettings } from './settings';
@@ -29,11 +30,13 @@ import InlineCSS from './inline-css';
 import { wxGetToken, wxAddDraft, wxBatchGetMaterial, DraftArticle } from './weixin-api';
 import { MDRendererCallback } from './markdown/extension';
 import { MarkedParser } from './markdown/parser';
-import { LocalImageManager } from './markdown/local-file';
+import { LocalImageManager, LocalFile } from './markdown/local-file';
 import { CardDataManager, CodeRenderer } from './markdown/code';
+import { debounce } from './utils';
 
 export const VIEW_TYPE_NOTE_PREVIEW = 'note-preview';
 
+// @ts-expect-error
 const FRONT_MATTER_REGEX = /^(---)$.+?^(---)$.+?/ims;
 
 
@@ -58,6 +61,9 @@ export class NotePreview extends ItemView implements MDRendererCallback {
     currentHighlight: string;
     currentAppId: string;
     markedParser: MarkedParser;
+    observer: MutationObserver | null = null;
+    editorView: EditorView | null = null;
+    debouncedRenderMarkdown: (...args: any[]) => void;
 
 
     constructor(leaf: WorkspaceLeaf) {
@@ -68,6 +74,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         this.currentTheme = this.settings.defaultStyle;
         this.currentHighlight = this.settings.defaultHighlight;
         this.markedParser = new MarkedParser(this.app, this);
+        this.debouncedRenderMarkdown = debounce(this.renderMarkdown.bind(this), 1000);
     }
 
     getViewType() {
@@ -88,12 +95,15 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             this.workspace.on('active-leaf-change', () => this.update())
         ];
 
+        this.setupMutationObserver();
         this.renderMarkdown();
         uevent('open');
     }
 
     async onClose() {
         this.listeners.forEach(listener => this.workspace.offref(listener));
+        this.releaseMutationObserver();
+        LocalFile.fileCache.clear();
         uevent('close');
     }
 
@@ -107,6 +117,63 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         LocalImageManager.getInstance().cleanup();
         CardDataManager.getInstance().cleanup();
         this.renderMarkdown();
+        this.setupMutationObserver();
+    }
+
+    setupMutationObserver() {
+        const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+        // @ts-expect-error, not typed
+        const editorView = view?.editor?.cm as EditorView;
+        if (!editorView) return;
+
+        if (this.editorView === editorView) {
+            return;
+        }
+        
+        this.releaseMutationObserver();
+        this.editorView = editorView;
+        const targetElement = editorView.dom;
+
+        const renderIfExcalidraw = (target: HTMLElement) => {
+            if (target.getAttribute('src')?.includes('.excalidraw')) {
+                const name = target.getAttribute('src') || '';
+                if (LocalFile.fileCache.has(name)) {
+                    return;
+                }
+                this.debouncedRenderMarkdown();
+            }
+        };
+        this.observer = new MutationObserver((mutationsList) => {
+            mutationsList.forEach((mutation) => {
+                try {
+                    const target = mutation.target as HTMLElement;
+                    if (target.classList.contains('internal-embed')){
+                        renderIfExcalidraw(target);
+                    }
+                    else {
+                        const items = target.getElementsByClassName('internal-embed');
+                        for (let i = 0; i < items.length; i++) {
+                            renderIfExcalidraw(items[i] as HTMLElement);
+                        };
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            });
+        });
+
+        // 开始监听目标元素的 DOM 变化
+        this.observer.observe(targetElement, {
+            attributes: true,       // 监听属性变化
+            childList: true,        // 监听子节点的变化
+            subtree: true,          // 监听子树中的节点变化
+        });
+    }
+
+    releaseMutationObserver() {
+        this.observer?.disconnect();
+        this.observer = null;
+        this.editorView = null;
     }
 
     errorContent(error: any) {
@@ -185,7 +252,8 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             const theme = this.assetsManager.getTheme(this.currentTheme);
             const highlight = this.assetsManager.getHighlight(this.currentHighlight);
             const customCSS = this.settings.useCustomCss ? this.assetsManager.customCSS : '';
-            return `${InlineCSS}\n\n${highlight!.css}\n\n${theme!.css}\n\n${customCSS}`;
+            const baseCSS = this.settings.baseCSS ? `.note-to-mp {${this.settings.baseCSS}}` : '';
+            return `${InlineCSS}\n\n${highlight!.css}\n\n${theme!.css}\n\n${baseCSS}\n\n${customCSS}`;
         } catch (error) {
             console.error(error);
             new Notice(`获取样式失败${this.currentTheme}|${this.currentHighlight}，请检查主题是否正确安装。`);
@@ -628,6 +696,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
                 this.showMsg('发布失败!'+draft.errmsg);
             }
         } catch (error) {
+            console.error(error);
             this.showMsg('发布失败!'+error.message);
         }
     }

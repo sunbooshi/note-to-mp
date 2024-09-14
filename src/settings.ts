@@ -34,6 +34,7 @@ export class NMPSettings {
     wxInfo: {name:string, appid:string, secret:string}[];
     math: string;
     expireat: Date | null = null;
+    baseCSS: string;
 
     private static instance: NMPSettings;
 
@@ -50,12 +51,13 @@ export class NMPSettings {
         this.defaultHighlight = '默认';
         this.showStyleUI = true;
         this.linkStyle = 'inline';
-        this.embedStyle = 'quote';
+        this.embedStyle = 'content';
         this.lineNumber = true;
         this.useCustomCss = false;
         this.authKey = '';
         this.wxInfo = [];
         this.math = 'latex';
+        this.baseCSS = '';
     }
 
     resetStyelAndHighlight() {
@@ -78,6 +80,7 @@ export class NMPSettings {
             wxInfo,
             math,
             useCustomCss,
+            baseCSS,
         } = data;
 
         const settings = NMPSettings.getInstance();
@@ -111,6 +114,9 @@ export class NMPSettings {
         if (useCustomCss !== undefined) {
             settings.useCustomCss = useCustomCss;
         }
+        if (baseCSS) {
+            settings.baseCSS = baseCSS;
+        }
         settings.getExpiredDate();
     }
 
@@ -127,6 +133,7 @@ export class NMPSettings {
             'wxInfo': settings.wxInfo,
             'math': settings.math,
             'useCustomCss': settings.useCustomCss,
+            'baseCSS': settings.baseCSS,
         }
     }
 
