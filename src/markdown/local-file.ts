@@ -469,28 +469,26 @@ export class LocalFile extends Extension{
                 if (info) {
                     const id = this.generateId();
                     let svg = '渲染中';
-                    console.log(info.filename);
                     if (LocalFile.fileCache.has(info.filename)) {
                         svg = LocalFile.fileCache.get(info.filename) || '渲染失败';
                     }
                     else {
                         this.renderExcalidraw(info.filename, id);
                     }
-                    return `<section class="${info.classname}"><section class="note-embed-excalidraw" id="${id}" ${info.style}>${svg}</section></section>`
+                    return `<span class="${info.classname}"><span class="note-embed-excalidraw" id="${id}" ${info.style}>${svg}</span></span>`
                 }
 
                 if (token.href.endsWith('.svg') || token.href.includes('.svg|')) {
                     const info = this.parseSVGLink(token.href);
                     const id = this.generateId();
                     let svg = '渲染中';
-                    console.log(info.filename);
                     if (LocalFile.fileCache.has(info.filename)) {
                         svg = LocalFile.fileCache.get(info.filename) || '渲染失败';
                     }
                     else {
                         this.renderSVGFile(info.filename, id);
                     }
-                    return `<section class="${info.classname}"><section class="note-svg-excalidraw" id="${id}" ${info.style}>${svg}</section></section>`
+                    return `<span class="${info.classname}"><span class="note-embed-svg" id="${id}" ${info.style}>${svg}</span></span>`
                 }
 
                 const id = this.generateId();

@@ -103,6 +103,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
     async onClose() {
         this.listeners.forEach(listener => this.workspace.offref(listener));
         this.releaseMutationObserver();
+        LocalFile.fileCache.clear();
         uevent('close');
     }
 

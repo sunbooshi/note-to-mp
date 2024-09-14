@@ -118,10 +118,15 @@ export function ruleToStyle(rule: postcss.Rule) {
 }
 
 function applyStyle(root: HTMLElement, cssRoot: postcss.Root) {
+	const cssText = root.style.cssText;
 	cssRoot.walkRules(rule => {
 		if (root.matches(rule.selector)) {
 			rule.walkDecls(decl => {
-				root.style.setProperty(decl.prop, decl.value);
+				// 如果已经设置了，则不覆盖
+				const setted = cssText.includes(decl.prop);
+				if (!setted || decl.important) {
+					root.style.setProperty(decl.prop, decl.value);
+				}
 			})
 		}
 	});

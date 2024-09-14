@@ -133,10 +133,8 @@ ul {
 }
 
 .note-embed-excalidraw-left {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  width: 100%;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .note-embed-excalidraw-center {
@@ -151,6 +149,15 @@ ul {
   flex-direction: row;
   justify-content: flex-end;
   width: 100%;
+}
+
+.note-embed-excalidraw {
+  display: inline-block;
+}
+
+.note-embed-excalidraw svg {
+  width: 100%;
+  height: 100%;
 }
 
 .note-embed-svg-left {
@@ -174,7 +181,7 @@ ul {
   width: 100%;
 }
 
-svg {
+.note-embed-svg svg {
   width: 100%;
   height: 100%;
 }
