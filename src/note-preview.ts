@@ -36,7 +36,6 @@ import { debounce } from './utils';
 
 export const VIEW_TYPE_NOTE_PREVIEW = 'note-preview';
 
-// @ts-expect-error
 const FRONT_MATTER_REGEX = /^(---)$.+?^(---)$.+?/ims;
 
 
