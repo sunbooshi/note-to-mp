@@ -20,12 +20,13 @@
  * THE SOFTWARE.
  */
 
-import { Plugin, WorkspaceLeaf, App, PluginManifest } from 'obsidian';
+import { Plugin, WorkspaceLeaf, App, PluginManifest, Menu, Notice } from 'obsidian';
 import { NotePreview, VIEW_TYPE_NOTE_PREVIEW } from './note-preview';
 import { NMPSettings } from './settings';
 import { NoteToMpSettingTab } from './setting-tab';
 import AssetsManager from './assets';
 import { setVersion, uevent } from './utils';
+import { WidgetsModal } from './widgets-modal';
 
 
 export default class NoteToMpPlugin extends Plugin {
@@ -54,7 +55,7 @@ export default class NoteToMpPlugin extends Plugin {
 		ribbonIconEl.addClass('note-to-mp-plugin-ribbon-class');
 
 		this.addCommand({
-			id: 'open-note-preview',
+			id: 'note-to-mp-preview',
 			name: '复制到公众号',
 			callback: () => {
 				this.activateView();
@@ -62,6 +63,14 @@ export default class NoteToMpPlugin extends Plugin {
 		});
 
 		this.addSettingTab(new NoteToMpSettingTab(this.app, this));
+
+		this.addCommand({
+			id: 'note-to-mp-template',
+			name: '插入样式',
+			callback: () => {
+				new WidgetsModal(this.app).open();
+			}
+		});
 	}
 
 	onunload() {

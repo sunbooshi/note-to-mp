@@ -25,7 +25,7 @@ import { requestUrl } from "obsidian";
 import { Extension } from "./extension";
 import { NMPSettings } from "src/settings";
 
-export class Box extends Extension {
+export class WidgetBox extends Extension {
   getBoxTitle(text: string) {
     let start = text.indexOf(']') + 1;
     let end = text.indexOf('\n');
@@ -121,6 +121,7 @@ export class Box extends Extension {
   }
 
   async renderer(token: Tokens.Blockquote) {
+    console.log(token.text);
     let boxId = this.getBoxId(token.text);
     if (boxId == '') {
       const body = this.marked.parser(token.tokens);
