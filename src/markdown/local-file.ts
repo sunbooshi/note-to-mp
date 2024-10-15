@@ -87,21 +87,15 @@ export class LocalImageManager {
 
     replaceImages(root: HTMLElement) {
         const images = root.getElementsByTagName('img');
-        const keys = this.images.keys();
-        for (let key of keys) {
-            const value = this.images.get(key);
+        for (let i = 0; i < images.length; i++) {
+            const img = images[i];
+            if (img.src.startsWith('http')) {
+                continue;
+            }
+            const value = this.images.get(img.src);
             if (value == null) continue;
             if (value.url == null) continue;
-            for (let i = 0; i < images.length; i++) {
-                const img = images[i];
-                if (img.src.startsWith('http')) {
-                    continue;
-                }
-                if (img.src === key) {
-                    img.setAttribute('src', value.url);
-                    break;
-                }
-            }
+            img.setAttribute('src', value.url);
         }
     }
 
