@@ -603,6 +603,8 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         const lm = LocalImageManager.getInstance();
         // 上传图片
         await lm.uploadLocalImage(token, this.app.vault);
+        // 上传图床图片
+        await lm.uploadRemoteImage(this.articleDiv, token);
         // 替换图片链接
         lm.replaceImages(this.articleDiv);
         // 上传Mermaid图片
@@ -649,6 +651,8 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             const lm = LocalImageManager.getInstance();
             // 上传图片
             await lm.uploadLocalImage(token, this.app.vault);
+            // 上传图床图片
+            await lm.uploadRemoteImage(this.articleDiv, token);
             // 替换图片链接
             lm.replaceImages(this.articleDiv);
             // 上传Mermaid图片

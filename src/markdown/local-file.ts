@@ -63,7 +63,7 @@ export class LocalImageManager {
     public setImage(path: string, info: ImageInfo): void {
         if (!this.images.has(path)) {
             this.images.set(path, info);
-        } 
+        }
     }
 
     async uploadLocalImage(token: string, vault: Vault) {
@@ -85,13 +85,78 @@ export class LocalImageManager {
         }
     }
 
+    getImageNameFromUrl(url: string): string {
+        try {
+            // 创建URL对象
+            const urlObj = new URL(url);
+            // 获取pathname部分
+            const pathname = urlObj.pathname;
+            // 获取最后一个/后的内容作为文件名
+            const filename = pathname.split('/').pop() || '';
+            return decodeURIComponent(filename);
+        } catch (e) {
+            // 如果URL解析失败，尝试简单的字符串处理
+            const queryIndex = url.indexOf('?');
+            if (queryIndex !== -1) {
+                url = url.substring(0, queryIndex);
+            }
+            return url.split('/').pop() || '';
+        }
+    }
+
+    getImageExtFromBlob(blob: Blob): string {
+        // MIME类型到文件扩展名的映射
+        const mimeToExt: { [key: string]: string } = {
+            'image/jpeg': '.jpg',
+            'image/jpg': '.jpg',
+            'image/png': '.png',
+            'image/gif': '.gif',
+            'image/bmp': '.bmp',
+            'image/webp': '.webp',
+            'image/svg+xml': '.svg',
+            'image/tiff': '.tiff'
+        };
+    
+        // 获取MIME类型
+        const mimeType = blob.type.toLowerCase();
+        
+        // 返回对应的扩展名，如果找不到则返回空字符串
+        return mimeToExt[mimeType] || '';
+    }
+
+    async uploadRemoteImage(root: HTMLElement, token: string) {
+        const images = root.getElementsByTagName('img');
+        for (let i = 0; i < images.length; i++) {
+            const img = images[i];
+            if (!img.src.startsWith('http')) continue; 
+            if (img.src.includes('mmbiz.qpic.cn')) continue;
+
+            const data = await requestUrl(img.src).arrayBuffer;
+            const blob = new Blob([data]);
+            let filename = this.getImageNameFromUrl(img.src);
+            if (filename == '' || filename == null) {
+                filename = 'remote_img' + this.getImageExtFromBlob(blob);
+            }
+            const res = await wxUploadImage(blob, filename, token);
+            if (res.errcode != 0) {
+                const msg = `上传图片失败: ${img.src} ${res.errcode} ${res.errmsg}`;
+                new Notice(msg);
+                console.error(msg);
+            }
+
+            const info = {
+                resUrl: img.src,
+                filePath: "",
+                url: res.url
+            };
+            this.images.set(img.src, info);
+        }
+    }
+
     replaceImages(root: HTMLElement) {
         const images = root.getElementsByTagName('img');
         for (let i = 0; i < images.length; i++) {
             const img = images[i];
-            if (img.src.startsWith('http')) {
-                continue;
-            }
             const value = this.images.get(img.src);
             if (value == null) continue;
             if (value.url == null) continue;
