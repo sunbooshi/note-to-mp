@@ -331,9 +331,14 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             })
 
             copyBtn.onclick = async() => {
-                await this.copyArticle();
-                new Notice('复制成功，请到公众号编辑器粘贴。');
-                uevent('copy');
+                try {
+                    await this.copyArticle();
+                    new Notice('复制成功，请到公众号编辑器粘贴。');
+                    uevent('copy');
+                } catch (error) {
+                    console.error(error);
+                    new Notice('复制失败: ' + error);
+                }
             }
         }
 
