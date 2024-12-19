@@ -163,6 +163,13 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 
 		this.wxInfo = this.parseWXInfo();
 
+		const helpEl = containerEl.createEl('div');
+		helpEl.style.cssText = 'display: flex;flex-direction: row;align-items: center;';
+		helpEl.createEl('h2', {text: '帮助文档'}).style.cssText = 'margin-right: 10px;';
+		helpEl.createEl('a', {text: 'https://sunboshi.tech/doc', attr: {href: 'https://sunboshi.tech/doc'}});
+
+		containerEl.createEl('h2', {text: '插件设置'});
+
 		new Setting(containerEl)
 			.setName('默认样式')
 			.addDropdown(dropdown => {
