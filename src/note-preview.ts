@@ -56,9 +56,9 @@ export class NotePreview extends ItemView implements MDRendererCallback {
     assetsManager: AssetsManager;
     articleHTML: string;
     title: string;
-    currentTheme: string;
-    currentHighlight: string;
-    currentAppId: string;
+    _currentTheme: string;
+    _currentHighlight: string;
+    _currentAppId: string;
     markedParser: MarkedParser;
     observer: MutationObserver | null = null;
     editorView: EditorView | null = null;
@@ -182,6 +182,47 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         + '<br/>Obsidian版本：' + apiVersion
         + '<br/>错误信息：<br/>'
         + `${error}`;
+    }
+
+    set currentTheme(value: string) {
+        this._currentTheme = value;
+    }
+
+    get currentTheme() {
+        const { theme } = this.getMetadata();
+        if (theme) {
+            return theme;
+        }
+        return this._currentTheme;
+    }
+
+    set currentHighlight(value: string) {
+        this._currentHighlight = value;
+    }
+
+    get currentHighlight() {
+        const { highlight } = this.getMetadata();
+        if (highlight) {
+            return highlight;
+        }
+        return this._currentHighlight;
+    }
+    
+    set currentAppId(value: string) {
+        this._currentAppId = value;
+    }
+
+    get currentAppId() {
+        const { appid } = this.getMetadata();
+        if (appid) {
+            if (appid.startsWith('wx')) {
+                return appid;
+            }
+            else {
+                return this.settings.wxInfo.find(wx => wx.name === appid)?.appid || '';
+            }
+        }
+        return this._currentAppId;
     }
 
     async renderMarkdown() {
@@ -502,7 +543,10 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             need_open_comment: undefined,
             only_fans_can_comment: undefined,
             pic_crop_235_1: undefined,
-            pic_crop_1_1: undefined
+            pic_crop_1_1: undefined,
+            appid: undefined,
+            theme: undefined,
+            highlight: undefined,
         }
         const file = this.app.workspace.getActiveFile();
         if (!file) return res;
@@ -517,6 +561,9 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             res.thumb_media_id = frontmatter['封面素材ID'];
             res.need_open_comment = frontmatter['打开评论'] ? 1 : undefined;
             res.only_fans_can_comment = frontmatter['仅粉丝可评论'] ? 1 : undefined;
+            res.appid = frontmatter['公众号'];
+            res.theme = frontmatter['样式'];
+            res.highlight = frontmatter['代码高亮'];
             if (frontmatter['封面裁剪']) {
                 res.pic_crop_235_1 = '0_0_1_0.5';
                 res.pic_crop_1_1 = '0_0.525_0.404_1';
@@ -636,6 +683,12 @@ export class NotePreview extends ItemView implements MDRendererCallback {
     }
 
     async postArticle() {
+        console.log('--------------------------');
+        console.log(this.currentAppId);
+        console.log(this.currentTheme);
+        console.log(this.currentHighlight);
+        console.log('--------------------------');
+        return;
         if (!this.settings.authKey) {
             this.showMsg('请先设置注册码（AuthKey）');
             return;

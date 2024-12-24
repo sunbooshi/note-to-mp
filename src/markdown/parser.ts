@@ -63,7 +63,7 @@ export class MarkedParser {
 	extensions: Extension[] = [];
 	marked: Marked;
 	app: App;
-  vault: Vault;
+	vault: Vault;
 
 	constructor(app: App, callback: MDRendererCallback) {
 		this.app = app;
