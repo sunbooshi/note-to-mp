@@ -683,12 +683,6 @@ export class NotePreview extends ItemView implements MDRendererCallback {
     }
 
     async postArticle() {
-        console.log('--------------------------');
-        console.log(this.currentAppId);
-        console.log(this.currentTheme);
-        console.log(this.currentHighlight);
-        console.log('--------------------------');
-        return;
         if (!this.settings.authKey) {
             this.showMsg('请先设置注册码（AuthKey）');
             return;
