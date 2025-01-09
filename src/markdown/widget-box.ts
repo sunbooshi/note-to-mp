@@ -24,6 +24,7 @@ import { Tokens, MarkedExtension } from "marked";
 import { requestUrl } from "obsidian";
 import { Extension } from "./extension";
 import { NMPSettings } from "src/settings";
+import { uevent } from "src/utils";
 
 export class WidgetBox extends Extension {
   getBoxTitle(text: string) {
@@ -76,13 +77,13 @@ export class WidgetBox extends Extension {
   }
 
   async reqContent(id: string, title: string, style: Map<string, string>, content: string) {
-    // const host = 'https://obplugin.sunboshi.tech';
-    const host = 'http://localhost:4000';
-    const path = '/math/box';
+    const host = 'https://obplugin.sunboshi.tech';
+    const path = '/math/widget';
     const url = `${host}${path}`;
     try {
-    const res = await requestUrl({
+      const res = await requestUrl({
         url,
+        throw: false,
         method: 'POST',
         contentType: 'application/json',
         headers: {
@@ -96,7 +97,6 @@ export class WidgetBox extends Extension {
         })
       })
       if (res.status === 200) {
-        console.log(res.json.content);
         return res.json.content;
       }
       return res.json.msg;
@@ -121,7 +121,6 @@ export class WidgetBox extends Extension {
   }
 
   async renderer(token: Tokens.Blockquote) {
-    console.log(token.text);
     let boxId = this.getBoxId(token.text);
     if (boxId == '') {
       const body = this.marked.parser(token.tokens);
@@ -140,9 +139,8 @@ export class WidgetBox extends Extension {
 
     this.processColor(style);
 
-    console.log(title, style, content);
     const reqContent = await this.reqContent(boxId, title, style, content);
-
+    uevent('render-widgets');
     return reqContent;
   }
 

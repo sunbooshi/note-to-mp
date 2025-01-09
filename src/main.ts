@@ -65,8 +65,8 @@ export default class NoteToMpPlugin extends Plugin {
 		this.addSettingTab(new NoteToMpSettingTab(this.app, this));
 
 		this.addCommand({
-			id: 'note-to-mp-template',
-			name: '插入样式',
+			id: 'note-to-mp-widget',
+			name: '插入样式小部件',
 			callback: () => {
 				new WidgetsModal(this.app).open();
 			}
