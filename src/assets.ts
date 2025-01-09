@@ -178,16 +178,24 @@ export default class AssetsManager {
     }
 
     getTheme(themeName: string) {
+        if (themeName === '') {
+            return this.themes[0];
+        }
+
         for (const theme of this.themes) {
-            if (theme.name === themeName || theme.className === themeName) {
+            if (theme.name.toLowerCase() === themeName.toLowerCase() || theme.className.toLowerCase() === themeName.toLowerCase()) {
                 return theme;
             }
         }
     }
 
     getHighlight(highlightName: string) {
+        if (highlightName === '') {
+            return this.highlights[0];
+        }
+
         for (const highlight of this.highlights) {
-            if (highlight.name === highlightName) {
+            if (highlight.name.toLowerCase() === highlightName.toLowerCase()) {
                 return highlight;
             }
         }

@@ -26,17 +26,17 @@ import { NMPSettings } from "src/settings";
 import { App, Vault } from "obsidian";
 import AssetsManager from "../assets";
 import { CalloutRenderer } from "./callouts";
-import { Box } from "./box";
+import { WidgetBox } from "./widget-box";
 
 export class Blockquote extends Extension {
   callout: CalloutRenderer;
-  box: Box;
+  box: WidgetBox;
 
   constructor(app: App, settings: NMPSettings, assetsManager: AssetsManager, callback: MDRendererCallback) {
     super(app, settings, assetsManager, callback);
     this.callout = new CalloutRenderer(app, settings, assetsManager, callback);
     if (settings.isAuthKeyVaild()) {
-      this.box = new Box(app, settings, assetsManager, callback);
+      this.box = new WidgetBox(app, settings, assetsManager, callback);
     }
   }
 
@@ -55,9 +55,9 @@ export class Blockquote extends Extension {
       return await this.callout.renderer(token);
     }
 
-    // if (this.box && this.box.matched(token.text)) {
-    //   return await this.box.renderer(token);
-    // }
+    if (this.box && this.box.matched(token.text)) {
+      return await this.box.renderer(token);
+    }
 
     const body = this.marked.parser(token.tokens);
     return `<blockquote>${body}</blockquote>`;

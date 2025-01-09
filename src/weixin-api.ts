@@ -121,6 +121,9 @@ export interface DraftArticle {
     only_fans_can_comment?: number;
     pic_crop_235_1?: string;
     pic_crop_1_1?: string;
+    appid?: string;
+    theme?: string;
+    highlight?: string;
 }
 
 export async function wxAddDraft(token: string, data: DraftArticle) {
