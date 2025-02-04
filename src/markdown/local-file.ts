@@ -85,15 +85,35 @@ export class LocalImageManager {
         }
     }
 
-    getImageNameFromUrl(url: string): string {
+    checkImageExt(filename: string ): boolean {
+        const name = filename.toLowerCase();
+
+        if (name.endsWith('.jpg')
+            || name.endsWith('.jpeg')
+            || name.endsWith('.png')
+            || name.endsWith('.gif')
+            || name.endsWith('.bmp')
+            || name.endsWith('.tiff')
+            || name.endsWith('.svg')
+            || name.endsWith('.webp')) {
+            return true;
+        }
+        return false;
+    }
+
+    getImageNameFromUrl(url: string, type: string): string {
         try {
             // 创建URL对象
             const urlObj = new URL(url);
             // 获取pathname部分
             const pathname = urlObj.pathname;
             // 获取最后一个/后的内容作为文件名
-            const filename = pathname.split('/').pop() || '';
-            return decodeURIComponent(filename);
+            let filename = pathname.split('/').pop() || '';
+            filename = decodeURIComponent(filename);
+            if (!this.checkImageExt(filename)) {
+                filename = filename + this.getImageExt(type);
+            }
+            return filename;
         } catch (e) {
             // 如果URL解析失败，尝试简单的字符串处理
             const queryIndex = url.indexOf('?');
@@ -124,6 +144,20 @@ export class LocalImageManager {
         return mimeToExt[mimeType] || '';
     }
 
+    getImageExt(type: string): string {
+        const mimeToExt: { [key: string]: string } = {
+            'image/jpeg': '.jpg',
+            'image/jpg': '.jpg',
+            'image/png': '.png',
+            'image/gif': '.gif',
+            'image/bmp': '.bmp',
+            'image/webp': '.webp',
+            'image/svg+xml': '.svg',
+            'image/tiff': '.tiff'
+        };
+        return mimeToExt[type] || '.jpg';
+    }
+
     async uploadRemoteImage(root: HTMLElement, token: string) {
         const images = root.getElementsByTagName('img');
         for (let i = 0; i < images.length; i++) {
@@ -131,12 +165,14 @@ export class LocalImageManager {
             if (!img.src.startsWith('http')) continue; 
             if (img.src.includes('mmbiz.qpic.cn')) continue;
 
-            const data = await requestUrl(img.src).arrayBuffer;
+            const rep = await requestUrl(img.src);
+            const data = rep.arrayBuffer;
             const blob = new Blob([data]);
-            let filename = this.getImageNameFromUrl(img.src);
+            let filename = this.getImageNameFromUrl(img.src, rep.headers['content-type']);
             if (filename == '' || filename == null) {
                 filename = 'remote_img' + this.getImageExtFromBlob(blob);
             }
+
             const res = await wxUploadImage(blob, filename, token);
             if (res.errcode != 0) {
                 const msg = `上传图片失败: ${img.src} ${res.errcode} ${res.errmsg}`;
