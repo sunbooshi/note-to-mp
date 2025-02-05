@@ -21,7 +21,7 @@
  */
 
 import { Token, Tokens, MarkedExtension } from "marked";
-import { Notice, TAbstractFile, TFile, Vault, MarkdownView, requestUrl } from "obsidian";
+import { Notice, TAbstractFile, TFile, Vault, MarkdownView, requestUrl, Platform } from "obsidian";
 import { wxUploadImage } from "../weixin-api";
 import { Extension } from "./extension";
 import { NMPSettings } from "../settings";
@@ -164,6 +164,11 @@ export class LocalImageManager {
             const img = images[i];
             if (!img.src.startsWith('http')) continue; 
             if (img.src.includes('mmbiz.qpic.cn')) continue;
+
+            // 移动端本地图片不通过src上传
+            if (img.src.startsWith('http://localhost/') && Platform.isMobileApp) {
+                continue;
+            }
 
             const rep = await requestUrl(img.src);
             const data = rep.arrayBuffer;
