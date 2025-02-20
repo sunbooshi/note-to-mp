@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Sun Booshi
+ * Copyright (c) 2024-2025 Sun Booshi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -54,6 +54,8 @@ export default class AssetsManager {
     hilightCfg: string;
     customCSSPath: string;
     iconsPath: string;
+    wasmPath: string;
+
     private static instance: AssetsManager;
 
     // 静态方法，用于获取实例
@@ -78,6 +80,7 @@ export default class AssetsManager {
         this.hilightCfg = this.assetsPath + 'highlights.json';
         this.customCSSPath = this.assetsPath + 'custom.css';
         this.iconsPath = this.assetsPath + 'icons/';
+        this.wasmPath = this.assetsPath + 'lib.wasm';
     }
 
     private constructor() {
@@ -175,6 +178,17 @@ export default class AssetsManager {
             return iconContent;
         }
         return '';
+    }
+
+    async loadWasm() {
+        if (!await this.app.vault.adapter.exists(this.wasmPath)) {
+            return null;
+        }
+        const wasmContent = await this.app.vault.adapter.readBinary(this.wasmPath);
+        if (wasmContent) {
+            return wasmContent;
+        }
+        return null;
     }
 
     getTheme(themeName: string) {
