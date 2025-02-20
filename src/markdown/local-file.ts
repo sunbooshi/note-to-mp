@@ -67,8 +67,12 @@ export class LocalImageManager {
         }
     }
 
-    isWebp(file: TFile): boolean {
-        return file.extension.toLowerCase() === 'webp';
+    isWebp(file: TFile | string): boolean {
+        if (file instanceof TFile) {
+            return file.extension.toLowerCase() === 'webp';
+        }
+        const name = file.toLowerCase();
+        return name.endsWith('.webp');
     }
 
     async uploadLocalImage(token: string, vault: Vault) {
@@ -164,12 +168,26 @@ export class LocalImageManager {
 
     async uploadImageFromUrl(url: string, token: string, type: string = '') {
         const rep = await requestUrl(url);
-        const data = rep.arrayBuffer;
-        const blob = new Blob([data]);
+
+        let data = rep.arrayBuffer;
+        let blob = new Blob([data]);
+
         let filename = this.getImageNameFromUrl(url, rep.headers['content-type']);
         if (filename == '' || filename == null) {
             filename = 'remote_img' + this.getImageExtFromBlob(blob);
         }
+
+        if (this.isWebp(filename)) {
+            if (IsWasmReady()) {
+                data = WebpToJPG(data);
+                blob = new Blob([data]);
+                filename = filename.toLowerCase().replace('.webp', '.jpg');
+            }
+            else {
+                console.error('wasm not ready for webp');
+            }
+        }
+
         return await wxUploadImage(blob, filename, token, type);
     }
 
