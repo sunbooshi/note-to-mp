@@ -21,7 +21,7 @@
  */
 
 import { Token, Tokens, MarkedExtension } from "marked";
-import { Notice, TAbstractFile, TFile, Vault, MarkdownView, requestUrl } from "obsidian";
+import { Notice, TAbstractFile, TFile, Vault, MarkdownView, requestUrl, Platform } from "obsidian";
 import { wxUploadImage } from "../weixin-api";
 import { Extension } from "./extension";
 import { NMPSettings } from "../settings";
@@ -103,15 +103,35 @@ export class LocalImageManager {
         }
     }
 
-    getImageNameFromUrl(url: string): string {
+    checkImageExt(filename: string ): boolean {
+        const name = filename.toLowerCase();
+
+        if (name.endsWith('.jpg')
+            || name.endsWith('.jpeg')
+            || name.endsWith('.png')
+            || name.endsWith('.gif')
+            || name.endsWith('.bmp')
+            || name.endsWith('.tiff')
+            || name.endsWith('.svg')
+            || name.endsWith('.webp')) {
+            return true;
+        }
+        return false;
+    }
+
+    getImageNameFromUrl(url: string, type: string): string {
         try {
             // 创建URL对象
             const urlObj = new URL(url);
             // 获取pathname部分
             const pathname = urlObj.pathname;
             // 获取最后一个/后的内容作为文件名
-            const filename = pathname.split('/').pop() || '';
-            return decodeURIComponent(filename);
+            let filename = pathname.split('/').pop() || '';
+            filename = decodeURIComponent(filename);
+            if (!this.checkImageExt(filename)) {
+                filename = filename + this.getImageExt(type);
+            }
+            return filename;
         } catch (e) {
             // 如果URL解析失败，尝试简单的字符串处理
             const queryIndex = url.indexOf('?');
@@ -143,13 +163,28 @@ export class LocalImageManager {
     }
 
     async uploadImageFromUrl(url: string, token: string, type: string = '') {
-        const data = await requestUrl(url).arrayBuffer;
+        const rep = await requestUrl(url);
+        const data = rep.arrayBuffer;
         const blob = new Blob([data]);
-        let filename = this.getImageNameFromUrl(url);
+        let filename = this.getImageNameFromUrl(url, rep.headers['content-type']);
         if (filename == '' || filename == null) {
             filename = 'remote_img' + this.getImageExtFromBlob(blob);
         }
         return await wxUploadImage(blob, filename, token, type);
+    }
+
+    getImageExt(type: string): string {
+        const mimeToExt: { [key: string]: string } = {
+            'image/jpeg': '.jpg',
+            'image/jpg': '.jpg',
+            'image/png': '.png',
+            'image/gif': '.gif',
+            'image/bmp': '.bmp',
+            'image/webp': '.webp',
+            'image/svg+xml': '.svg',
+            'image/tiff': '.tiff'
+        };
+        return mimeToExt[type] || '.jpg';
     }
 
     async uploadRemoteImage(root: HTMLElement, token: string) {
@@ -158,6 +193,10 @@ export class LocalImageManager {
             const img = images[i];
             if (!img.src.startsWith('http')) continue; 
             if (img.src.includes('mmbiz.qpic.cn')) continue;
+            // 移动端本地图片不通过src上传
+            if (img.src.startsWith('http://localhost/') && Platform.isMobileApp) {
+                continue;
+            }
 
             const res = await this.uploadImageFromUrl(img.src, token);
             if (res.errcode != 0) {
