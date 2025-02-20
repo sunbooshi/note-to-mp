@@ -25,6 +25,7 @@ import { Notice, TAbstractFile, TFile, Vault, MarkdownView, requestUrl } from "o
 import { wxUploadImage } from "../weixin-api";
 import { Extension } from "./extension";
 import { NMPSettings } from "../settings";
+import { IsWasmReady, LoadWasm, WebpToJPG } from "../wasm/wasm";
 
 declare module 'obsidian' {
     interface Vault {
@@ -66,21 +67,38 @@ export class LocalImageManager {
         }
     }
 
+    isWebp(file: TFile): boolean {
+        return file.extension.toLowerCase() === 'webp';
+    }
+
     async uploadLocalImage(token: string, vault: Vault) {
         const keys = this.images.keys();
+        await LoadWasm();
         for (let key of keys) {
             const value = this.images.get(key);
             if (value == null) continue;
             if (value.url != null) continue;
             const file = vault.getFileByPath(value.filePath);
             if (file == null) continue;
-            const fileData = await vault.readBinary(file);
-            const res = await wxUploadImage(new Blob([fileData]), file.name, token);
+            let fileData = await vault.readBinary(file);
+            let name = file.name;
+            if (this.isWebp(file)) {
+                if (IsWasmReady()) {
+                    fileData = WebpToJPG(fileData);
+                    name = name.toLowerCase().replace('.webp', '.jpg');
+                }
+                else {
+                    console.error('wasm not ready for webp');
+                }
+            }
+
+            const res = await wxUploadImage(new Blob([fileData]), name, token);
             if (res.errcode != 0) {
                 const msg = `上传图片失败: ${res.errcode} ${res.errmsg}`;
                 new Notice(msg);
                 console.error(msg);
             }
+
             value.url = res.url;
         }
     }
@@ -124,6 +142,16 @@ export class LocalImageManager {
         return mimeToExt[mimeType] || '';
     }
 
+    async uploadImageFromUrl(url: string, token: string, type: string = '') {
+        const data = await requestUrl(url).arrayBuffer;
+        const blob = new Blob([data]);
+        let filename = this.getImageNameFromUrl(url);
+        if (filename == '' || filename == null) {
+            filename = 'remote_img' + this.getImageExtFromBlob(blob);
+        }
+        return await wxUploadImage(blob, filename, token, type);
+    }
+
     async uploadRemoteImage(root: HTMLElement, token: string) {
         const images = root.getElementsByTagName('img');
         for (let i = 0; i < images.length; i++) {
@@ -131,13 +159,7 @@ export class LocalImageManager {
             if (!img.src.startsWith('http')) continue; 
             if (img.src.includes('mmbiz.qpic.cn')) continue;
 
-            const data = await requestUrl(img.src).arrayBuffer;
-            const blob = new Blob([data]);
-            let filename = this.getImageNameFromUrl(img.src);
-            if (filename == '' || filename == null) {
-                filename = 'remote_img' + this.getImageExtFromBlob(blob);
-            }
-            const res = await wxUploadImage(blob, filename, token);
+            const res = await this.uploadImageFromUrl(img.src, token);
             if (res.errcode != 0) {
                 const msg = `上传图片失败: ${img.src} ${res.errcode} ${res.errmsg}`;
                 new Notice(msg);
