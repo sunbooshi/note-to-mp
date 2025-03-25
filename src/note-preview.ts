@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Sun Booshi
+ * Copyright (c) 2024-2025 Sun Booshi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -646,24 +646,30 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             return;
         }
         this.showLoading('上传图片中...');
-        // 获取token
-        const token = await this.getToken();
-        if (token === '') {
-            return;
+
+        try {
+            // 获取token
+            const token = await this.getToken();
+            if (token === '') {
+                return;
+            }
+
+            const lm = LocalImageManager.getInstance();
+            // 上传图片
+            await lm.uploadLocalImage(token, this.app.vault);
+            // 上传图床图片
+            await lm.uploadRemoteImage(this.articleDiv, token);
+            // 替换图片链接
+            lm.replaceImages(this.articleDiv);
+            // 上传Mermaid图片
+            await CodeRenderer.uploadMermaidImages(this.articleDiv, token);
+
+            await this.copyArticle();
+            this.showMsg('图片已上传，并且已复制，请到公众号编辑器粘贴。');
+        } catch (error) {
+            console.error(error);
+            this.showMsg('上传图片失败: ' + error.message);
         }
-
-        const lm = LocalImageManager.getInstance();
-        // 上传图片
-        await lm.uploadLocalImage(token, this.app.vault);
-        // 上传图床图片
-        await lm.uploadRemoteImage(this.articleDiv, token);
-        // 替换图片链接
-        lm.replaceImages(this.articleDiv);
-        // 上传Mermaid图片
-        await CodeRenderer.uploadMermaidImages(this.articleDiv, token);
-
-        await this.copyArticle();
-        this.showMsg('图片已上传，并且已复制，请到公众号编辑器粘贴。');
     }
 
     async copyArticle() {
@@ -714,7 +720,18 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             if (!mediaId) {
                 if (metadata.cover) {
                     // 上传仓库里的图片
-                    mediaId = await this.uploadVaultCover(metadata.cover, token);
+                    if (metadata.cover.startsWith('http')) {
+                        const res = await LocalImageManager.getInstance().uploadImageFromUrl(metadata.cover, token, 'image');
+                        if (res.media_id) {
+                            mediaId = res.media_id;
+                        }
+                        else {
+                            throw new Error('上传封面失败:' + res.errmsg);
+                        }
+                    }
+                    else {
+                        mediaId = await this.uploadVaultCover(metadata.cover, token);
+                    }
                 }
                 else if (this.useLocalCover.checked) {
                     mediaId = await this.uploadLocalCover(token);
