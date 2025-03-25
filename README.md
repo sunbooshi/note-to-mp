@@ -352,7 +352,7 @@ section .note-callout-example {
 
 公众号卡片内容需要从已发布并且包含公众号卡片的文章中获取，然后在公众号中回复卡片，会获得一个链接，点击链接，在其中输入包含公众号卡片的文章链接，点击获取即可获得公众号卡片代码，点击复制将内容粘贴到Obsidian中，插件就可以在文章中插入公众号卡片了。详细的操作视频如下：
 
-<iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=113006126107328&bvid=BV1rPW7eqEUH&cid=500001658617131&p=1&autoplay=0" width="640" height="360" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+https://www.bilibili.com/video/BV1rPW7eqEUH/
 
 
 ### 设置图片大小
@@ -380,8 +380,7 @@ NoteToMP插件支持该语法。
 在NoteToMP插件中有两种展示文件嵌入内容的样式，一种是引用，也就是Obsidian默认的方式，一种是正文，相当于模板的方式。与模板不同的是，采用嵌入方式内容会跟随被嵌入文件的内容更改。
 
 ### 插入SVG图标
-
-<iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=113005807341086&bvid=BV15XWVeEEJa&cid=500001658511185&p=1&autoplay=0"  width="640" height="360" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+https://www.bilibili.com/video/BV15XWVeEEJa/
 
 ### 摘要、封面裁剪、原文链接等
 ```yaml
@@ -400,7 +399,7 @@ NoteToMP插件支持该语法。
 ---
 ```
 
-<iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=113005807338524&bvid=BV15XWVeEEmA&cid=500001658510987&p=1&autoplay=0" width="640" height="360" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+视频教程：https://www.bilibili.com/video/BV15XWVeEEmA/
 
 ## 5、反馈交流群
 
