@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Sun Booshi
+ * Copyright (c) 2024-2025 Sun Booshi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@ const markedOptiones = {
 const customRenderer = {
 	heading(text: string, level: number, raw: string): string {
 		// ignore IDs
-		return `<h${level}><span class="h-prefix"></span><span class="h-content">${text}</span><span class="h-suffix"></span></h${level}>`;
+		return `<h${level}>${text}</h${level}>`;
 	},
 	hr(): string {
 		return '<hr>';

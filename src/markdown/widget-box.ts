@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Sun Booshi
+ * Copyright (c) 2024-2025 Sun Booshi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,40 @@ import { Extension } from "./extension";
 import { NMPSettings } from "src/settings";
 import { uevent } from "src/utils";
 
+const widgetCache = new Map<string, string>();
+
+export function cleanWidgetCache() {
+  widgetCache.clear();
+}
+
 export class WidgetBox extends Extension {
+  mapToString(map: Map<string, string>): string {
+    if (map.size === 0) return "";
+    
+    return Array.from(map.entries())
+        .map(([key, value]) => `${key}=${value}`)
+        .join("&"); // 用 "&" 连接键值对，可换成其他分隔符
+  }
+
+  calcKey(id: string, title: string, style: Map<string, string>, content: string) {
+    const styleStr = this.mapToString(style);
+    const key = `${id}-${title}-${styleStr}-${content}`;
+    return key; 
+  }
+
+  cacheWidget(id: string, title: string, style: Map<string, string>, content: string, result: string) {
+    const key = this.calcKey(id, title, style, content);
+    widgetCache.set(key, result);
+  }
+
+  getWidget(id: string, title: string, style: Map<string, string>, content: string) {
+    const key = this.calcKey(id, title, style, content);
+    if (!widgetCache.has(key)) {
+      return null;
+    }
+    return widgetCache.get(key);  
+  }
+
   getBoxTitle(text: string) {
     let start = text.indexOf(']') + 1;
     let end = text.indexOf('\n');
@@ -139,9 +172,17 @@ export class WidgetBox extends Extension {
 
     this.processColor(style);
 
-    const reqContent = await this.reqContent(boxId, title, style, content);
-    uevent('render-widgets');
-    return reqContent;
+    const cached = this.getWidget(boxId, title, style, content);
+    if (cached) {
+      uevent('render-widgets-cached');
+      return cached;
+    }
+    else {
+      const reqContent = await this.reqContent(boxId, title, style, content);
+      this.cacheWidget(boxId, title, style, content, reqContent);
+      uevent('render-widgets');
+      return reqContent; 
+    }
   }
 
   markedExtension(): MarkedExtension {

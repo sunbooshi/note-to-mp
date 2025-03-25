@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Sun Booshi
+ * Copyright (c) 2024-2025 Sun Booshi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,10 +21,11 @@
  */
 
 import { Token, Tokens, MarkedExtension } from "marked";
-import { Notice, TAbstractFile, TFile, Vault, MarkdownView, requestUrl } from "obsidian";
+import { Notice, TAbstractFile, TFile, Vault, MarkdownView, requestUrl, Platform } from "obsidian";
 import { wxUploadImage } from "../weixin-api";
 import { Extension } from "./extension";
 import { NMPSettings } from "../settings";
+import { IsWasmReady, LoadWasm, WebpToJPG } from "../wasm/wasm";
 
 declare module 'obsidian' {
     interface Vault {
@@ -66,34 +67,75 @@ export class LocalImageManager {
         }
     }
 
+    isWebp(file: TFile | string): boolean {
+        if (file instanceof TFile) {
+            return file.extension.toLowerCase() === 'webp';
+        }
+        const name = file.toLowerCase();
+        return name.endsWith('.webp');
+    }
+
     async uploadLocalImage(token: string, vault: Vault) {
         const keys = this.images.keys();
+        await LoadWasm();
         for (let key of keys) {
             const value = this.images.get(key);
             if (value == null) continue;
             if (value.url != null) continue;
             const file = vault.getFileByPath(value.filePath);
             if (file == null) continue;
-            const fileData = await vault.readBinary(file);
-            const res = await wxUploadImage(new Blob([fileData]), file.name, token);
+            let fileData = await vault.readBinary(file);
+            let name = file.name;
+            if (this.isWebp(file)) {
+                if (IsWasmReady()) {
+                    fileData = WebpToJPG(fileData);
+                    name = name.toLowerCase().replace('.webp', '.jpg');
+                }
+                else {
+                    console.error('wasm not ready for webp');
+                }
+            }
+
+            const res = await wxUploadImage(new Blob([fileData]), name, token);
             if (res.errcode != 0) {
                 const msg = `上传图片失败: ${res.errcode} ${res.errmsg}`;
                 new Notice(msg);
                 console.error(msg);
             }
+
             value.url = res.url;
         }
     }
 
-    getImageNameFromUrl(url: string): string {
+    checkImageExt(filename: string ): boolean {
+        const name = filename.toLowerCase();
+
+        if (name.endsWith('.jpg')
+            || name.endsWith('.jpeg')
+            || name.endsWith('.png')
+            || name.endsWith('.gif')
+            || name.endsWith('.bmp')
+            || name.endsWith('.tiff')
+            || name.endsWith('.svg')
+            || name.endsWith('.webp')) {
+            return true;
+        }
+        return false;
+    }
+
+    getImageNameFromUrl(url: string, type: string): string {
         try {
             // 创建URL对象
             const urlObj = new URL(url);
             // 获取pathname部分
             const pathname = urlObj.pathname;
             // 获取最后一个/后的内容作为文件名
-            const filename = pathname.split('/').pop() || '';
-            return decodeURIComponent(filename);
+            let filename = pathname.split('/').pop() || '';
+            filename = decodeURIComponent(filename);
+            if (!this.checkImageExt(filename)) {
+                filename = filename + this.getImageExt(type);
+            }
+            return filename;
         } catch (e) {
             // 如果URL解析失败，尝试简单的字符串处理
             const queryIndex = url.indexOf('?');
@@ -124,20 +166,57 @@ export class LocalImageManager {
         return mimeToExt[mimeType] || '';
     }
 
+    async uploadImageFromUrl(url: string, token: string, type: string = '') {
+        const rep = await requestUrl(url);
+
+        let data = rep.arrayBuffer;
+        let blob = new Blob([data]);
+
+        let filename = this.getImageNameFromUrl(url, rep.headers['content-type']);
+        if (filename == '' || filename == null) {
+            filename = 'remote_img' + this.getImageExtFromBlob(blob);
+        }
+
+        if (this.isWebp(filename)) {
+            if (IsWasmReady()) {
+                data = WebpToJPG(data);
+                blob = new Blob([data]);
+                filename = filename.toLowerCase().replace('.webp', '.jpg');
+            }
+            else {
+                console.error('wasm not ready for webp');
+            }
+        }
+
+        return await wxUploadImage(blob, filename, token, type);
+    }
+
+    getImageExt(type: string): string {
+        const mimeToExt: { [key: string]: string } = {
+            'image/jpeg': '.jpg',
+            'image/jpg': '.jpg',
+            'image/png': '.png',
+            'image/gif': '.gif',
+            'image/bmp': '.bmp',
+            'image/webp': '.webp',
+            'image/svg+xml': '.svg',
+            'image/tiff': '.tiff'
+        };
+        return mimeToExt[type] || '.jpg';
+    }
+
     async uploadRemoteImage(root: HTMLElement, token: string) {
         const images = root.getElementsByTagName('img');
         for (let i = 0; i < images.length; i++) {
             const img = images[i];
             if (!img.src.startsWith('http')) continue; 
             if (img.src.includes('mmbiz.qpic.cn')) continue;
-
-            const data = await requestUrl(img.src).arrayBuffer;
-            const blob = new Blob([data]);
-            let filename = this.getImageNameFromUrl(img.src);
-            if (filename == '' || filename == null) {
-                filename = 'remote_img' + this.getImageExtFromBlob(blob);
+            // 移动端本地图片不通过src上传
+            if (img.src.startsWith('http://localhost/') && Platform.isMobileApp) {
+                continue;
             }
-            const res = await wxUploadImage(blob, filename, token);
+
+            const res = await this.uploadImageFromUrl(img.src, token);
             if (res.errcode != 0) {
                 const msg = `上传图片失败: ${img.src} ${res.errcode} ${res.errmsg}`;
                 new Notice(msg);
