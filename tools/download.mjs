@@ -22,6 +22,7 @@
 
 import fs from 'node:fs';
 import https from 'node:https';
+import { exec } from 'node:child_process';
 
 // 仓库信息
 const owner = 'sunbooshi';
@@ -54,18 +55,13 @@ https.get(apiUrl, { headers: { 'User-Agent': 'Node.js' } }, (apiRes) => {
             const downloadUrl = asset.browser_download_url;
             console.log(`找到 ${assetName}，下载链接: ${downloadUrl}`);
 
-            // 下载文件
-            const file = fs.createWriteStream(assetName);
-            https.get(downloadUrl, (downloadRes) => {
-                downloadRes.pipe(file);
-
-                file.on('finish', () => {
-                    file.close();
-                    console.log(`${assetName} 下载完成！`);
-                });
-            }).on('error', (err) => {
-                fs.unlink(assetName, () => {}); // 删除文件
-                console.error(`下载失败: ${err.message}`);
+            // 使用系统 wget 命令下载
+            exec(`wget "${downloadUrl}" -O "${assetName}"`, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`下载失败: ${error}`);
+                    return;
+                }
+                console.log(`${assetName} 下载完成！`);
             });
         } catch (err) {
             console.error('解析 API 响应失败:', err);
