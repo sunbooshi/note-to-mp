@@ -27,7 +27,7 @@ import { wxUploadImage } from './weixin-api';
 import { NMPSettings } from './settings';
 import AssetsManager from './assets';
 import InlineCSS from './inline-css';
-import { wxGetToken, wxAddDraft, wxBatchGetMaterial, DraftArticle } from './weixin-api';
+import { wxGetToken, wxAddDraft, wxBatchGetMaterial, DraftArticle, DraftImageMediaId, DraftImages, wxAddDraftImages } from './weixin-api';
 import { MDRendererCallback } from './markdown/extension';
 import { MarkedParser } from './markdown/parser';
 import { LocalImageManager, LocalFile } from './markdown/local-file';
@@ -287,6 +287,10 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         return CardDataManager.getInstance().restoreCard(html);
     }
 
+    getArticleText() {
+       return this.articleDiv.innerText.trimStart();
+    }
+
     getCSS() {
         try {
             const theme = this.assetsManager.getTheme(this.currentTheme);
@@ -399,6 +403,15 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         postBtn.onclick = async() => {
             await this.postArticle();
             uevent('pub');
+        }
+
+        const imagesBtn = lineDiv.createEl('button', { cls: 'copy-button' }, async (button) => {
+            button.setText('图片/文字');
+        })
+
+        imagesBtn.onclick = async() => {
+            await this.postImages();
+            uevent('pub-images');
         }
 
         const refreshBtn = lineDiv.createEl('button', { cls: 'refresh-button' }, async (button) => {
@@ -756,6 +769,81 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             if (res.status != 200) {
                 console.error(res.text);
                 this.showMsg(`创建草稿失败, https状态码: ${res.status} 可能是文章包含异常内容，请尝试手动复制到公众号编辑器！`);
+                return;
+            }
+
+            const draft = res.json;
+            if (draft.media_id) {
+                this.showMsg('发布成功!');
+            }
+            else {
+                console.error(JSON.stringify(draft));
+                this.showMsg('发布失败!'+draft.errmsg);
+            }
+        } catch (error) {
+            console.error(error);
+            this.showMsg('发布失败!'+error.message);
+        }
+    }
+
+    async postImages() {
+        if (!this.settings.authKey) {
+            this.showMsg('请先设置注册码（AuthKey）');
+            return;
+        }
+        if (this.currentAppId === '') {
+            this.showMsg('请先选择公众号');
+            return;
+        }
+        this.showLoading('上传中...');
+        try {
+            // 获取token
+            const token = await this.getToken();
+            if (token === '') {
+                this.showMsg('获取token失败,请检查网络链接!');
+                return;
+            }
+            let metadata = this.getMetadata();
+            const imageList:DraftImageMediaId[] = [];
+            const lm = LocalImageManager.getInstance();
+            // 上传图片
+            const localImages = await lm.uploadLocalImage(token, this.app.vault, 'image');
+            for (const image of localImages) {
+                imageList.push({
+                    image_media_id: image.media_id,
+                }); 
+            }
+            // 上传图床图片
+            const remoteImages = await lm.uploadRemoteImage(this.articleDiv, token, 'image');
+            for (const image of remoteImages) {
+                imageList.push({
+                    image_media_id: image.media_id,
+                }); 
+            }
+
+            const content = this.getArticleText();
+
+            if (imageList.length === 0) {
+                this.showMsg('没有图片需要发布!');
+                return; 
+            }
+            
+            const imagesData: DraftImages = {
+                article_type: 'newspic',
+                title: metadata.title || this.title,
+                content: content, 
+                need_open_commnet: metadata.need_open_comment || 0,
+                only_fans_can_comment: metadata.only_fans_can_comment || 0,
+                image_info: {
+                    image_list: imageList, 
+                }
+            }
+            // 创建草稿
+            const res = await wxAddDraftImages(token, imagesData);
+
+            if (res.status != 200) {
+                console.error(res.text);
+                this.showMsg(`创建图片/文字失败, https状态码: ${res.status}  ${res.text}！`);
                 return;
             }
 

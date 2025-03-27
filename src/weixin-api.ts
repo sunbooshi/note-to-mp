@@ -151,6 +151,37 @@ export async function wxAddDraft(token: string, data: DraftArticle) {
     return res;
 }
 
+export interface DraftImageMediaId {
+    image_media_id: string;
+}
+
+export interface DraftImageInfo {
+    image_list: DraftImageMediaId[];
+}
+
+export interface DraftImages {
+    article_type: string;
+    title: string;
+    content: string;
+    need_open_commnet: number;
+    only_fans_can_comment: number;
+    image_info: DraftImageInfo;
+}
+
+export async function wxAddDraftImages(token: string, data: DraftImages) {
+    const url = 'https://api.weixin.qq.com/cgi-bin/draft/add?access_token=' + token;
+    const body = {articles:[data]};
+
+    const res = await requestUrl({
+        method: 'POST',
+        url: url,
+        throw: false,
+        body: JSON.stringify(body)
+    });
+
+    return res;
+}
+
 export async function wxBatchGetMaterial(token: string, type: string, offset: number = 0, count: number = 10) {
     const url = 'https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token=' + token;
     const body = {

@@ -75,9 +75,10 @@ export class LocalImageManager {
         return name.endsWith('.webp');
     }
 
-    async uploadLocalImage(token: string, vault: Vault) {
+    async uploadLocalImage(token: string, vault: Vault, type: string = '') {
         const keys = this.images.keys();
         await LoadWasm();
+        const result = [];
         for (let key of keys) {
             const value = this.images.get(key);
             if (value == null) continue;
@@ -96,7 +97,7 @@ export class LocalImageManager {
                 }
             }
 
-            const res = await wxUploadImage(new Blob([fileData]), name, token);
+            const res = await wxUploadImage(new Blob([fileData]), name, token, type);
             if (res.errcode != 0) {
                 const msg = `上传图片失败: ${res.errcode} ${res.errmsg}`;
                 new Notice(msg);
@@ -104,7 +105,9 @@ export class LocalImageManager {
             }
 
             value.url = res.url;
+            result.push(res);
         }
+        return result;
     }
 
     checkImageExt(filename: string ): boolean {
@@ -205,8 +208,9 @@ export class LocalImageManager {
         return mimeToExt[type] || '.jpg';
     }
 
-    async uploadRemoteImage(root: HTMLElement, token: string) {
+    async uploadRemoteImage(root: HTMLElement, token: string, type: string = '') {
         const images = root.getElementsByTagName('img');
+        const result = [];
         for (let i = 0; i < images.length; i++) {
             const img = images[i];
             if (!img.src.startsWith('http')) continue; 
@@ -216,7 +220,7 @@ export class LocalImageManager {
                 continue;
             }
 
-            const res = await this.uploadImageFromUrl(img.src, token);
+            const res = await this.uploadImageFromUrl(img.src, token, type);
             if (res.errcode != 0) {
                 const msg = `上传图片失败: ${img.src} ${res.errcode} ${res.errmsg}`;
                 new Notice(msg);
@@ -229,7 +233,9 @@ export class LocalImageManager {
                 url: res.url
             };
             this.images.set(img.src, info);
+            result.push(res);
         }
+        return result;
     }
 
     replaceImages(root: HTMLElement) {
