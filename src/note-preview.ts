@@ -23,7 +23,7 @@
 import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, sanitizeHTMLToDom, apiVersion, TFile, Platform, Editor, MarkdownView, MarkdownFileInfo } from 'obsidian';
 import { EditorView } from "@codemirror/view";
 import { applyCSS, uevent } from './utils';
-import { wxUploadImage } from './weixin-api';
+import { UploadImageToWx } from './imagelib';
 import { NMPSettings } from './settings';
 import AssetsManager from './assets';
 import InlineCSS from './inline-css';
@@ -619,7 +619,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
     }
 
     async uploadCover(data: Blob, filename: string, token: string,) {
-        const res = await wxUploadImage(data, filename, token, 'image');
+        const res = await UploadImageToWx(data, filename, token, 'image');
         if (res.media_id) {
             return res.media_id;
         }

@@ -35,6 +35,7 @@ export class NMPSettings {
     math: string;
     expireat: Date | null = null;
     baseCSS: string;
+    watermark: string;
 
     private static instance: NMPSettings;
 
@@ -58,6 +59,7 @@ export class NMPSettings {
         this.wxInfo = [];
         this.math = 'latex';
         this.baseCSS = '';
+        this.watermark = '';
     }
 
     resetStyelAndHighlight() {
@@ -81,6 +83,7 @@ export class NMPSettings {
             math,
             useCustomCss,
             baseCSS,
+            logo,
         } = data;
 
         const settings = NMPSettings.getInstance();
@@ -117,6 +120,9 @@ export class NMPSettings {
         if (baseCSS) {
             settings.baseCSS = baseCSS;
         }
+        if (logo) {
+            settings.watermark = logo;
+        }
         settings.getExpiredDate();
     }
 
@@ -134,6 +140,7 @@ export class NMPSettings {
             'math': settings.math,
             'useCustomCss': settings.useCustomCss,
             'baseCSS': settings.baseCSS,
+            'logo': settings.watermark,
         }
     }
 

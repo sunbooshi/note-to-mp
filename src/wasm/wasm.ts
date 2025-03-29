@@ -33,9 +33,6 @@ declare class Go {
   run(instance: WebAssembly.Instance): Promise<void>;
 }
 
-declare function GoWebpToJPG(data: ArrayBuffer): ArrayBuffer;
-declare function GoWebpToPNG(data: ArrayBuffer): ArrayBuffer;
-
 let WasmLoaded = false;
 
 export function IsWasmReady() {
@@ -58,12 +55,4 @@ export async function LoadWasm() {
     const ret = await WebAssembly.instantiate(wasmContent, go.importObject);
     go.run(ret.instance);
     WasmLoaded = true;
-}
-
-export function WebpToJPG(data: ArrayBuffer): ArrayBuffer {
-    return GoWebpToJPG(new Uint8Array(data));
-}
-
-export function WebpToPNG(data: ArrayBuffer): ArrayBuffer {
-    return GoWebpToPNG(data);
 }

@@ -22,10 +22,9 @@
 
 import { Token, Tokens, MarkedExtension } from "marked";
 import { Notice, TAbstractFile, TFile, Vault, MarkdownView, requestUrl, Platform } from "obsidian";
-import { wxUploadImage } from "../weixin-api";
 import { Extension } from "./extension";
 import { NMPSettings } from "../settings";
-import { IsWasmReady, LoadWasm, WebpToJPG } from "../wasm/wasm";
+import { IsImageLibReady, PrepareImageLib, WebpToJPG, UploadImageToWx } from "../imagelib";
 
 declare module 'obsidian' {
     interface Vault {
@@ -77,7 +76,7 @@ export class LocalImageManager {
 
     async uploadLocalImage(token: string, vault: Vault, type: string = '') {
         const keys = this.images.keys();
-        await LoadWasm();
+        await PrepareImageLib();
         const result = [];
         for (let key of keys) {
             const value = this.images.get(key);
@@ -88,7 +87,7 @@ export class LocalImageManager {
             let fileData = await vault.readBinary(file);
             let name = file.name;
             if (this.isWebp(file)) {
-                if (IsWasmReady()) {
+                if (IsImageLibReady()) {
                     fileData = WebpToJPG(fileData);
                     name = name.toLowerCase().replace('.webp', '.jpg');
                 }
@@ -97,7 +96,7 @@ export class LocalImageManager {
                 }
             }
 
-            const res = await wxUploadImage(new Blob([fileData]), name, token, type);
+            const res = await UploadImageToWx(new Blob([fileData]), name, token, type);
             if (res.errcode != 0) {
                 const msg = `上传图片失败: ${res.errcode} ${res.errmsg}`;
                 new Notice(msg);
@@ -171,7 +170,7 @@ export class LocalImageManager {
 
     async uploadImageFromUrl(url: string, token: string, type: string = '') {
         const rep = await requestUrl(url);
-
+        await PrepareImageLib();
         let data = rep.arrayBuffer;
         let blob = new Blob([data]);
 
@@ -181,7 +180,7 @@ export class LocalImageManager {
         }
 
         if (this.isWebp(filename)) {
-            if (IsWasmReady()) {
+            if (IsImageLibReady()) {
                 data = WebpToJPG(data);
                 blob = new Blob([data]);
                 filename = filename.toLowerCase().replace('.webp', '.jpg');
@@ -191,7 +190,7 @@ export class LocalImageManager {
             }
         }
 
-        return await wxUploadImage(blob, filename, token, type);
+        return await UploadImageToWx(blob, filename, token, type);
     }
 
     getImageExt(type: string): string {

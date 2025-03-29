@@ -257,6 +257,18 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			})
 
 		new Setting(containerEl)
+			.setName('水印图片')
+			.addText(text => {
+			    text.setPlaceholder('请输入图片名称')
+					.setValue(this.settings.watermark)
+					.onChange(async (value) => {
+					  this.settings.watermark = value.trim();
+						await this.plugin.saveSettings();
+					})
+					.inputEl.setAttr('style', 'width: 320px;')
+			})
+
+		new Setting(containerEl)
 			.setName('获取更多主题')
 			.addButton(button => {
 			    button.setButtonText('下载');
