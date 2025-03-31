@@ -36,6 +36,7 @@ export class NMPSettings {
     expireat: Date | null = null;
     baseCSS: string;
     watermark: string;
+    useFigcaption: boolean;
 
     private static instance: NMPSettings;
 
@@ -60,6 +61,7 @@ export class NMPSettings {
         this.math = 'latex';
         this.baseCSS = '';
         this.watermark = '';
+        this.useFigcaption = false;
     }
 
     resetStyelAndHighlight() {
@@ -83,7 +85,8 @@ export class NMPSettings {
             math,
             useCustomCss,
             baseCSS,
-            logo,
+            watermark,
+            useFigcaption,
         } = data;
 
         const settings = NMPSettings.getInstance();
@@ -120,8 +123,11 @@ export class NMPSettings {
         if (baseCSS) {
             settings.baseCSS = baseCSS;
         }
-        if (logo) {
-            settings.watermark = logo;
+        if (watermark) {
+            settings.watermark = watermark;
+        }
+        if (useFigcaption!== undefined) {
+            settings.useFigcaption = useFigcaption;
         }
         settings.getExpiredDate();
     }
@@ -140,7 +146,8 @@ export class NMPSettings {
             'math': settings.math,
             'useCustomCss': settings.useCustomCss,
             'baseCSS': settings.baseCSS,
-            'logo': settings.watermark,
+            'watermark': settings.watermark,
+            'useFigcaption': settings.useFigcaption,
         }
     }
 

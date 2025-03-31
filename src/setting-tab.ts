@@ -255,6 +255,16 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 			})
+		
+		new Setting(containerEl)
+		.setName('渲染图片标题')
+		.addToggle(toggle => {
+			toggle.setValue(this.settings.useFigcaption);
+			toggle.onChange(async (value) => {
+				this.settings.useFigcaption = value;
+				await this.plugin.saveSettings();
+			});
+		})
 
 		new Setting(containerEl)
 			.setName('水印图片')

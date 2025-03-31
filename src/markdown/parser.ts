@@ -31,9 +31,10 @@ import { CodeRenderer } from "./code";
 import { EmbedBlockMark } from "./embed-block-mark";
 import { SVGIcon } from "./icons";
 import { LinkRenderer } from "./link";
-import { LocalFile } from "./local-file";
+import { LocalFile, LocalImageManager } from "./local-file";
 import { MathRenderer } from "./math";
 import { TextHighlight } from "./text-highlight";
+import { cleanUrl } from "../utils";
 
 
 const markedOptiones = {
@@ -56,7 +57,48 @@ const customRenderer = {
 	},
 	listitem(text: string, task: boolean, checked: boolean): string {
 		return `<li>${text}</li>`;
-	}
+	},
+	image(href: string, title: string | null, text: string): string {
+    const cleanHref = cleanUrl(href);
+    if (cleanHref === null) {
+      return text;
+    }
+    href = cleanHref;
+
+		if (!href.startsWith('http')) {
+			const res = AssetsManager.getInstance().getResourcePath(href);
+			if (res) {
+				href = res.resUrl;
+				const info = {
+					resUrl: res.resUrl,
+					filePath: res.filePath,
+					url: null
+				};
+				LocalImageManager.getInstance().setImage(res.resUrl, info);	
+			}
+		}
+		let out = '';
+		if (NMPSettings.getInstance().useFigcaption) {
+			out = `<figure style="display: flex; flex-direction: column; align-items: center;"><img src="${href}" alt="${text}"`;
+			if (title) {
+				out += ` title="${title}"`;
+			}
+			if (text.length > 0) {
+				out += `><figcaption>${text}</figcaption></figure>`;
+			}
+			else {
+				out += '></figure>'
+			}
+		}
+		else {
+			out = `<img src="${href}" alt="${text}"`;
+			if (title) {
+				out += ` title="${title}"`;
+			}
+			out += '>';
+		}
+    return out;
+  }
 };
 
 export class MarkedParser {

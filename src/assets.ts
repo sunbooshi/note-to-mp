@@ -345,6 +345,15 @@ export default class AssetsManager {
         return null;
     }
 
+    getResourcePath(path: string): {resUrl:string, filePath:string}|null {
+        const file = this.searchFile(path) as TFile;
+        if (file == null) {
+            return null;
+        }
+        const resUrl = this.app.vault.getResourcePath(file);
+        return {resUrl, filePath: file.path};
+    }
+
     resolvePath(relativePath: string): string {
         const basePath = this.getActiveFileDir();
         if (!relativePath.includes('/')) {

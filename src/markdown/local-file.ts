@@ -264,21 +264,18 @@ export class LocalFile extends Extension{
     }
 
     getImagePath(path: string) {
-        const file = this.assetsManager.searchFile(path);
-
-        if (file == null) {
+        const res = this.assetsManager.getResourcePath(path);
+        if (res == null) {
             console.error('找不到文件：' + path);
             return '';
         }
-
-        const resPath = this.app.vault.getResourcePath(file as TFile);
         const info = {
-            resUrl: resPath,
-            filePath: file.path,
+            resUrl: res.resUrl,
+            filePath: res.filePath,
             url: null
         };
-        LocalImageManager.getInstance().setImage(resPath, info);
-        return resPath;
+        LocalImageManager.getInstance().setImage(res.resUrl, info);
+        return res.resUrl;
     }
 
     isImage(file: string) {
