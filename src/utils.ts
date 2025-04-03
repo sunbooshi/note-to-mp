@@ -180,3 +180,12 @@ export function debounce<T extends (...args: any[]) => any>(func: T, wait: numbe
 		timeout = setTimeout(later, wait);
 	};
 }
+
+export function cleanUrl(href: string) {
+  try {
+    href = encodeURI(href).replace(/%25/g, '%');
+  } catch (e) {
+    return null;
+  }
+  return href;
+}

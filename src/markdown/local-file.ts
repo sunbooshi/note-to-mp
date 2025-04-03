@@ -22,10 +22,9 @@
 
 import { Token, Tokens, MarkedExtension } from "marked";
 import { Notice, TAbstractFile, TFile, Vault, MarkdownView, requestUrl, Platform } from "obsidian";
-import { wxUploadImage } from "../weixin-api";
 import { Extension } from "./extension";
 import { NMPSettings } from "../settings";
-import { IsWasmReady, LoadWasm, WebpToJPG } from "../wasm/wasm";
+import { IsImageLibReady, PrepareImageLib, WebpToJPG, UploadImageToWx } from "../imagelib";
 
 declare module 'obsidian' {
     interface Vault {
@@ -75,9 +74,10 @@ export class LocalImageManager {
         return name.endsWith('.webp');
     }
 
-    async uploadLocalImage(token: string, vault: Vault) {
+    async uploadLocalImage(token: string, vault: Vault, type: string = '') {
         const keys = this.images.keys();
-        await LoadWasm();
+        await PrepareImageLib();
+        const result = [];
         for (let key of keys) {
             const value = this.images.get(key);
             if (value == null) continue;
@@ -87,7 +87,7 @@ export class LocalImageManager {
             let fileData = await vault.readBinary(file);
             let name = file.name;
             if (this.isWebp(file)) {
-                if (IsWasmReady()) {
+                if (IsImageLibReady()) {
                     fileData = WebpToJPG(fileData);
                     name = name.toLowerCase().replace('.webp', '.jpg');
                 }
@@ -96,7 +96,7 @@ export class LocalImageManager {
                 }
             }
 
-            const res = await wxUploadImage(new Blob([fileData]), name, token);
+            const res = await UploadImageToWx(new Blob([fileData]), name, token, type);
             if (res.errcode != 0) {
                 const msg = `上传图片失败: ${res.errcode} ${res.errmsg}`;
                 new Notice(msg);
@@ -104,7 +104,9 @@ export class LocalImageManager {
             }
 
             value.url = res.url;
+            result.push(res);
         }
+        return result;
     }
 
     checkImageExt(filename: string ): boolean {
@@ -168,7 +170,7 @@ export class LocalImageManager {
 
     async uploadImageFromUrl(url: string, token: string, type: string = '') {
         const rep = await requestUrl(url);
-
+        await PrepareImageLib();
         let data = rep.arrayBuffer;
         let blob = new Blob([data]);
 
@@ -178,7 +180,7 @@ export class LocalImageManager {
         }
 
         if (this.isWebp(filename)) {
-            if (IsWasmReady()) {
+            if (IsImageLibReady()) {
                 data = WebpToJPG(data);
                 blob = new Blob([data]);
                 filename = filename.toLowerCase().replace('.webp', '.jpg');
@@ -188,7 +190,7 @@ export class LocalImageManager {
             }
         }
 
-        return await wxUploadImage(blob, filename, token, type);
+        return await UploadImageToWx(blob, filename, token, type);
     }
 
     getImageExt(type: string): string {
@@ -205,8 +207,9 @@ export class LocalImageManager {
         return mimeToExt[type] || '.jpg';
     }
 
-    async uploadRemoteImage(root: HTMLElement, token: string) {
+    async uploadRemoteImage(root: HTMLElement, token: string, type: string = '') {
         const images = root.getElementsByTagName('img');
+        const result = [];
         for (let i = 0; i < images.length; i++) {
             const img = images[i];
             if (!img.src.startsWith('http')) continue; 
@@ -216,7 +219,7 @@ export class LocalImageManager {
                 continue;
             }
 
-            const res = await this.uploadImageFromUrl(img.src, token);
+            const res = await this.uploadImageFromUrl(img.src, token, type);
             if (res.errcode != 0) {
                 const msg = `上传图片失败: ${img.src} ${res.errcode} ${res.errmsg}`;
                 new Notice(msg);
@@ -229,7 +232,9 @@ export class LocalImageManager {
                 url: res.url
             };
             this.images.set(img.src, info);
+            result.push(res);
         }
+        return result;
     }
 
     replaceImages(root: HTMLElement) {
@@ -259,21 +264,18 @@ export class LocalFile extends Extension{
     }
 
     getImagePath(path: string) {
-        const file = this.assetsManager.searchFile(path);
-
-        if (file == null) {
+        const res = this.assetsManager.getResourcePath(path);
+        if (res == null) {
             console.error('找不到文件：' + path);
             return '';
         }
-
-        const resPath = this.app.vault.getResourcePath(file as TFile);
         const info = {
-            resUrl: resPath,
-            filePath: file.path,
+            resUrl: res.resUrl,
+            filePath: res.filePath,
             url: null
         };
-        LocalImageManager.getInstance().setImage(resPath, info);
-        return resPath;
+        LocalImageManager.getInstance().setImage(res.resUrl, info);
+        return res.resUrl;
     }
 
     isImage(file: string) {

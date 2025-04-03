@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-import { App, PluginManifest, Notice, requestUrl, FileSystemAdapter, TAbstractFile } from "obsidian";
+import { App, PluginManifest, Notice, requestUrl, FileSystemAdapter, TAbstractFile, TFile } from "obsidian";
 import * as zip from "@zip.js/zip.js";
 import DefaultTheme from "./default-theme";
 import DefaultHighlight from "./default-highlight";
@@ -345,6 +345,15 @@ export default class AssetsManager {
         return null;
     }
 
+    getResourcePath(path: string): {resUrl:string, filePath:string}|null {
+        const file = this.searchFile(path) as TFile;
+        if (file == null) {
+            return null;
+        }
+        const resUrl = this.app.vault.getResourcePath(file);
+        return {resUrl, filePath: file.path};
+    }
+
     resolvePath(relativePath: string): string {
         const basePath = this.getActiveFileDir();
         if (!relativePath.includes('/')) {
@@ -374,5 +383,14 @@ export default class AssetsManager {
             return '';
         }
         return parts.join('/');
+    }
+
+    async readFileBinary(path: string) {
+        const vault= this.app.vault;
+        const file = this.searchFile(path) as TFile;
+        if (file == null) {
+            return null;
+        }
+        return await vault.readBinary(file);
     }
 }
