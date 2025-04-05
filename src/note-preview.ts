@@ -33,6 +33,7 @@ import { MarkedParser } from './markdown/parser';
 import { LocalImageManager, LocalFile } from './markdown/local-file';
 import { CardDataManager, CodeRenderer } from './markdown/code';
 import { debounce } from './utils';
+import { PrepareImageLib, IsImageLibReady, WebpToJPG } from './imagelib';
 
 export const VIEW_TYPE_NOTE_PREVIEW = 'note-preview';
 
@@ -618,7 +619,15 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         return await this.uploadCover(file, file.name, token);
     }
 
-    async uploadCover(data: Blob, filename: string, token: string,) {
+    async uploadCover(data: Blob, filename: string, token: string) {
+        if (filename.toLowerCase().endsWith('.webp')) {
+            await PrepareImageLib();
+            if (IsImageLibReady()) {
+                data = new Blob([WebpToJPG(await data.arrayBuffer())]);
+                filename = filename.toLowerCase().replace('.webp', '.jpg');
+            }
+        }
+
         const res = await UploadImageToWx(data, filename, token, 'image');
         if (res.media_id) {
             return res.media_id;

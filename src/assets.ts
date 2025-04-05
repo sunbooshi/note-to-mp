@@ -244,20 +244,20 @@ export default class AssetsManager {
         const entries = await zipReader.getEntries();
 
         if (!await this.app.vault.adapter.exists(this.assetsPath)) {
-            this.app.vault.adapter.mkdir(this.assetsPath);
+            await this.app.vault.adapter.mkdir(this.assetsPath);
         }
 
         for (const entry of entries) {
             if (entry.directory) {
                 const dirPath = this.assetsPath + entry.filename;
-                this.app.vault.adapter.mkdir(dirPath);
+                await this.app.vault.adapter.mkdir(dirPath);
             }
             else {
                 const filePath = this.assetsPath + entry.filename;
-                const textWriter = new zip.TextWriter();
+                const blobWriter = new zip.Uint8ArrayWriter();
                 if (entry.getData) {
-                    const data = await entry.getData(textWriter);
-                    await this.app.vault.adapter.write(filePath, data);
+                    const data = await entry.getData(blobWriter);
+                    await this.app.vault.adapter.writeBinary(filePath, data);
                 }
             }
         }
