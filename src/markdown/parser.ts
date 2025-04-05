@@ -66,7 +66,7 @@ const customRenderer = {
     href = cleanHref;
 
 		if (!href.startsWith('http')) {
-			const res = AssetsManager.getInstance().getResourcePath(href);
+			const res = AssetsManager.getInstance().getResourcePath(decodeURI(href));
 			if (res) {
 				href = res.resUrl;
 				const info = {
