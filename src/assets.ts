@@ -222,7 +222,6 @@ export default class AssetsManager {
 
     async getStyle() {
         const file = this.app.vault.configDir + '/plugins/' + this.manifest.id + '/styles.css';
-        console.log(file);
         if (!await this.app.vault.adapter.exists(file)) {
             return '';
         }

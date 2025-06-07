@@ -883,7 +883,6 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         const lm = LocalImageManager.getInstance();
         const content = await lm.embleImages(this.articleDiv, this.app.vault);
         const globalStyle = await this.assetsManager.getStyle();
-        console.log(globalStyle);
         const html = applyCSS(content, this.getCSS() + globalStyle);
         const blob = new Blob([html], {type: 'text/html'});
         const url = URL.createObjectURL(blob);
