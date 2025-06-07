@@ -118,6 +118,10 @@ export function ruleToStyle(rule: postcss.Rule) {
 }
 
 function applyStyle(root: HTMLElement, cssRoot: postcss.Root) {
+	if (root.tagName.toLowerCase() === 'a' && root.classList.contains('wx_topic_link')) {
+		return;
+	}
+
 	const cssText = root.style.cssText;
 	cssRoot.walkRules(rule => {
 		if (root.matches(rule.selector)) {

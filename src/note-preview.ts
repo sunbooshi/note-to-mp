@@ -284,7 +284,10 @@ export class NotePreview extends ItemView implements MDRendererCallback {
 
     getArticleContent() {
         const content = this.articleDiv.innerHTML;
-        const html = applyCSS(content, this.getCSS());
+        let html = applyCSS(content, this.getCSS());
+        // 处理话题多余内容
+        html = html.replace(/rel="noopener nofollow"/g, '');
+        html = html.replace(/target="_blank"/g, '');
         return CardDataManager.getInstance().restoreCard(html);
     }
 
