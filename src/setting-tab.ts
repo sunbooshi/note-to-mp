@@ -343,7 +343,10 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			});
 		
 		let descHtml = '详情说明：<a href="https://sunboshi.tech/subscribe">https://sunboshi.tech/subscribe</a>';
-		if (this.settings.expireat) {
+		if (this.settings.isVip) {
+			descHtml = '永久会员';
+		}
+		else if (this.settings.expireat) {
 			const timestr = this.settings.expireat.toLocaleString();
 			descHtml = `有效期至：${timestr} <br/>${descHtml}`
 		}

@@ -371,6 +371,15 @@ export class NotePreview extends ItemView implements MDRendererCallback {
 
         // 复制，刷新，带图片复制，发草稿箱
         lineDiv = this.toolbar.createDiv({ cls: 'toolbar-line' });
+        const refreshBtn = lineDiv.createEl('button', { cls: 'refresh-button' }, async (button) => {
+            button.setText('刷新');
+        })
+
+        refreshBtn.onclick = async () => {
+            this.setStyle(this.getCSS());
+            await this.renderMarkdown();
+            uevent('refresh');
+        }
         if (Platform.isDesktop) {
             const copyBtn = lineDiv.createEl('button', { cls: 'copy-button' }, async (button) => {
                 button.setText('复制');
@@ -415,15 +424,15 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             uevent('pub-images');
         }
 
-        const refreshBtn = lineDiv.createEl('button', { cls: 'refresh-button' }, async (button) => {
-            button.setText('刷新');
+        const htmlBtn = lineDiv.createEl('button', { cls: 'copy-button' }, async (button) => {
+            button.setText('导出HTML');
         })
 
-        refreshBtn.onclick = async () => {
-            this.setStyle(this.getCSS());
-            await this.renderMarkdown();
-            uevent('refresh');
+        htmlBtn.onclick = async() => {
+            await this.exportHTML();
+            uevent('export-html');
         }
+
 
         // 封面
         lineDiv = this.toolbar.createDiv({ cls: 'toolbar-line' }); 
@@ -868,6 +877,23 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             console.error(error);
             this.showMsg('发布失败!'+error.message);
         }
+    }
+
+    async exportHTML() {
+        const lm = LocalImageManager.getInstance();
+        const content = await lm.embleImages(this.articleDiv, this.app.vault);
+        const globalStyle = await this.assetsManager.getStyle();
+        console.log(globalStyle);
+        const html = applyCSS(content, this.getCSS() + globalStyle);
+        const blob = new Blob([html], {type: 'text/html'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = this.title + '.html';
+        a.click();
+        URL.revokeObjectURL(url);
+        a.remove();
+        this.showMsg('导出成功!');
     }
 
     updateElementByID(id:string, html:string):void {

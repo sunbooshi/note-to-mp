@@ -220,6 +220,19 @@ export default class AssetsManager {
         return `https://github.com/sunbooshi/note-to-mp/releases/download/${version}/assets.zip`;
     }
 
+    async getStyle() {
+        const file = this.app.vault.configDir + '/plugins/' + this.manifest.id + '/styles.css';
+        console.log(file);
+        if (!await this.app.vault.adapter.exists(file)) {
+            return '';
+        }
+        const data = await this.app.vault.adapter.read(file);
+        if (data) {
+            return data;
+        }
+        return '';
+    }
+
     async downloadThemes() {
         try {
             if (await this.app.vault.adapter.exists(this.themeCfg)) {

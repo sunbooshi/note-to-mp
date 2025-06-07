@@ -364,7 +364,7 @@ Code
     text-wrap: nowrap;
     line-height: 1.75em;
     padding: 1em;
-    backgroud: unset;
+    background: unset;
 }
 `
 

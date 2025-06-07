@@ -34,6 +34,7 @@ export class NMPSettings {
     wxInfo: {name:string, appid:string, secret:string}[];
     math: string;
     expireat: Date | null = null;
+    isVip: boolean = false;
     baseCSS: string;
     watermark: string;
     useFigcaption: boolean;
@@ -155,13 +156,19 @@ export class NMPSettings {
         if (this.authKey.length == 0) return;
         wxKeyInfo(this.authKey).then((res) => {
             if (res.status == 200) {
-                this.expireat = new Date(res.json.expireat);
+                if (res.json.vip) {
+                    this.isVip = true;
+                }
+                else {
+                    this.expireat = new Date(res.json.expireat);
+                }
             }
         })
     }
 
     isAuthKeyVaild() {
         if (this.authKey.length == 0) return false;
+        if (this.isVip) return true;
         if (this.expireat == null) return false;
         return this.expireat > new Date();
     }

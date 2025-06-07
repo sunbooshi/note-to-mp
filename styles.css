@@ -93,6 +93,7 @@
 
 .msg-title {
   margin-bottom: 20px;
+  max-width: 90%;
 }
 
 .note-mpcard-wrapper {
