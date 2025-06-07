@@ -296,7 +296,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         try {
             const theme = this.assetsManager.getTheme(this.currentTheme);
             const highlight = this.assetsManager.getHighlight(this.currentHighlight);
-            const customCSS = this.settings.useCustomCss ? this.assetsManager.customCSS : '';
+            const customCSS = this.settings.customCSSNote.length > 0 || this.settings.useCustomCss ? this.assetsManager.customCSS : '';
             const baseCSS = this.settings.baseCSS ? `.note-to-mp {${this.settings.baseCSS}}` : '';
             return `${InlineCSS}\n\n${highlight!.css}\n\n${theme!.css}\n\n${baseCSS}\n\n${customCSS}`;
         } catch (error) {
@@ -376,6 +376,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         })
 
         refreshBtn.onclick = async () => {
+            this.assetsManager.loadCustomCSS();
             this.setStyle(this.getCSS());
             await this.renderMarkdown();
             uevent('refresh');

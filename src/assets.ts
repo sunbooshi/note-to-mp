@@ -24,6 +24,7 @@ import { App, PluginManifest, Notice, requestUrl, FileSystemAdapter, TAbstractFi
 import * as zip from "@zip.js/zip.js";
 import DefaultTheme from "./default-theme";
 import DefaultHighlight from "./default-highlight";
+import { NMPSettings } from "./settings";
 
 
 export interface Theme {
@@ -129,6 +130,21 @@ export default class AssetsManager {
 
     async loadCustomCSS() {
         try {
+            const customCSSNote = NMPSettings.getInstance().customCSSNote;
+            if (customCSSNote != '') {
+                const file = this.searchFile(customCSSNote);
+                if (file) {
+                    const cssContent = await this.app.vault.adapter.read(file.path);
+                    if (cssContent) {
+                        this.customCSS = cssContent.replace(/```css/gi, '').replace(/```/g, '');
+                    }
+                }
+                else {
+                    new Notice(customCSSNote + '自定义CSS文件不存在！');
+                }
+                return;
+            }
+
             if (!await this.app.vault.adapter.exists(this.customCSSPath)) {
                 return;
             }

@@ -47,6 +47,9 @@ export class LinkRenderer extends Extension {
                 name: 'link',
                 level: 'inline',
                 renderer: (token: Tokens.Link) => {
+                    if (token.href.startsWith('mailto:')) {
+                        return token.text;
+                    }
                     if (token.text.indexOf(token.href) === 0
                         || (token.href.indexOf('https://mp.weixin.qq.com/mp') === 0)
                         || (token.href.indexOf('https://mp.weixin.qq.com/s') === 0)) {

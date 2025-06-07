@@ -31,6 +31,7 @@ export class NMPSettings {
     lineNumber: boolean;
     authKey: string;
     useCustomCss: boolean;
+    customCSSNote: string;
     wxInfo: {name:string, appid:string, secret:string}[];
     math: string;
     expireat: Date | null = null;
@@ -63,6 +64,7 @@ export class NMPSettings {
         this.baseCSS = '';
         this.watermark = '';
         this.useFigcaption = false;
+        this.customCSSNote = '';
     }
 
     resetStyelAndHighlight() {
@@ -88,6 +90,7 @@ export class NMPSettings {
             baseCSS,
             watermark,
             useFigcaption,
+            customCSSNote,
         } = data;
 
         const settings = NMPSettings.getInstance();
@@ -130,6 +133,9 @@ export class NMPSettings {
         if (useFigcaption!== undefined) {
             settings.useFigcaption = useFigcaption;
         }
+        if (customCSSNote) {
+            settings.customCSSNote = customCSSNote;
+        }
         settings.getExpiredDate();
     }
 
@@ -149,6 +155,7 @@ export class NMPSettings {
             'baseCSS': settings.baseCSS,
             'watermark': settings.watermark,
             'useFigcaption': settings.useFigcaption,
+            'customCSSNote': settings.customCSSNote,
         }
     }
 

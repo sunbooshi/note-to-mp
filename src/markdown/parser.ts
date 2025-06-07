@@ -130,7 +130,7 @@ export class MarkedParser {
 	}
 
 	async buildMarked() {
-	    this.marked = new Marked();
+	  this.marked = new Marked();
 		this.marked.use(markedOptiones);
 		for (const ext of this.extensions) {
 			this.marked.use(ext.markedExtension());
