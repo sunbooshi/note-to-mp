@@ -428,13 +428,15 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             uevent('pub-images');
         }
 
-        const htmlBtn = lineDiv.createEl('button', { cls: 'copy-button' }, async (button) => {
-            button.setText('导出HTML');
-        })
+        if (Platform.isDesktop && this.settings.isAuthKeyVaild()) {
+            const htmlBtn = lineDiv.createEl('button', { cls: 'copy-button' }, async (button) => {
+                button.setText('导出HTML');
+            })
 
-        htmlBtn.onclick = async() => {
-            await this.exportHTML();
-            uevent('export-html');
+            htmlBtn.onclick = async() => {
+                await this.exportHTML();
+                uevent('export-html');
+            }
         }
 
 

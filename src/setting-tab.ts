@@ -334,7 +334,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 		
 		let descHtml = '详情说明：<a href="https://sunboshi.tech/subscribe">https://sunboshi.tech/subscribe</a>';
 		if (this.settings.isVip) {
-			descHtml = '永久会员';
+			descHtml = '<span style="color:rgb(245, 70, 85);font-weight: bold;">👑永久会员</span><br/>' + descHtml;
 		}
 		else if (this.settings.expireat) {
 			const timestr = this.settings.expireat.toLocaleString();

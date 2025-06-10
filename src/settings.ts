@@ -166,9 +166,7 @@ export class NMPSettings {
                 if (res.json.vip) {
                     this.isVip = true;
                 }
-                else {
-                    this.expireat = new Date(res.json.expireat);
-                }
+                this.expireat = new Date(res.json.expireat);
             }
         })
     }
