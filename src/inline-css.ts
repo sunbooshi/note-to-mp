@@ -155,10 +155,12 @@ ul {
   display: inline-block;
 }
 
+/*
 .note-embed-excalidraw svg {
   width: 100%;
   height: 100%;
 }
+*/
 
 .note-embed-svg-left {
   display: flex;

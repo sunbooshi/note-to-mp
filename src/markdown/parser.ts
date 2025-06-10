@@ -34,6 +34,8 @@ import { LinkRenderer } from "./link";
 import { LocalFile, LocalImageManager } from "./local-file";
 import { MathRenderer } from "./math";
 import { TextHighlight } from "./text-highlight";
+import { Comment } from "./commnet";
+import { Topic } from "./topic";
 import { cleanUrl } from "../utils";
 
 
@@ -122,13 +124,15 @@ export class MarkedParser {
 		this.extensions.push(new LinkRenderer(app, settings, assetsManager, callback));
 		this.extensions.push(new TextHighlight(app, settings, assetsManager, callback));
 		this.extensions.push(new CodeRenderer(app, settings, assetsManager, callback));
+		this.extensions.push(new Comment(app, settings, assetsManager, callback));
+		this.extensions.push(new Topic(app, settings, assetsManager, callback));
 		if (settings.isAuthKeyVaild()) {
 			this.extensions.push(new MathRenderer(app, settings, assetsManager, callback));
 		}
 	}
 
 	async buildMarked() {
-	    this.marked = new Marked();
+	  this.marked = new Marked();
 		this.marked.use(markedOptiones);
 		for (const ext of this.extensions) {
 			this.marked.use(ext.markedExtension());

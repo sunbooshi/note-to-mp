@@ -57,7 +57,7 @@ export async function wxEncrypt(authkey:string, wechat:any[]) {
 }
 
 export async function wxKeyInfo(authkey:string) {
-    const url = 'https://obplugin.sunboshi.tech/wx/info/' + authkey;
+    const url = 'https://obplugin.sunboshi.tech/wx/info/' + authkey + '?ver=2';
     const res = await requestUrl({
         url: url,
         method: 'GET',

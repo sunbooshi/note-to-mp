@@ -169,28 +169,34 @@ export class LocalImageManager {
     }
 
     async uploadImageFromUrl(url: string, token: string, type: string = '') {
-        const rep = await requestUrl(url);
-        await PrepareImageLib();
-        let data = rep.arrayBuffer;
-        let blob = new Blob([data]);
+        try {
+            const rep = await requestUrl(url);
+            await PrepareImageLib();
+            let data = rep.arrayBuffer;
+            let blob = new Blob([data]);
 
-        let filename = this.getImageNameFromUrl(url, rep.headers['content-type']);
-        if (filename == '' || filename == null) {
-            filename = 'remote_img' + this.getImageExtFromBlob(blob);
-        }
-
-        if (this.isWebp(filename)) {
-            if (IsImageLibReady()) {
-                data = WebpToJPG(data);
-                blob = new Blob([data]);
-                filename = filename.toLowerCase().replace('.webp', '.jpg');
+            let filename = this.getImageNameFromUrl(url, rep.headers['content-type']);
+            if (filename == '' || filename == null) {
+                filename = 'remote_img' + this.getImageExtFromBlob(blob);
             }
-            else {
-                console.error('wasm not ready for webp');
-            }
-        }
 
-        return await UploadImageToWx(blob, filename, token, type);
+            if (this.isWebp(filename)) {
+                if (IsImageLibReady()) {
+                    data = WebpToJPG(data);
+                    blob = new Blob([data]);
+                    filename = filename.toLowerCase().replace('.webp', '.jpg');
+                }
+                else {
+                    console.error('wasm not ready for webp');
+                }
+            }
+
+            return await UploadImageToWx(blob, filename, token, type);
+        }
+        catch (e) {
+            console.error(e);
+            throw new Error('上传图片失败:' + e.message + '|' + url);
+        }
     }
 
     getImageExt(type: string): string {
@@ -205,6 +211,20 @@ export class LocalImageManager {
             'image/tiff': '.tiff'
         };
         return mimeToExt[type] || '.jpg';
+    }
+
+    getMimeType(ext: string): string {
+        const extToMime: { [key: string]: string } = {
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.png': 'image/png',
+            '.gif': 'image/gif',
+            '.bmp': 'image/bmp',
+            '.webp': 'image/webp',
+            '.svg': 'image/svg+xml',
+            '.tiff': 'image/tiff'
+        };
+        return extToMime[ext.toLowerCase()] || 'image/jpeg';
     }
 
     async uploadRemoteImage(root: HTMLElement, token: string, type: string = '') {
@@ -246,6 +266,91 @@ export class LocalImageManager {
             if (value.url == null) continue;
             img.setAttribute('src', value.url);
         }
+    }
+
+    arrayBufferToBase64(buffer: ArrayBuffer): string {
+        let binary = '';
+        const bytes = new Uint8Array(buffer);
+        const len = bytes.byteLength;
+        for (let i = 0; i < len; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        return btoa(binary);
+    }
+
+    async localImagesToBase64(vault: Vault) {
+        const keys = this.images.keys();
+        const result = new Map<string, string>();
+        for (let key of keys) {
+            const value = this.images.get(key);
+            if (value == null) continue;
+            const file = vault.getFileByPath(value.filePath);
+            if (file == null) continue;
+            let fileData = await vault.readBinary(file);
+            const base64 = this.arrayBufferToBase64(fileData);
+            const mimeType = this.getMimeType(file.extension);
+            const data = `data:${mimeType};base64,${base64}`;
+            result.set(value.resUrl, data);
+        }
+        return result;
+    }
+
+    async downloadRemoteImage(url: string) {
+        try {
+            const rep = await requestUrl(url);
+            let data = rep.arrayBuffer;
+            let blob = new Blob([data]);
+
+            let ext = this.getImageExtFromBlob(blob);
+            if (ext == '' || ext == null) {
+                const filename = this.getImageNameFromUrl(url, rep.headers['content-type']);
+                ext = '.' + filename.split('.').pop() || 'jpg';
+            }
+
+            const base64 = this.arrayBufferToBase64(data);
+            const mimeType = this.getMimeType(ext);
+            return `data:${mimeType};base64,${base64}`;
+        }
+        catch (e) {
+            console.error(e);
+            return '';
+        }
+    }
+
+    async remoteImagesToBase64(root: HTMLElement) {
+        const images = root.getElementsByTagName('img');
+        const result = new Map<string, string>();
+        for (let i = 0; i < images.length; i++) {
+            const img = images[i];
+            if (!img.src.startsWith('http')) continue;
+            const base64 = await this.downloadRemoteImage(img.src);
+            if (base64 == '') continue;
+            result.set(img.src, base64);
+        }
+        return result;
+    }
+
+    async embleImages(root: HTMLElement, vault: Vault) {
+        const localImages = await this.localImagesToBase64(vault);
+        const remoteImages = await this.remoteImagesToBase64(root);
+        const result = root.cloneNode(true) as HTMLElement;
+        const images = result.getElementsByTagName('img');
+        for (let i = 0; i < images.length; i++) {
+            const img = images[i];
+            if (img.src.startsWith('http')) {
+                const base64 = remoteImages.get(img.src);
+                if (base64 != null) {
+                    img.setAttribute('src', base64);
+                }
+            }
+            else {
+                const base64 = localImages.get(img.src);
+                if (base64 != null) {
+                    img.setAttribute('src', base64);
+                }
+            }
+        }
+        return result.innerHTML;
     }
 
     async cleanup() {

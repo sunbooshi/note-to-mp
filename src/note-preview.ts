@@ -284,7 +284,10 @@ export class NotePreview extends ItemView implements MDRendererCallback {
 
     getArticleContent() {
         const content = this.articleDiv.innerHTML;
-        const html = applyCSS(content, this.getCSS());
+        let html = applyCSS(content, this.getCSS());
+        // 处理话题多余内容
+        html = html.replace(/rel="noopener nofollow"/g, '');
+        html = html.replace(/target="_blank"/g, '');
         return CardDataManager.getInstance().restoreCard(html);
     }
 
@@ -296,7 +299,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         try {
             const theme = this.assetsManager.getTheme(this.currentTheme);
             const highlight = this.assetsManager.getHighlight(this.currentHighlight);
-            const customCSS = this.settings.useCustomCss ? this.assetsManager.customCSS : '';
+            const customCSS = this.settings.customCSSNote.length > 0 || this.settings.useCustomCss ? this.assetsManager.customCSS : '';
             const baseCSS = this.settings.baseCSS ? `.note-to-mp {${this.settings.baseCSS}}` : '';
             return `${InlineCSS}\n\n${highlight!.css}\n\n${theme!.css}\n\n${baseCSS}\n\n${customCSS}`;
         } catch (error) {
@@ -371,6 +374,16 @@ export class NotePreview extends ItemView implements MDRendererCallback {
 
         // 复制，刷新，带图片复制，发草稿箱
         lineDiv = this.toolbar.createDiv({ cls: 'toolbar-line' });
+        const refreshBtn = lineDiv.createEl('button', { cls: 'refresh-button' }, async (button) => {
+            button.setText('刷新');
+        })
+
+        refreshBtn.onclick = async () => {
+            this.assetsManager.loadCustomCSS();
+            this.setStyle(this.getCSS());
+            await this.renderMarkdown();
+            uevent('refresh');
+        }
         if (Platform.isDesktop) {
             const copyBtn = lineDiv.createEl('button', { cls: 'copy-button' }, async (button) => {
                 button.setText('复制');
@@ -415,15 +428,17 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             uevent('pub-images');
         }
 
-        const refreshBtn = lineDiv.createEl('button', { cls: 'refresh-button' }, async (button) => {
-            button.setText('刷新');
-        })
+        if (Platform.isDesktop && this.settings.isAuthKeyVaild()) {
+            const htmlBtn = lineDiv.createEl('button', { cls: 'copy-button' }, async (button) => {
+                button.setText('导出HTML');
+            })
 
-        refreshBtn.onclick = async () => {
-            this.setStyle(this.getCSS());
-            await this.renderMarkdown();
-            uevent('refresh');
+            htmlBtn.onclick = async() => {
+                await this.exportHTML();
+                uevent('export-html');
+            }
         }
+
 
         // 封面
         lineDiv = this.toolbar.createDiv({ cls: 'toolbar-line' }); 
@@ -868,6 +883,22 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             console.error(error);
             this.showMsg('发布失败!'+error.message);
         }
+    }
+
+    async exportHTML() {
+        const lm = LocalImageManager.getInstance();
+        const content = await lm.embleImages(this.articleDiv, this.app.vault);
+        const globalStyle = await this.assetsManager.getStyle();
+        const html = applyCSS(content, this.getCSS() + globalStyle);
+        const blob = new Blob([html], {type: 'text/html'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = this.title + '.html';
+        a.click();
+        URL.revokeObjectURL(url);
+        a.remove();
+        this.showMsg('导出成功!');
     }
 
     updateElementByID(id:string, html:string):void {

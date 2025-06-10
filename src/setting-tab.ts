@@ -318,32 +318,25 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 					})
 				    .inputEl.setAttr('style', 'width: 520px; height: 60px;');
 		})
+		const customCSSDoc = '使用指南：<a href="https://sunboshi.tech/customcss">https://sunboshi.tech/customcss</a>';
 		new Setting(containerEl)
-			.setName('CSS代码片段')
-			.setDesc('优先级最高，可以覆盖默认样式和基本样式')
-			.addToggle(toggle => {
-			    toggle.setValue(this.settings.useCustomCss);
-				toggle.onChange(async (value) => {
-				    this.settings.useCustomCss = value;
+			.setName('自定义CSS笔记')
+			.setDesc(sanitizeHTMLToDom(customCSSDoc))
+			.addText(text => {
+				text.setPlaceholder('请输入自定义CSS笔记标题')
+				.setValue(this.settings.customCSSNote)
+				.onChange(async (value) => {
+					this.settings.customCSSNote = value.trim();
 					await this.plugin.saveSettings();
-				});
-			})
-			.addButton(button => {
-				button.setIcon('refresh-ccw');
-				button.onClick(async () => {
-					await this.plugin.assetsManager.loadCustomCSS();
-					new Notice('刷新成功');
-				});
-			})
-			.addButton(button => {
-				button.setIcon('folder-open');
-				button.onClick(async () => {
-					await this.plugin.assetsManager.openAssets();
-				});
-			});
+				})
+				.inputEl.setAttr('style', 'width: 320px;')
+		});
 		
 		let descHtml = '详情说明：<a href="https://sunboshi.tech/subscribe">https://sunboshi.tech/subscribe</a>';
-		if (this.settings.expireat) {
+		if (this.settings.isVip) {
+			descHtml = '<span style="color:rgb(245, 70, 85);font-weight: bold;">👑永久会员</span><br/>' + descHtml;
+		}
+		else if (this.settings.expireat) {
 			const timestr = this.settings.expireat.toLocaleString();
 			descHtml = `有效期至：${timestr} <br/>${descHtml}`
 		}
@@ -351,14 +344,14 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			.setName('注册码（AuthKey）')
 			.setDesc(sanitizeHTMLToDom(descHtml))
 			.addText(text => {
-			    text.setPlaceholder('请输入注册码')
-					.setValue(this.settings.authKey)
-					.onChange(async (value) => {
-					    this.settings.authKey = value.trim();
-						this.settings.getExpiredDate();
-						await this.plugin.saveSettings();
-					})
-					.inputEl.setAttr('style', 'width: 320px;')
+				text.setPlaceholder('请输入注册码')
+				.setValue(this.settings.authKey)
+				.onChange(async (value) => {
+						this.settings.authKey = value.trim();
+					this.settings.getExpiredDate();
+					await this.plugin.saveSettings();
+				})
+				.inputEl.setAttr('style', 'width: 320px;')
 			}).descEl.setAttr('style', '-webkit-user-select: text; user-select: text;')
 				
 		
@@ -374,7 +367,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 					.onChange(value => {
 					    this.wxInfo = value;
 					})
-				    .inputEl.setAttr('style', 'width: 520px; height: 120px;');
+				  .inputEl.setAttr('style', 'width: 520px; height: 120px;');
 			})
 		
 		new Setting(containerEl).addButton(button => {
