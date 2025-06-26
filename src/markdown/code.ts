@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-import { MarkdownView, Notice } from "obsidian";
-import { toPng } from 'html-to-image';
+import { Notice } from "obsidian";
 import { Tokens } from "marked";
 import { MathRendererQueue } from "./math";
 import { Extension } from "./extension";
@@ -182,36 +181,9 @@ export class CodeRenderer extends Extension {
 		try {
 			const meraidIndex = this.mermaidIndex;
 			const containerId = `mermaid-${meraidIndex}`;
-			const imgId = `meraid-img-${meraidIndex}`;
+			this.callback.cacheElement('mermaid', containerId, token.raw);
 			this.mermaidIndex += 1;
-			const failElement = '<span>mermaid渲染失败</span>';
-			let container: HTMLElement | null = null;
-			const currentFile = this.app.workspace.getActiveFile();
-			const leaves = this.app.workspace.getLeavesOfType('markdown');
-			for (let leaf of leaves) {
-				const markdownView = leaf.view as MarkdownView;
-				if (markdownView.file?.path === currentFile?.path) {
-					container = markdownView.containerEl;
-				}
-			}
-			if (container) {
-				const containers = container.querySelectorAll('.mermaid');
-				if (containers.length < meraidIndex) {
-					return failElement;
-				}
-				const root = containers[meraidIndex];
-				toPng(root as HTMLElement).then(dataUrl => {
-					this.callback.updateElementByID(containerId, `<img id="${imgId}" class="${MermaidImgClassName}" src="${dataUrl}"></img>`);
-				})
-					.catch(error => {
-						console.error('oops, something went wrong!', error);
-						this.callback.updateElementByID(containerId, failElement);
-					});
-				return `<section id="${containerId}" class="${MermaidSectionClassName}">渲染中</section>`;
-			} else {
-				console.error('container is null');
-				return failElement;
-			}
+			return `<section id="${containerId}" class="${MermaidSectionClassName}"></section>`;
 		} catch (error) {
 			console.error(error.message);
 			return '<span>mermaid渲染失败</span>';

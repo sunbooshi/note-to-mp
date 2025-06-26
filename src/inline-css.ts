@@ -155,6 +155,11 @@ ul {
   display: inline-block;
 }
 
+.note-embed-excalidraw p {
+  line-height: 0 !important;
+  margin: 0 !important;
+}
+
 /*
 .note-embed-excalidraw svg {
   width: 100%;
@@ -188,4 +193,7 @@ ul {
   height: 100%;
 }
 
+.note-mermaid .mermaid {
+  width: fit-content;
+}
 `;

@@ -39,6 +39,7 @@ export class NMPSettings {
     baseCSS: string;
     watermark: string;
     useFigcaption: boolean;
+    excalidrawToPNG: boolean;
 
     private static instance: NMPSettings;
 
@@ -65,6 +66,7 @@ export class NMPSettings {
         this.watermark = '';
         this.useFigcaption = false;
         this.customCSSNote = '';
+        this.excalidrawToPNG = false;
     }
 
     resetStyelAndHighlight() {
@@ -91,6 +93,7 @@ export class NMPSettings {
             watermark,
             useFigcaption,
             customCSSNote,
+            excalidrawToPNG,
         } = data;
 
         const settings = NMPSettings.getInstance();
@@ -130,11 +133,14 @@ export class NMPSettings {
         if (watermark) {
             settings.watermark = watermark;
         }
-        if (useFigcaption!== undefined) {
+        if (useFigcaption !== undefined) {
             settings.useFigcaption = useFigcaption;
         }
         if (customCSSNote) {
             settings.customCSSNote = customCSSNote;
+        }
+        if (excalidrawToPNG !== undefined) {
+            settings.excalidrawToPNG = excalidrawToPNG;
         }
         settings.getExpiredDate();
     }
@@ -156,6 +162,7 @@ export class NMPSettings {
             'watermark': settings.watermark,
             'useFigcaption': settings.useFigcaption,
             'customCSSNote': settings.customCSSNote,
+            'excalidrawToPNG': settings.excalidrawToPNG,
         }
     }
 

@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, sanitizeHTMLToDom, apiVersion, TFile, Platform, Editor, MarkdownView, MarkdownFileInfo } from 'obsidian';
-import { EditorView } from "@codemirror/view";
+import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, sanitizeHTMLToDom, apiVersion, TFile, Platform, MarkdownRenderer } from 'obsidian';
 import { applyCSS, uevent } from './utils';
 import { UploadImageToWx } from './imagelib';
 import { NMPSettings } from './settings';
@@ -31,9 +30,10 @@ import { wxGetToken, wxAddDraft, wxBatchGetMaterial, DraftArticle, DraftImageMed
 import { MDRendererCallback } from './markdown/extension';
 import { MarkedParser } from './markdown/parser';
 import { LocalImageManager, LocalFile } from './markdown/local-file';
-import { CardDataManager, CodeRenderer } from './markdown/code';
+import { CardDataManager } from './markdown/code';
 import { debounce } from './utils';
 import { PrepareImageLib, IsImageLibReady, WebpToJPG } from './imagelib';
+import { toPng } from 'html-to-image';
 
 export const VIEW_TYPE_NOTE_PREVIEW = 'note-preview';
 
@@ -61,8 +61,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
     _currentHighlight: string;
     _currentAppId: string;
     markedParser: MarkedParser;
-    observer: MutationObserver | null = null;
-    editorView: EditorView | null = null;
+    cachedElements: Map<string, string> = new Map();
     debouncedRenderMarkdown: (...args: any[]) => void;
 
 
@@ -95,14 +94,12 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             this.workspace.on('active-leaf-change', () => this.update())
         ];
 
-        this.setupMutationObserver();
         this.renderMarkdown();
         uevent('open');
     }
 
     async onClose() {
         this.listeners.forEach(listener => this.workspace.offref(listener));
-        this.releaseMutationObserver();
         LocalFile.fileCache.clear();
         uevent('close');
     }
@@ -117,63 +114,6 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         LocalImageManager.getInstance().cleanup();
         CardDataManager.getInstance().cleanup();
         this.renderMarkdown();
-        this.setupMutationObserver();
-    }
-
-    setupMutationObserver() {
-        const view = this.app.workspace.getActiveViewOfType(MarkdownView);
-        // @ts-expect-error, not typed
-        const editorView = view?.editor?.cm as EditorView;
-        if (!editorView) return;
-
-        if (this.editorView === editorView) {
-            return;
-        }
-        
-        this.releaseMutationObserver();
-        this.editorView = editorView;
-        const targetElement = editorView.dom;
-
-        const renderIfExcalidraw = (target: HTMLElement) => {
-            if (target.getAttribute('src')?.includes('.excalidraw')) {
-                const name = target.getAttribute('src') || '';
-                if (LocalFile.fileCache.has(name)) {
-                    return;
-                }
-                this.debouncedRenderMarkdown();
-            }
-        };
-        this.observer = new MutationObserver((mutationsList) => {
-            mutationsList.forEach((mutation) => {
-                try {
-                    const target = mutation.target as HTMLElement;
-                    if (target.classList.contains('internal-embed')){
-                        renderIfExcalidraw(target);
-                    }
-                    else {
-                        const items = target.getElementsByClassName('internal-embed');
-                        for (let i = 0; i < items.length; i++) {
-                            renderIfExcalidraw(items[i] as HTMLElement);
-                        };
-                    }
-                } catch (error) {
-                    console.error(error);
-                }
-            });
-        });
-
-        // 开始监听目标元素的 DOM 变化
-        this.observer.observe(targetElement, {
-            attributes: true,       // 监听属性变化
-            childList: true,        // 监听子节点的变化
-            subtree: true,          // 监听子树中的节点变化
-        });
-    }
-
-    releaseMutationObserver() {
-        this.observer?.disconnect();
-        this.observer = null;
-        this.editorView = null;
     }
 
     errorContent(error: any) {
@@ -244,6 +184,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             this.articleHTML = await this.markedParser.parse(md);
 
             this.setArticle(this.articleHTML);
+            await this.processCachedElements();
         }
         catch (e) {
             console.error(e);
@@ -691,6 +632,8 @@ export class NotePreview extends ItemView implements MDRendererCallback {
                 return;
             }
 
+            await this.cachedElememtsToImg();
+
             const lm = LocalImageManager.getInstance();
             // 上传图片
             await lm.uploadLocalImage(token, this.app.vault);
@@ -698,8 +641,6 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             await lm.uploadRemoteImage(this.articleDiv, token);
             // 替换图片链接
             lm.replaceImages(this.articleDiv);
-            // 上传Mermaid图片
-            await CodeRenderer.uploadMermaidImages(this.articleDiv, token);
 
             await this.copyArticle();
             this.showMsg('图片已上传，并且已复制，请到公众号编辑器粘贴。');
@@ -742,6 +683,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
                 this.showMsg('获取token失败,请检查网络链接!');
                 return;
             }
+            await this.cachedElememtsToImg();
             let metadata = this.getMetadata();
             const lm = LocalImageManager.getInstance();
             // 上传图片
@@ -750,8 +692,6 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             await lm.uploadRemoteImage(this.articleDiv, token);
             // 替换图片链接
             lm.replaceImages(this.articleDiv);
-            // 上传Mermaid图片
-            await CodeRenderer.uploadMermaidImages(this.articleDiv, token);
             // 上传封面
             let mediaId = metadata.thumb_media_id;
             if (!mediaId) {
@@ -901,6 +841,57 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         this.showMsg('导出成功!');
     }
 
+    async processCachedElements() {
+        const af = this.app.workspace.getActiveFile();
+        if (!af) {
+            console.error('当前没有打开文件，无法处理缓存元素');
+            return;
+        }
+        for (const [key, value] of this.cachedElements) {
+            const [category, id] = key.split(':');
+            if (category === 'mermaid' || category === 'excalidraw') {
+                const container = this.articleDiv.querySelector('#'+id) as HTMLElement;
+                if (container) {
+                    await MarkdownRenderer.render(this.app, value, container, af.path, this);
+                }
+            }
+        }
+    }
+
+    async cachedElememtsToImg() {
+        for (const [key, value] of this.cachedElements) {
+            const [category, id] = key.split(':');
+            if (category === 'mermaid') {
+                const container = this.articleDiv.querySelector('#'+id) as HTMLElement;
+                if (!container) continue;
+                const children = container.getElementsByClassName('mermaid');
+                if (children.length === 0) continue;
+                const src = await toPng(children[0] as HTMLElement);
+                const img = document.createElement('img');
+                img.setAttribute('src', src);
+                img.id = 'img-' + id;
+                container.replaceChild(img, children[0]);
+            }
+            else if (category === 'excalidraw') {
+                const container = this.articleDiv.querySelector('#'+id) as HTMLElement;
+                if (!container) continue;
+                const children = container.getElementsByTagName('div');
+                if (children.length === 0) continue;
+                if (NMPSettings.getInstance().excalidrawToPNG) {
+                    const src = await toPng(children[0] as HTMLElement);
+                    const img = document.createElement('img');
+                    img.setAttribute('src', src);
+                    img.id = 'img-' + id;
+                    container.replaceChild(img, container.childNodes[0]);
+                }
+                else {
+                    const svg = await LocalFile.renderExcalidraw(children[0].innerHTML);
+                    this.updateElementByID(id, svg);
+                }
+            }
+        }
+    }
+
     updateElementByID(id:string, html:string):void {
         const item = this.articleDiv.querySelector('#'+id) as HTMLElement;
         if (!item) return;
@@ -914,5 +905,10 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         else {
             item.innerText = '渲染失败';
         } 
+    }
+
+    cacheElement(category: string, id: string, data: string): void {
+        const key = category + ':' + id;
+        this.cachedElements.set(key, data);
     }
 }
