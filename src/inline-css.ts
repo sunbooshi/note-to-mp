@@ -133,8 +133,9 @@ ul {
 }
 
 .note-embed-excalidraw-left {
-  display: inline-block;
-  vertical-align: middle;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
 }
 
 .note-embed-excalidraw-center {
@@ -193,7 +194,4 @@ ul {
   height: 100%;
 }
 
-.note-mermaid .mermaid {
-  width: fit-content;
-}
 `;

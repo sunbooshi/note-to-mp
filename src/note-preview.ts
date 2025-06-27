@@ -632,7 +632,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
                 return;
             }
 
-            await this.cachedElememtsToImg();
+            await this.cachedElementsToImages();
 
             const lm = LocalImageManager.getInstance();
             // 上传图片
@@ -683,7 +683,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
                 this.showMsg('获取token失败,请检查网络链接!');
                 return;
             }
-            await this.cachedElememtsToImg();
+            await this.cachedElementsToImages();
             let metadata = this.getMetadata();
             const lm = LocalImageManager.getInstance();
             // 上传图片
@@ -759,7 +759,7 @@ export class NotePreview extends ItemView implements MDRendererCallback {
             this.showMsg('请先选择公众号');
             return;
         }
-        this.showLoading('上传中...');
+        this.showLoading('发布中...');
         try {
             // 获取token
             const token = await this.getToken();
@@ -826,19 +826,26 @@ export class NotePreview extends ItemView implements MDRendererCallback {
     }
 
     async exportHTML() {
-        const lm = LocalImageManager.getInstance();
-        const content = await lm.embleImages(this.articleDiv, this.app.vault);
-        const globalStyle = await this.assetsManager.getStyle();
-        const html = applyCSS(content, this.getCSS() + globalStyle);
-        const blob = new Blob([html], {type: 'text/html'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = this.title + '.html';
-        a.click();
-        URL.revokeObjectURL(url);
-        a.remove();
-        this.showMsg('导出成功!');
+        this.showLoading('导出中...');
+        try {
+            await this.cachedElementsToImages();
+            const lm = LocalImageManager.getInstance();
+            const content = await lm.embleImages(this.articleDiv, this.app.vault);
+            const globalStyle = await this.assetsManager.getStyle();
+            const html = applyCSS(content, this.getCSS() + globalStyle);
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = this.title + '.html';
+            a.click();
+            URL.revokeObjectURL(url);
+            a.remove();
+            this.showMsg('导出成功!');
+        } catch (error) {
+            console.error(error);
+            this.showMsg('导出失败!'+error.message);
+        }
     }
 
     async processCachedElements() {
@@ -858,37 +865,65 @@ export class NotePreview extends ItemView implements MDRendererCallback {
         }
     }
 
-    async cachedElememtsToImg() {
-        for (const [key, value] of this.cachedElements) {
-            const [category, id] = key.split(':');
+    async cachedElementsToImages() {
+        for (const [key, cached] of this.cachedElements) {
+            const [category, elementId] = key.split(':');
+            const container = this.articleDiv.querySelector(`#${elementId}`) as HTMLElement;
+            if (!container) continue;
+
             if (category === 'mermaid') {
-                const container = this.articleDiv.querySelector('#'+id) as HTMLElement;
-                if (!container) continue;
-                const children = container.getElementsByClassName('mermaid');
-                if (children.length === 0) continue;
-                const src = await toPng(children[0] as HTMLElement);
+                await this.replaceMermaidWithImage(container, elementId);
+            } else if (category === 'excalidraw') {
+                await this.replaceExcalidrawWithImage(container, elementId);
+            }
+        }
+    }
+
+    private async replaceMermaidWithImage(container: HTMLElement, id: string) {
+        const mermaidContainer = container.querySelector('.mermaid') as HTMLElement;
+        if (!mermaidContainer || !mermaidContainer.children.length) return;
+
+        const svg = mermaidContainer.querySelector('svg');
+        if (!svg) return;
+
+        try {
+            const pngDataUrl = await toPng(mermaidContainer.firstElementChild as HTMLElement, { pixelRatio: 2 });
+            const img = document.createElement('img');
+            img.id = `img-${id}`;
+            img.src = pngDataUrl;
+            img.style.width = `${svg.clientWidth}px`;
+            img.style.height = 'auto';
+
+            container.replaceChild(img, mermaidContainer);
+        } catch (error) {
+            console.warn(`Failed to render Mermaid diagram: ${id}`, error);
+        }
+    }
+
+    private async replaceExcalidrawWithImage(container: HTMLElement, id: string) {
+        const innerDiv = container.querySelector('div') as HTMLElement;
+        if (!innerDiv) return;
+
+        if (NMPSettings.getInstance().excalidrawToPNG) {
+            const originalImg = container.querySelector('img') as HTMLImageElement;
+            if (!originalImg) return;
+
+            const style = originalImg.getAttribute('style') || '';
+            try {
+                const pngDataUrl = await toPng(originalImg, { pixelRatio: 2 });
+
                 const img = document.createElement('img');
-                img.setAttribute('src', src);
-                img.id = 'img-' + id;
-                container.replaceChild(img, children[0]);
+                img.id = `img-${id}`;
+                img.src = pngDataUrl;
+                img.setAttribute('style', style);
+
+                container.replaceChild(img, container.firstChild!);
+            } catch (error) {
+                console.warn(`Failed to render Excalidraw image: ${id}`, error);
             }
-            else if (category === 'excalidraw') {
-                const container = this.articleDiv.querySelector('#'+id) as HTMLElement;
-                if (!container) continue;
-                const children = container.getElementsByTagName('div');
-                if (children.length === 0) continue;
-                if (NMPSettings.getInstance().excalidrawToPNG) {
-                    const src = await toPng(children[0] as HTMLElement);
-                    const img = document.createElement('img');
-                    img.setAttribute('src', src);
-                    img.id = 'img-' + id;
-                    container.replaceChild(img, container.childNodes[0]);
-                }
-                else {
-                    const svg = await LocalFile.renderExcalidraw(children[0].innerHTML);
-                    this.updateElementByID(id, svg);
-                }
-            }
+        } else {
+            const svg = await LocalFile.renderExcalidraw(innerDiv.innerHTML);
+            this.updateElementByID(id, svg);
         }
     }
 
