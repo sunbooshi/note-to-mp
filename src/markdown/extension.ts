@@ -28,6 +28,7 @@ import AssetsManager from "../assets";
 export interface MDRendererCallback {
    settings: NMPSettings;
    updateElementByID(id:string, html:string):void;
+   cacheElement(category: string, id: string, data: string): void;
 }
 
 export abstract class Extension {

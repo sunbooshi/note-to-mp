@@ -168,6 +168,23 @@ export class LocalImageManager {
         return mimeToExt[mimeType] || '';
     }
 
+    base64ToBlob(src: string) {
+        const items = src.split(',');
+        if (items.length != 2) {
+            throw new Error('base64格式错误');
+        }
+        const mineType = items[0].replace('data:', '');
+		const base64 = items[1];
+
+		const byteCharacters = atob(base64);
+		const byteNumbers = new Array(byteCharacters.length);
+		for (let i = 0; i < byteCharacters.length; i++) {
+			byteNumbers[i] = byteCharacters.charCodeAt(i);
+		}
+		const byteArray = new Uint8Array(byteNumbers);
+		return {blob: new Blob([byteArray], { type: mineType }), ext: this.getImageExt(mineType)};
+	}
+
     async uploadImageFromUrl(url: string, token: string, type: string = '') {
         try {
             const rep = await requestUrl(url);
@@ -232,27 +249,48 @@ export class LocalImageManager {
         const result = [];
         for (let i = 0; i < images.length; i++) {
             const img = images[i];
-            if (!img.src.startsWith('http')) continue; 
             if (img.src.includes('mmbiz.qpic.cn')) continue;
             // 移动端本地图片不通过src上传
             if (img.src.startsWith('http://localhost/') && Platform.isMobileApp) {
                 continue;
             }
 
-            const res = await this.uploadImageFromUrl(img.src, token, type);
-            if (res.errcode != 0) {
-                const msg = `上传图片失败: ${img.src} ${res.errcode} ${res.errmsg}`;
-                new Notice(msg);
-                console.error(msg);
+            if (img.src.startsWith('http')) {
+                const res = await this.uploadImageFromUrl(img.src, token, type);
+                if (res.errcode != 0) {
+                    const msg = `上传图片失败: ${img.src} ${res.errcode} ${res.errmsg}`;
+                    new Notice(msg);
+                    console.error(msg);
+                }
+                const info = {
+                    resUrl: img.src,
+                    filePath: "",
+                    url: res.url
+                };
+                this.images.set(img.src, info);
+                result.push(res);
             }
-
-            const info = {
-                resUrl: img.src,
-                filePath: "",
-                url: res.url
-            };
-            this.images.set(img.src, info);
-            result.push(res);
+            else if (img.src.startsWith('data:image/')) {
+                const {blob, ext} = this.base64ToBlob(img.src);
+                if (!img.id) {
+                    img.id = `local-img-${i}`;
+                }
+                const name = img.id + ext;
+                const res = await UploadImageToWx(blob, name, token);
+                if (res.errcode != 0) {
+                    const msg = `上传图片失败: ${res.errcode} ${res.errmsg}`;
+                    new Notice(msg);
+                    console.error(msg);
+                    continue;
+                }
+                const info = {
+                    resUrl: '#' + img.id,
+                    filePath: "",
+                    url: res.url
+                };
+                this.images.set('#' + img.id, info);
+                result.push(res);
+            }
         }
         return result;
     }
@@ -261,7 +299,14 @@ export class LocalImageManager {
         const images = root.getElementsByTagName('img');
         for (let i = 0; i < images.length; i++) {
             const img = images[i];
-            const value = this.images.get(img.src);
+            let value = this.images.get(img.src);
+            if (value == null) {
+                if (!img.id) {
+                    console.error('miss image id, ' + img.src);
+                    continue;
+                }
+                value = this.images.get('#' + img.id);
+            }
             if (value == null) continue;
             if (value.url == null) continue;
             img.setAttribute('src', value.url);
@@ -515,16 +560,19 @@ export class LocalFile extends Extension{
             return;
         }
 
-        const content = await this.getFileContent(file, header, block);
+        let content = await this.getFileContent(file, header, block);
+        if (content.startsWith('---')) {
+            content = content.replace(/^(---)$.+?^(---)$.+?/ims, '');
+        }
         const body = await this.marked.parse(content);
         this.callback.updateElementByID(id, body);
     }
 
-    async readBlob(src: string) {
+    static async readBlob(src: string) {
         return await fetch(src).then(response => response.blob())
     }
 
-    async getExcalidrawUrl(data: string) {
+    static async getExcalidrawUrl(data: string) {
         const url = 'https://obplugin.sunboshi.tech/math/excalidraw';
         const req = await requestUrl({
             url,
@@ -605,49 +653,27 @@ export class LocalFile extends Extension{
         return null;
     }
 
-    async renderExcalidraw(name: string, id: string) {
+    static async renderExcalidraw(html: string) {
         try {
-            let container: HTMLElement | null = null;
-            const currentFile = this.app.workspace.getActiveFile();
-            const leaves = this.app.workspace.getLeavesOfType('markdown');
-            for (let leaf of leaves) {
-                const markdownView = leaf.view as MarkdownView;
-                if (markdownView.file?.path === currentFile?.path) {
-                    container = markdownView.containerEl;
+            const src = await this.getExcalidrawUrl(html);
+            let svg = '';
+            if (src === '') {
+                svg = '渲染失败';
+                console.log('Failed to get Excalidraw URL');
+            }
+            else {
+                const blob = await this.readBlob(src);
+                if (blob.type === 'image/svg+xml') {
+                    svg = await blob.text();
+                }
+                else {
+                    svg = '暂不支持' + blob.type;
                 }
             }
-            if (container) {
-                const containers = container.querySelectorAll('.internal-embed');
-                for (let container of containers) {
-                    if (name !== container.getAttribute('src')) {
-                        continue;
-                    }
-
-                    const src = await this.getExcalidrawUrl(container.innerHTML);
-                    let svg = '';
-                    if (src === '') {
-                        svg = '渲染失败';
-                        console.log('Failed to get Excalidraw URL');
-                    }
-                    else {
-                        const blob = await this.readBlob(src);
-                        if (blob.type === 'image/svg+xml') {
-                            svg = await blob.text();
-                            LocalFile.fileCache.set(name, svg);
-                        }
-                        else {
-                            svg = '暂不支持' + blob.type;
-                        }
-                    }
-                    this.callback.updateElementByID(id, svg);
-                }
-            } else {
-                console.error('container is null ' + name);
-                this.callback.updateElementByID(id, '渲染失败');
-            }
+            return svg;
         } catch (error) {
             console.error(error.message);
-            this.callback.updateElementByID(id, '渲染失败:' + error.message);
+            return  '渲染失败:' + error.message;
         }
     }
 
@@ -683,7 +709,7 @@ export class LocalFile extends Extension{
     markedExtension(): MarkedExtension {
         return {extensions:[{
             name: 'LocalImage',
-            level: 'inline',
+            level: 'block',
             start: (src: string) => {
                 const index = src.indexOf('![[');
                 if (index === -1) return;
@@ -712,15 +738,12 @@ export class LocalFile extends Extension{
 
                 const info = this.parseExcalidrawLink(token.href);
                 if (info) {
+                    if (!NMPSettings.getInstance().isAuthKeyVaild()) {
+                        return "<span>请设置注册码</span>";
+                    }
                     const id = this.generateId();
-                    let svg = '渲染中';
-                    if (LocalFile.fileCache.has(info.filename)) {
-                        svg = LocalFile.fileCache.get(info.filename) || '渲染失败';
-                    }
-                    else {
-                        this.renderExcalidraw(info.filename, id);
-                    }
-                    return `<span class="${info.classname}"><span class="note-embed-excalidraw" id="${id}" ${info.style}>${svg}</span></span>`
+                    this.callback.cacheElement('excalidraw', id, token.raw);
+                    return `<span class="${info.classname}"><span class="note-embed-excalidraw" id="${id}" ${info.style}></span></span>`
                 }
 
                 if (token.href.endsWith('.svg') || token.href.includes('.svg|')) {

@@ -133,8 +133,9 @@ ul {
 }
 
 .note-embed-excalidraw-left {
-  display: inline-block;
-  vertical-align: middle;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
 }
 
 .note-embed-excalidraw-center {
@@ -153,6 +154,11 @@ ul {
 
 .note-embed-excalidraw {
   display: inline-block;
+}
+
+.note-embed-excalidraw p {
+  line-height: 0 !important;
+  margin: 0 !important;
 }
 
 /*

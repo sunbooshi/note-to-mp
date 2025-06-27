@@ -267,6 +267,16 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 		})
 
 		new Setting(containerEl)
+		.setName('Excalidraw 渲染为 PNG 图片')
+		.addToggle(toggle => {
+			toggle.setValue(this.settings.excalidrawToPNG);
+			toggle.onChange(async (value) => {
+				this.settings.excalidrawToPNG = value;
+				await this.plugin.saveSettings();
+			});
+		})
+
+		new Setting(containerEl)
 			.setName('水印图片')
 			.addText(text => {
 			    text.setPlaceholder('请输入图片名称')
