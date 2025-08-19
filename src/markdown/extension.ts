@@ -27,7 +27,7 @@ import AssetsManager from "../assets";
 
 export interface MDRendererCallback {
    settings: NMPSettings;
-   updateElementByID(id:string, html:string):void;
+   updateElementByID(id:string, html:string):void; // 改为异步渲染后已废弃
    cacheElement(category: string, id: string, data: string): void;
 }
 

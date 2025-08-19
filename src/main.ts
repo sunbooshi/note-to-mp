@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-import { Plugin, WorkspaceLeaf, App, PluginManifest, Menu, Notice } from 'obsidian';
+import { Plugin, WorkspaceLeaf, App, PluginManifest, Menu, Notice, TAbstractFile, TFile, TFolder } from 'obsidian';
 import { NotePreview, VIEW_TYPE_NOTE_PREVIEW } from './note-preview';
 import { NMPSettings } from './settings';
 import { NoteToMpSettingTab } from './setting-tab';
@@ -71,6 +71,34 @@ export default class NoteToMpPlugin extends Plugin {
 				new WidgetsModal(this.app).open();
 			}
 		});
+
+		this.addCommand({
+			id: 'note-to-mp-pub',
+			name: '发布公众号文章',
+			callback: () => {
+				this.app.workspace.detachLeavesOfType(VIEW_TYPE_NOTE_PREVIEW);
+			}
+		});
+
+		// 监听右键菜单
+    this.registerEvent(
+      this.app.workspace.on('file-menu', (menu, file) => {
+        menu.addItem((item) => {
+          item
+            .setTitle('发布到公众号')
+            .setIcon('lucide-star') // 可选图标
+            .onClick(async () => {
+              if (file instanceof TFile) {
+                await this.app.vault.read(file).then(data => {
+                  console.log('文件内容:', data);
+                });
+              } else if (file instanceof TFolder) {
+                console.log('选中的文件夹:', file.path);
+              }
+            });
+        });
+      })
+    );
 	}
 
 	onunload() {

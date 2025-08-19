@@ -556,8 +556,7 @@ export class LocalFile extends Extension{
         if (file == null) {
             const msg = '找不到文件：' + path;
             console.error(msg)
-            this.callback.updateElementByID(id, msg);
-            return;
+            return msg;
         }
 
         let content = await this.getFileContent(file, header, block);
@@ -565,7 +564,7 @@ export class LocalFile extends Extension{
             content = content.replace(/^(---)$.+?^(---)$.+?/ims, '');
         }
         const body = await this.marked.parse(content);
-        this.callback.updateElementByID(id, body);
+        return body;
     }
 
     static async readBlob(src: string) {
@@ -697,17 +696,64 @@ export class LocalFile extends Extension{
         if (file == null) {
             const msg = '找不到文件：' + file;
             console.error(msg)
-            this.callback.updateElementByID(id, msg);
-            return;
+            return msg;
         }
 
         const content = await this.getFileContent(file, null, null);
         LocalFile.fileCache.set(filename, content);
-        this.callback.updateElementByID(id, content);
+        return content;
     }
 
     markedExtension(): MarkedExtension {
-        return {extensions:[{
+        return {
+            async: true,
+            walkTokens: async (token: Tokens.Generic) => {
+                if (token.type !== 'LocalImage') {
+                    return;
+                }
+                // 渲染本地图片
+                let item = this.parseImageLink(token.href);
+                if (item) {
+                    const src = this.getImagePath(item.path);
+                    const width = item.width ? `width="${item.width}"` : '';
+                    const height = item.height? `height="${item.height}"` : '';
+                    token.html = `<img src="${src}" alt="${token.text}" ${width} ${height} />`;
+                    return;
+                }
+
+                const info = this.parseExcalidrawLink(token.href);
+                if (info) {
+                    if (!NMPSettings.getInstance().isAuthKeyVaild()) {
+                        token.html = "<span>请设置注册码</span>";
+                        return;
+                    }
+                    const id = this.generateId();
+                    this.callback.cacheElement('excalidraw', id, token.raw);
+                    token.html = `<span class="${info.classname}"><span class="note-embed-excalidraw" id="${id}" ${info.style}></span></span>`
+                    return;
+                }
+
+                if (token.href.endsWith('.svg') || token.href.includes('.svg|')) {
+                    const info = this.parseSVGLink(token.href);
+                    const id = this.generateId();
+                    let svg = '渲染中';
+                    if (LocalFile.fileCache.has(info.filename)) {
+                        svg = LocalFile.fileCache.get(info.filename) || '渲染失败';
+                    }
+                    else {
+                        svg = await this.renderSVGFile(info.filename, id) || '渲染失败';
+                    }
+                    token.html = `<span class="${info.classname}"><span class="note-embed-svg" id="${id}" ${info.style}>${svg}</span></span>`
+                    return;
+                }
+
+                const id = this.generateId();
+                const content = await this.renderFile(token.href, id);
+                const tag = this.callback.settings.embedStyle === 'quote' ? 'blockquote' : 'section';
+                token.html = `<${tag} class="note-embed-file" id="${id}">${content}</${tag}>`
+            },
+
+            extensions:[{
             name: 'LocalImage',
             level: 'block',
             start: (src: string) => {
@@ -726,43 +772,8 @@ export class LocalFile extends Extension{
                 };
                 return token;
             },
-            renderer: (token: Tokens.Image) => {
-                // 渲染本地图片
-                let item = this.parseImageLink(token.href);
-                if (item) {
-                    const src = this.getImagePath(item.path);
-                    const width = item.width ? `width="${item.width}"` : '';
-                    const height = item.height? `height="${item.height}"` : '';
-                    return `<img src="${src}" alt="${token.text}" ${width} ${height} />`;
-                }
-
-                const info = this.parseExcalidrawLink(token.href);
-                if (info) {
-                    if (!NMPSettings.getInstance().isAuthKeyVaild()) {
-                        return "<span>请设置注册码</span>";
-                    }
-                    const id = this.generateId();
-                    this.callback.cacheElement('excalidraw', id, token.raw);
-                    return `<span class="${info.classname}"><span class="note-embed-excalidraw" id="${id}" ${info.style}></span></span>`
-                }
-
-                if (token.href.endsWith('.svg') || token.href.includes('.svg|')) {
-                    const info = this.parseSVGLink(token.href);
-                    const id = this.generateId();
-                    let svg = '渲染中';
-                    if (LocalFile.fileCache.has(info.filename)) {
-                        svg = LocalFile.fileCache.get(info.filename) || '渲染失败';
-                    }
-                    else {
-                        this.renderSVGFile(info.filename, id);
-                    }
-                    return `<span class="${info.classname}"><span class="note-embed-svg" id="${id}" ${info.style}>${svg}</span></span>`
-                }
-
-                const id = this.generateId();
-                this.renderFile(token.href, id);
-                const tag = this.callback.settings.embedStyle === 'quote' ? 'blockquote' : 'section';
-                return `<${tag} class="note-embed-file" id="${id}">渲染中</${tag}>`
+            renderer: (token: Tokens.Generic) => {
+                return token.html;
             }
         }]};
     }

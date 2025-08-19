@@ -22,7 +22,7 @@
 
 import { MarkedExtension, Token, Tokens } from "marked";
 import { requestUrl } from "obsidian";
-import { Extension, MDRendererCallback } from "./extension";
+import { Extension } from "./extension";
 import { NMPSettings } from "src/settings";
 
 const inlineRule = /^(\${1,2})(?!\$)((?:\\.|[^\\\n])*?(?:\\.|[^\\\n\$]))\1/;
@@ -35,8 +35,6 @@ export function cleanMathCache() {
 }
 
 export class MathRendererQueue {
-    private queue: (() => Promise<any>)[] = [];
-    private isProcessing: boolean = false;
     private host = 'https://obplugin.sunboshi.tech';
     private static instance: MathRendererQueue;
     private mathIndex: number = 0;
@@ -49,80 +47,49 @@ export class MathRendererQueue {
         return MathRendererQueue.instance;
     }
 
-    private constructor () {
+    private constructor() {
     }
 
-    getMathSVG(expression:string, inline:boolean, type:string, callback:(svg:string)=>void) {
-        const req = () => {
-            return new Promise<void>((resolve, reject) => {
-                let path = '';
-                if (type === 'asciimath') {
-                    path = '/math/am';
-                }
-                else {
-                    path = '/math/tex';
-                }
-
-                const url = `${this.host}${path}`;
-                requestUrl({
-                    url,
-                    method: 'POST',
-                    contentType: 'application/json',
-                    headers: {
-                        authkey: NMPSettings.getInstance().authKey
-                    },
-                    body: JSON.stringify({
-                        expression,
-                        inline
-                    })
-                }).then(res => {
-                    let svg = ''
-                    if (res.status === 200) {
-                        svg = res.text;
-                    }
-                    else {
-                        console.error('render error: ' + res.json.msg)
-                        svg = '渲染失败';
-                    }
-                    callback(svg);
-                    resolve();
-                }).catch(err => {
-                    console.log(err.msg);
-                    const svg = '渲染失败';
-                    callback(svg);
-                    resolve();
-                })
-
-       })}
-       this.enqueue(req);
-    }
-
-    // 添加请求到队列
-    enqueue(request: () => Promise<any>): void {
-        this.queue.push(request);
-        this.processQueue();
-    }
-    
-    // 处理队列中的请求
-    private async processQueue(): Promise<void> {
-        if (this.isProcessing) {
-            return;
-        }
-    
-        this.isProcessing = true;
-    
-        while (this.queue.length > 0) {
-            const request = this.queue.shift();
-            if (request) {
-                try {
-                    await request();
-                } catch (error) {
-                    console.error('Request failed:', error);
-                }
+    async getMathSVG(expression: string, inline: boolean, type: string) {
+        try {
+            let success = false;
+            let path = '';
+            if (type === 'asciimath') {
+                path = '/math/am';
             }
+            else {
+                path = '/math/tex';
+            }
+
+            const url = `${this.host}${path}`;
+            const res = await requestUrl({
+                url,
+                method: 'POST',
+                contentType: 'application/json',
+                headers: {
+                    authkey: NMPSettings.getInstance().authKey
+                },
+                body: JSON.stringify({
+                    expression,
+                    inline
+                })
+            })
+            let svg = ''
+            if (res.status === 200) {
+                svg = res.text;
+                success = true;
+            }
+            else {
+                console.error('render error: ' + res.json.msg)
+                svg = '渲染失败: ' + res.json.msg;
+            }
+            return { svg, success };
         }
-    
-        this.isProcessing = false;
+        catch (err) {
+            console.log(err.msg);
+            const svg = '渲染失败: ' + err.message;
+            return { svg, success: false };
+        }
     }
 
     generateId() {
@@ -130,7 +97,7 @@ export class MathRendererQueue {
         return `math-id-${this.mathIndex}`;
     }
 
-    render(token: Tokens.Generic, inline: boolean, type: string, callback: MDRendererCallback) {
+    async render(token: Tokens.Generic, inline: boolean, type: string) {
         if (!NMPSettings.getInstance().isAuthKeyVaild()) {
             return '<span>注册码无效或已过期</span>';
         }
@@ -142,28 +109,35 @@ export class MathRendererQueue {
             svg = svgCache.get(expression) as string;
         }
         else {
-            this.getMathSVG(expression, inline, type, (svg: string)=>{
-                svgCache.set(expression, svg);
-                callback.updateElementByID(id, svg); 
-            })
+            const res = await this.getMathSVG(expression, inline, type)
+            if (res.success) {
+                svgCache.set(expression, res.svg);
+            }
+            svg = res.svg;
         }
 
-        let className = inline? 'inline-math-svg' : 'block-math-svg';
+        let className = inline ? 'inline-math-svg' : 'block-math-svg';
         return `<span id="${id}" class="${className}">${svg}</span>`;
     }
 }
 
 
 export class MathRenderer extends Extension {
-    renderer(token: Tokens.Generic, inline: boolean, type: string = '') {
+    async renderer(token: Tokens.Generic, inline: boolean, type: string = '') {
         if (type === '') {
             type = this.settings.math;
         }
-        return MathRendererQueue.getInstance().render(token, inline, type, this.callback);
+        return await MathRendererQueue.getInstance().render(token, inline, type);
     }
 
     markedExtension(): MarkedExtension {
         return {
+            async: true,
+            walkTokens: async (token: Tokens.Generic) => {
+                if (token.type === 'InlineMath' || token.type === 'BlockMath') {
+                    token.html = await this.renderer(token, token.type === 'InlineMath', token.displayMode ? 'latex' : 'asciimath');
+                }
+            },
             extensions: [
                 this.inlineMath(),
                 this.blockMath()
@@ -206,7 +180,7 @@ export class MathRenderer extends Extension {
                 }
             },
             renderer: (token: Tokens.Generic) => {
-               return this.renderer(token, true);
+               return token.html;
             }
         }
     }
@@ -226,7 +200,7 @@ export class MathRenderer extends Extension {
                 }
             },
             renderer: (token: Tokens.Generic) => {
-                return this.renderer(token, false);
+                return token.html;
             }
         };
     }
