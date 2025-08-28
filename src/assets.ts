@@ -167,7 +167,6 @@ export default class AssetsManager {
             const note = NMPSettings.getInstance().expertSettingsNote;
             if (note != '') {
                 const file = this.searchFile(note);
-                console.log('expertSettings note=', note, file);
                 if (file) {
                     let content = await this.app.vault.adapter.read(file.path);
                     if (content) {
