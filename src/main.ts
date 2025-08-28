@@ -75,8 +75,9 @@ export default class NoteToMpPlugin extends Plugin {
 		this.addCommand({
 			id: 'note-to-mp-pub',
 			name: '发布公众号文章',
-			callback: () => {
-				this.app.workspace.detachLeavesOfType(VIEW_TYPE_NOTE_PREVIEW);
+			callback: async () => {
+				await this.activateView();
+				this.getNotePreview()?.postArticle();
 			}
 		});
 
@@ -86,14 +87,19 @@ export default class NoteToMpPlugin extends Plugin {
         menu.addItem((item) => {
           item
             .setTitle('发布到公众号')
-            .setIcon('lucide-star') // 可选图标
+            .setIcon('lucide-send')
             .onClick(async () => {
               if (file instanceof TFile) {
-                await this.app.vault.read(file).then(data => {
-                  console.log('文件内容:', data);
-                });
+								if (file.extension.toLowerCase() !== 'md') {
+									new Notice('只能发布 Markdown 文件');
+									return;
+								}
+								await this.activateView();
+								await this.getNotePreview()?.renderMarkdown(file);
+								await this.getNotePreview()?.postArticle();
               } else if (file instanceof TFolder) {
-                console.log('选中的文件夹:', file.path);
+								await this.activateView();
+								await this.getNotePreview()?.batchPost(file);
               }
             });
         });
@@ -127,5 +133,14 @@ export default class NoteToMpPlugin extends Plugin {
 		}
 	
 		if (leaf) workspace.revealLeaf(leaf);
+	}
+
+	getNotePreview(): NotePreview | null {
+		const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_NOTE_PREVIEW);
+		if (leaves.length > 0) {
+			const leaf = leaves[0];
+			return leaf.view as NotePreview;
+		}
+		return null;
 	}
 }

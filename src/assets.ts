@@ -20,11 +20,12 @@
  * THE SOFTWARE.
  */
 
-import { App, PluginManifest, Notice, requestUrl, FileSystemAdapter, TAbstractFile, TFile } from "obsidian";
+import { App, PluginManifest, Notice, requestUrl, FileSystemAdapter, TAbstractFile, TFile, parseYaml } from "obsidian";
 import * as zip from "@zip.js/zip.js";
 import DefaultTheme from "./default-theme";
 import DefaultHighlight from "./default-highlight";
 import { NMPSettings } from "./settings";
+import { ExpertSettings, defaultExpertSettings, expertSettingsFromString } from "./expert-settings";
 
 
 export interface Theme {
@@ -56,6 +57,7 @@ export default class AssetsManager {
     customCSSPath: string;
     iconsPath: string;
     wasmPath: string;
+    expertSettings: ExpertSettings;
 
     private static instance: AssetsManager;
 
@@ -92,6 +94,7 @@ export default class AssetsManager {
         await this.loadThemes();
         await this.loadHighlights();
         await this.loadCustomCSS();
+        await this.loadExpertSettings();
     }
 
     async loadThemes() {
@@ -156,6 +159,36 @@ export default class AssetsManager {
         } catch (error) {
             console.error(error);
             new Notice('读取CSS失败！');
+        }
+    }
+
+    async loadExpertSettings() {
+        try {
+            const note = NMPSettings.getInstance().expertSettingsNote;
+            if (note != '') {
+                const file = this.searchFile(note);
+                console.log('expertSettings note=', note, file);
+                if (file) {
+                    let content = await this.app.vault.adapter.read(file.path);
+                    if (content) {
+                        this.expertSettings = expertSettingsFromString(content);
+                    }
+                    else {
+                        this.expertSettings = defaultExpertSettings;
+                        new Notice(note + '专家设置文件内容为空！');
+                    }
+                }
+                else {
+                    this.expertSettings = defaultExpertSettings;
+                    new Notice(note + '专家设置不存在！');
+                }
+            }
+            else {
+                this.expertSettings = defaultExpertSettings;
+            }
+        } catch (error) {
+            console.error(error);
+            new Notice('读取专家设置失败！');
         }
     }
 
@@ -285,7 +318,7 @@ export default class AssetsManager {
                 const blobWriter = new zip.Uint8ArrayWriter();
                 if (entry.getData) {
                     const data = await entry.getData(blobWriter);
-                    await this.app.vault.adapter.writeBinary(filePath, data);
+                    await this.app.vault.adapter.writeBinary(filePath, data.buffer as ArrayBuffer);
                 }
             }
         }

@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, Platform } from 'obsidian';
+import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, Platform, TFile, TFolder, TAbstractFile } from 'obsidian';
 import { uevent } from './utils';
 import { NMPSettings } from './settings';
 import AssetsManager from './assets';
@@ -58,6 +58,8 @@ export class NotePreview extends ItemView {
     markedParser: MarkedParser;
     cachedElements: Map<string, string> = new Map();
     _articleRender: ArticleRender | null = null;
+    isCancelUpload: boolean = false;
+    isBatchRuning: boolean = false;
 
 
     constructor(leaf: WorkspaceLeaf) {
@@ -113,6 +115,9 @@ export class NotePreview extends ItemView {
     }
 
     async update() {
+        if (this.isBatchRuning) {
+            return;
+        }
         LocalImageManager.getInstance().cleanup();
         CardDataManager.getInstance().cleanup();
         this.renderMarkdown();
@@ -131,13 +136,24 @@ export class NotePreview extends ItemView {
         okBtn.onclick = async () => {
             this.msgView.setAttr('style', 'display: none;');
         }
+        const cancelBtn = this.msgView.createEl('button', { cls: 'msg-ok-btn' }, async (button) => {
+        });
+        cancelBtn.id = 'msg-cancel-btn';
+        cancelBtn.innerText = '取消';
+        cancelBtn.onclick = async () => {
+            this.isCancelUpload = true;
+            this.msgView.setAttr('style', 'display: none;');
+        }
     }
 
-    showLoading(msg: string) {
+    showLoading(msg: string, cancelable: boolean = false) {
         const title = this.msgView.querySelector('#msg-title') as HTMLElement;
         title!.innerText = msg;
         const btn = this.msgView.querySelector('#msg-ok-btn') as HTMLElement;
         btn.setAttr('style', 'display: none;');
+        this.msgView.setAttr('style', 'display: flex;');
+        const cancelBtn = this.msgView.querySelector('#msg-cancel-btn') as HTMLElement;
+        cancelBtn.setAttr('style', cancelable ? 'display: block;': 'display: none;');
         this.msgView.setAttr('style', 'display: flex;');
     }
 
@@ -146,6 +162,9 @@ export class NotePreview extends ItemView {
         title!.innerText = msg;
         const btn = this.msgView.querySelector('#msg-ok-btn') as HTMLElement;
         btn.setAttr('style', 'display: block;');
+        this.msgView.setAttr('style', 'display: flex;');
+        const cancelBtn = this.msgView.querySelector('#msg-cancel-btn') as HTMLElement;
+        cancelBtn.setAttr('style', 'display: none;');
         this.msgView.setAttr('style', 'display: flex;');
     }
 
@@ -189,7 +208,8 @@ export class NotePreview extends ItemView {
         })
 
         refreshBtn.onclick = async () => {
-            this.assetsManager.loadCustomCSS();
+            await this.assetsManager.loadCustomCSS();
+            await this.assetsManager.loadExpertSettings();
             this.render.reloadStyle();
             await this.renderMarkdown();
             uevent('refresh');
@@ -365,8 +385,14 @@ export class NotePreview extends ItemView {
         this.articleDiv = this.renderDiv.createEl('div');
     }
 
-    async renderMarkdown() {
-        await this.render.renderMarkdown();
+    async renderMarkdown(af: TFile | null = null) {
+        if (!af) {
+            af = this.app.workspace.getActiveFile();
+        }
+        if (!af || af.extension.toLocaleLowerCase() !== 'md') {
+            return;
+        }
+        await this.render.renderMarkdown(af);
         const metadata = this.render.getMetadata();
         if (metadata.appid) {
             this.wechatSelect.value = metadata.appid;
@@ -445,6 +471,36 @@ export class NotePreview extends ItemView {
             this.showMsg('HTML导出成功');
         } catch (error) {
             this.showMsg('HTML导出失败: ' + error.message);
+        }
+    }
+
+    async batchPost(folder: TFolder) {
+        this.isCancelUpload = false;
+        this.isBatchRuning = true;
+        try {
+            const files = folder.children.filter((child: TAbstractFile) => child.path.toLocaleLowerCase().endsWith('.md'));
+            if (!files) {
+                new Notice('没有可渲染的笔记或文件不支持渲染');
+                return;
+            }
+            for (let file of files) {
+                if (this.isCancelUpload) {
+                    break;
+                }
+                this.showLoading(`即将发布: ${file.name}`, true);
+                await sleep(10000);
+                await this.renderMarkdown(file as TFile);
+                await this.postArticle();
+            }
+            this.showMsg('批量发布完成');
+        }
+        catch (e) {
+            console.error(e);
+            new Notice('批量发布失败: ' + e.message);
+        }
+        finally {
+            this.isBatchRuning = false;
+            this.isCancelUpload = false;
         }
     }
 }

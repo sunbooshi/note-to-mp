@@ -338,6 +338,22 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					this.settings.customCSSNote = value.trim();
 					await this.plugin.saveSettings();
+					await this.plugin.assetsManager.loadCustomCSS();
+				})
+				.inputEl.setAttr('style', 'width: 320px;')
+		});
+
+		const expertDoc = '使用指南：<a href="https://sunboshi.tech/expert">https://sunboshi.tech/expert</a>';
+		new Setting(containerEl)
+			.setName('专家设置笔记')
+			.setDesc(sanitizeHTMLToDom(expertDoc))
+			.addText(text => {
+				text.setPlaceholder('请输入专家设置笔记标题')
+				.setValue(this.settings.expertSettingsNote)
+				.onChange(async (value) => {
+					this.settings.expertSettingsNote = value.trim();
+					await this.plugin.saveSettings();
+					await this.plugin.assetsManager.loadExpertSettings();
 				})
 				.inputEl.setAttr('style', 'width: 320px;')
 		});

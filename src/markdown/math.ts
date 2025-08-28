@@ -116,8 +116,9 @@ export class MathRendererQueue {
             svg = res.svg;
         }
 
-        let className = inline ? 'inline-math-svg' : 'block-math-svg';
-        return `<span id="${id}" class="${className}">${svg}</span>`;
+        const className = inline ? 'inline-math-svg' : 'block-math-svg';
+        const body = inline ? svg : `<section style="text-align: center;overflow: auto;">${svg}</section>`;
+        return `<span id="${id}" class="${className}">${body}</span>`;
     }
 }
 

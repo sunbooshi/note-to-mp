@@ -26,7 +26,6 @@ import { App, Vault } from "obsidian";
 import AssetsManager from "../assets";
 import { Extension, MDRendererCallback } from "./extension";
 import { Blockquote} from "./blockquote";
-import { CodeHighlight } from "./code-highlight";
 import { CodeRenderer } from "./code";
 import { EmbedBlockMark } from "./embed-block-mark";
 import { SVGIcon } from "./icons";
@@ -36,6 +35,7 @@ import { MathRenderer } from "./math";
 import { TextHighlight } from "./text-highlight";
 import { Comment } from "./commnet";
 import { Topic } from "./topic";
+import { HeadingRenderer } from "./heading";
 import { cleanUrl } from "../utils";
 
 
@@ -45,10 +45,6 @@ const markedOptiones = {
 };
 
 const customRenderer = {
-	heading(text: string, level: number, raw: string): string {
-		// ignore IDs
-		return `<h${level}>${text}</h${level}>`;
-	},
 	hr(): string {
 		return '<hr>';
 	},
@@ -58,7 +54,7 @@ const customRenderer = {
 		return '<' + type + startatt + '>' + body + '</' + type + '>';
 	},
 	listitem(text: string, task: boolean, checked: boolean): string {
-		return `<li>${text}</li>`;
+		return `<li><section><span leaf="">${text}<span></section></li>`;
 	},
 	image(href: string, title: string | null, text: string): string {
     const cleanHref = cleanUrl(href);
@@ -118,7 +114,6 @@ export class MarkedParser {
 
 		this.extensions.push(new LocalFile(app, settings, assetsManager, callback));
 		this.extensions.push(new Blockquote(app, settings, assetsManager, callback));
-		this.extensions.push(new CodeHighlight(app, settings, assetsManager, callback));
 		this.extensions.push(new EmbedBlockMark(app, settings, assetsManager, callback));
 		this.extensions.push(new SVGIcon(app, settings, assetsManager, callback));
 		this.extensions.push(new LinkRenderer(app, settings, assetsManager, callback));
@@ -126,6 +121,7 @@ export class MarkedParser {
 		this.extensions.push(new CodeRenderer(app, settings, assetsManager, callback));
 		this.extensions.push(new Comment(app, settings, assetsManager, callback));
 		this.extensions.push(new Topic(app, settings, assetsManager, callback));
+		this.extensions.push(new HeadingRenderer(app, settings, assetsManager, callback));
 		if (settings.isAuthKeyVaild()) {
 			this.extensions.push(new MathRenderer(app, settings, assetsManager, callback));
 		}

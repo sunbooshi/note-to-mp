@@ -151,9 +151,8 @@ export class ArticleRender implements MDRendererCallback {
       + `${error}`;
   }
 
-  async renderMarkdown() {
+  async renderMarkdown(af: TFile | null = null) {
     try {
-      const af = this.app.workspace.getActiveFile();
       let md = '';
       if (af && af.extension.toLocaleLowerCase() === 'md') {
         md = await this.app.vault.adapter.read(af.path);
@@ -221,22 +220,23 @@ export class ArticleRender implements MDRendererCallback {
     if (!file) return res;
     const metadata = this.app.metadataCache.getFileCache(file);
     if (metadata?.frontmatter) {
+      const keys = this.assetsManager.expertSettings.frontmatter;
       const frontmatter = metadata.frontmatter;
-      res.title = frontmatter['标题'];
-      res.author = frontmatter['作者'];
-      res.digest = frontmatter['摘要'];
-      res.content_source_url = frontmatter['原文地址'];
-      res.cover = frontmatter['封面'];
-      res.thumb_media_id = frontmatter['封面素材ID'];
-      res.need_open_comment = frontmatter['打开评论'] ? 1 : undefined;
-      res.only_fans_can_comment = frontmatter['仅粉丝可评论'] ? 1 : undefined;
-      res.appid = frontmatter['公众号'];
+      res.title = frontmatter[keys.title];
+      res.author = frontmatter[keys.author];
+      res.digest = frontmatter[keys.digest];
+      res.content_source_url = frontmatter[keys.content_source_url];
+      res.cover = frontmatter[keys.cover];
+      res.thumb_media_id = frontmatter[keys.thumb_media_id] ;
+      res.need_open_comment = frontmatter[keys.need_open_comment] ? 1 : undefined;
+      res.only_fans_can_comment = frontmatter[keys.only_fans_can_comment] ? 1 : undefined;
+      res.appid = frontmatter[keys.appid];
       if (res.appid && !res.appid.startsWith('wx')) {
         res.appid = this.settings.wxInfo.find(wx => wx.name === res.appid)?.appid;
       }
-      res.theme = frontmatter['样式'];
-      res.highlight = frontmatter['代码高亮'];
-      if (frontmatter['封面裁剪']) {
+      res.theme = frontmatter[keys.theme];
+      res.highlight = frontmatter[keys.highlight];
+      if (frontmatter[keys.crop]) {
         res.pic_crop_235_1 = '0_0_1_0.5';
         res.pic_crop_1_1 = '0_0.525_0.404_1';
       }

@@ -93,6 +93,11 @@ section .note-callout-quote {
   color: rgb(158, 158, 158);
   background-color: rgba(158, 158, 158, 0.1);
 }
+/* custom icon callout */
+section .note-callout-custom { 
+  color: rgb(8, 109, 221);
+  background-color: rgba(8, 109, 221, 0.1);
+}
 
 /* --------------------------------------- */
 /* math */

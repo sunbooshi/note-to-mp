@@ -22,6 +22,8 @@
 
 import { Tokens, MarkedExtension} from "marked";
 import { Extension } from "./extension";
+import AssetsManager from "src/assets";
+import { wxWidget } from "src/weixin-api";
 
 const icon_note = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-pencil"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path><path d="m15 5 4 4"></path></svg>`
 const icon_abstract = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-clipboard-list"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M12 11h4"></path><path d="M12 16h4"></path><path d="M8 11h.01"></path><path d="M8 16h.01"></path></svg>`
@@ -208,22 +210,46 @@ export class CalloutRenderer extends Extension {
         }
     
         const title = GetCalloutTitle(callout, token.text);
-        let info = GetCallout(callout.toLowerCase());
-        if (info == null) {
-            const svg = await this.assetsManager.loadIcon(callout);
-            if (svg) {
-                info = {icon: svg, style: 'note-callout-note'}
-            }
-            else {
-                info = GetCallout('note');
-            }
-        }
         const index = token.text.indexOf('\n');
         let body = '';
         if (index > 0) {
             token.text = token.text.slice(index+1)
             body = await this.marked.parse(token.text);
         } 
+
+        const setting = AssetsManager.getInstance().expertSettings.render?.callout as { [key: string]: any };
+        if (setting && callout.toLocaleLowerCase() in setting) {
+            const authkey = this.settings.authKey;
+            const widget = setting[callout.toLocaleLowerCase()];
+            if (typeof widget === 'number') {
+                return await wxWidget(authkey, JSON.stringify({
+                    id: `${widget}`,
+                    title,
+                    content: body,
+                }));
+            }
+            if (typeof widget === 'object') {
+                const {id, style} = widget;
+                return await wxWidget(authkey, JSON.stringify({
+                    id: `${id}`,
+                    title,
+                    style: style || {},
+                    content: body,
+                }));
+            }
+        }
+
+        let info = GetCallout(callout.toLowerCase());
+        if (info == null) {
+            const svg = await this.assetsManager.loadIcon(callout);
+            if (svg) {
+                info = {icon: svg, style: 'note-callout-custom'}
+            }
+            else {
+                info = GetCallout('note');
+            }
+        }
+
         
         return `<section class="note-callout ${info?.style}"><section class="note-callout-title-wrap"><span class="note-callout-icon">${info?.icon}</span><span class="note-callout-title">${title}<span></section><section class="note-callout-content">${body}</section></section>`;
      }
