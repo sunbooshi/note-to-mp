@@ -22,9 +22,11 @@
 
 import { requestUrl, RequestUrlParam, getBlobArrayBuffer } from "obsidian";
 
+const PluginHost = 'https://obplugin.sunboshi.tech';
+
 // 获取token
 export async function wxGetToken(authkey:string, appid:string, secret:string) {
-    const url = 'https://obplugin.sunboshi.tech/wx/token';
+    const url = PluginHost + '/v1/wx/token';
     const body = {
         authkey,
         appid,
@@ -41,7 +43,7 @@ export async function wxGetToken(authkey:string, appid:string, secret:string) {
 }
 
 export async function wxEncrypt(authkey:string, wechat:any[]) {
-    const url = 'https://obplugin.sunboshi.tech/wx/encrypt';
+    const url = PluginHost + '/v1/wx/encrypt';
     const body =  JSON.stringify({
         authkey,
         wechat
@@ -57,7 +59,7 @@ export async function wxEncrypt(authkey:string, wechat:any[]) {
 }
 
 export async function wxKeyInfo(authkey:string) {
-    const url = 'https://obplugin.sunboshi.tech/wx/info/' + authkey + '?ver=2';
+    const url = PluginHost + '/v1/wx/info/' + authkey;
     const res = await requestUrl({
         url: url,
         method: 'GET',
@@ -65,6 +67,31 @@ export async function wxKeyInfo(authkey:string) {
         contentType: 'application/json',
     });
     return res
+}
+
+export async function wxWidget(authkey: string, params: string) {
+    const host = 'https://obplugin.sunboshi.tech';
+    const path = '/math/widget';
+    const url = `${host}${path}`;
+    try {
+        const res = await requestUrl({
+            url,
+            throw: false,
+            method: 'POST',
+            contentType: 'application/json',
+            headers: {
+                authkey
+            },
+            body: params
+        })
+        if (res.status === 200) {
+            return res.json.content;
+        }
+        return res.json.msg;
+    } catch (error) {
+        console.log(error);
+        return error.message;
+    }
 }
 
 // 上传图片

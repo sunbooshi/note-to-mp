@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-import { App, PluginManifest, Notice, requestUrl, FileSystemAdapter, TAbstractFile, TFile, parseYaml } from "obsidian";
+import { App, PluginManifest, Notice, requestUrl, FileSystemAdapter, TAbstractFile, TFile, TFolder } from "obsidian";
 import * as zip from "@zip.js/zip.js";
 import DefaultTheme from "./default-theme";
 import DefaultHighlight from "./default-highlight";
@@ -58,6 +58,7 @@ export default class AssetsManager {
     iconsPath: string;
     wasmPath: string;
     expertSettings: ExpertSettings;
+    isLoaded: boolean = false;
 
     private static instance: AssetsManager;
 
@@ -95,6 +96,7 @@ export default class AssetsManager {
         await this.loadHighlights();
         await this.loadCustomCSS();
         await this.loadExpertSettings();
+        this.isLoaded = true;
     }
 
     async loadThemes() {
@@ -361,27 +363,28 @@ export default class AssetsManager {
 		shell.openPath(dst);
 	}
 
-    searchFile(originPath: string): TAbstractFile | null {
-        const resolvedPath = this.resolvePath(originPath);
+    searchFile(nameOrPath: string): TAbstractFile | null {
+        const resolvedPath = this.resolvePath(nameOrPath);
         const vault= this.app.vault;
         const attachmentFolderPath = vault.config.attachmentFolderPath || '';
         let localPath = resolvedPath;
         let file = null;
 
-        // 然后从根目录查找
+        // 先按路径查找
         file = vault.getFileByPath(resolvedPath);
         if (file) {
             return file; 
         }
 
-        file = vault.getFileByPath(originPath);
+        // 在根目录查找
+        file = vault.getFileByPath(nameOrPath);
         if (file) {
             return file; 
         }
 
-        // 先从附件文件夹查找
+        // 从附件文件夹查找
         if (attachmentFolderPath != '') {
-            localPath = attachmentFolderPath + '/' + originPath;
+            localPath = attachmentFolderPath + '/' + nameOrPath;
             file = vault.getFileByPath(localPath)
             if (file) {
                 return file;
@@ -394,10 +397,12 @@ export default class AssetsManager {
             }
         }
 
-        // 最后查找所有文件
+        // 最后查找所有文件，这里只需要判断文件名
         const files = vault.getAllLoadedFiles();
         for (let f of files) {
-            if (f.path.includes(originPath)) {
+            if (f instanceof TFolder) continue
+            file = f as TFile;
+            if (file.basename === nameOrPath || file.name === nameOrPath) {
                 return f;
             }
         }

@@ -41,6 +41,7 @@ export class NMPSettings {
     watermark: string;
     useFigcaption: boolean;
     excalidrawToPNG: boolean;
+    isLoaded: boolean = false;
 
     private static instance: NMPSettings;
 
@@ -149,6 +150,7 @@ export class NMPSettings {
             settings.expertSettingsNote = expertSettingsNote;
         }
         settings.getExpiredDate();
+        settings.isLoaded = true;
     }
 
     public static allSettings() {

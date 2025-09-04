@@ -28,7 +28,7 @@ export interface ExpertSettings {
     h2?: string | number | object;
     h3?: string | number | object;
     code?: number;
-    callout: object | undefined;
+    callout?: object | undefined;
   },
   frontmatter: {
     title: string;

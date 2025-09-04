@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-import { Tokens, MarkedExtension } from "marked";
+import { Tokens, MarkedExtension, Parser } from "marked";
 import { Extension } from "./extension";
 import AssetsManager from "src/assets";
 import { ExpertSettings } from "src/expert-settings";
@@ -49,20 +49,22 @@ export class HeadingRenderer extends Extension {
     }
   }
 
-  renderWithTemplate(token: Tokens.Generic, template: string) {
-    token.html = template.replace('{content}', token.text)
+  async renderWithTemplate(token: Tokens.Heading, template: string) {
+    const content = await this.marked.parseInline(token.text);
+    return template.replace('{content}', content);
   }
 
-  async renderWithWidgetId(token: Tokens.Generic, widgetId: number) {
+  async renderWithWidgetId(token: Tokens.Heading, widgetId: number) {
     const authkey = this.settings.authKey;
+    const content = await this.marked.parseInline(token.text);
     const params = JSON.stringify({
       id: `${widgetId}`,
-      title: token.text,
+      title: content,
     });
-    token.html = await wxWidget(authkey, params);
+    return await wxWidget(authkey, params);
   }
 
-  async renderWithWidget(token: Tokens.Generic, widgetId: number, counter: boolean|undefined, len: number|undefined, style: object|undefined = undefined) {
+  async renderWithWidget(token: Tokens.Heading, widgetId: number, counter: boolean|undefined, len: number|undefined, style: object|undefined = undefined) {
     const authkey = this.settings.authKey;
     let title = token.text;
     if (counter === undefined) {
@@ -80,13 +82,14 @@ export class HeadingRenderer extends Extension {
         title = title.padStart(len, '0');
       }
     }
+    const content = await this.marked.parseInline(token.text);
     const params = JSON.stringify({
       id: `${widgetId}`,
       title,
       style,
-      content: '<p>' + token.text + '</p>',
+      content: '<p>' + content + '</p>',
     });
-    token.html = await wxWidget(authkey, params);
+    return await wxWidget(authkey, params);
   }
 
   markedExtension(): MarkedExtension {
@@ -101,19 +104,20 @@ export class HeadingRenderer extends Extension {
         this.index[token.depth] += 1;
         if (setting) {
           if (typeof setting === 'string') {
-            this.renderWithTemplate(token, setting);
+            token.html = await this.renderWithTemplate(token as Tokens.Heading, setting);
           }
           else if (typeof setting === 'number') {
-            await this.renderWithWidgetId(token, setting);
+            token.html = await this.renderWithWidgetId(token as Tokens.Heading, setting);
           }
           else {
             const { id, counter, len, style } = setting;
-            await this.renderWithWidget(token, id, counter, len, style);
+            token.html = await this.renderWithWidget(token as Tokens.Heading, id, counter, len, style);
           }
           return;
         }
 
-        token.html = `<h${token.depth}>${token.text}</h${token.depth}>`;
+        const body = await this.marked.parseInline(token.text);
+        token.html = `<h${token.depth}>${body}</h${token.depth}>`;
       },
       extensions: [{
         name: 'heading',

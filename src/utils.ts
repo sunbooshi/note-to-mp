@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-import { sanitizeHTMLToDom, requestUrl, Platform } from "obsidian";
+import { App, sanitizeHTMLToDom, requestUrl, Platform } from "obsidian";
 import * as postcss from "./postcss/postcss";
 
 let PluginVersion = "0.0.0";
@@ -117,6 +117,23 @@ export function ruleToStyle(rule: postcss.Rule) {
 	return style;
 }
 
+function processPseudoSelector(selector: string) {
+	if (selector.includes('::before') || selector.includes('::after')) {
+		selector = selector.replace(/::before/g, '').replace(/::after/g, '');
+	}
+	return selector;
+}
+
+function getPseudoType(selector: string) {
+	if (selector.includes('::before')) {
+		return 'before';
+	}
+	else if (selector.includes('::after')) {
+		return 'after';
+	}
+	return undefined;
+}
+
 function applyStyle(root: HTMLElement, cssRoot: postcss.Root) {
 	if (root.tagName.toLowerCase() === 'a' && root.classList.contains('wx_topic_link')) {
 		return;
@@ -124,12 +141,32 @@ function applyStyle(root: HTMLElement, cssRoot: postcss.Root) {
 
 	const cssText = root.style.cssText;
 	cssRoot.walkRules(rule => {
-		if (root.matches(rule.selector)) {
+		const selector = processPseudoSelector(rule.selector);
+		if (root.matches(selector)) {
+			let item = root;
+
+			const pseudoType = getPseudoType(rule.selector);
+			if (pseudoType) {
+				let content = '';
+				rule.walkDecls('content', decl => {
+					content = decl.value || '';
+				})
+				item = createSpan();
+				item.textContent = content.replace(/(^")|("$)/g, '');
+
+				if (pseudoType === 'before') {
+					root.prepend(item);
+				}
+				else if (pseudoType === 'after') {
+					root.appendChild(item);
+				}
+			}
+
 			rule.walkDecls(decl => {
 				// 如果已经设置了，则不覆盖
 				const setted = cssText.includes(decl.prop);
 				if (!setted || decl.important) {
-					root.style.setProperty(decl.prop, decl.value);
+					item.style.setProperty(decl.prop, decl.value);
 				}
 			})
 		}
@@ -192,4 +229,13 @@ export function cleanUrl(href: string) {
     return null;
   }
   return href;
+}
+
+export async function waitForLayoutReady(app: App): Promise<void> {
+  if (app.workspace.layoutReady) {
+    return;
+  }
+  return new Promise((resolve) => {
+    app.workspace.onLayoutReady(() => resolve());
+  });
 }

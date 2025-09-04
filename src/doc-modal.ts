@@ -20,57 +20,46 @@
  * THE SOFTWARE.
  */
 
-import { App, Modal, MarkdownView } from "obsidian";
-import { uevent } from "./utils";
+import { App, Modal, sanitizeHTMLToDom } from "obsidian";
 
-export class WidgetsModal extends Modal {
-  listener: any = null;
-  url: string = 'https://widgets.sunboshi.tech';
-  constructor(app: App) {
+export class DocModal extends Modal {
+  url: string = '';
+  title: string = '提示';
+  content: string = '';
+
+  constructor(app: App, title: string = "提示", content: string = "", url: string = "") {
     super(app);
-  }
-
-  insertMarkdown(markdown: string) {
-    const editor = this.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
-    if (!editor) return;
-    editor.replaceSelection(markdown);
-    editor.exec("goRight");
-    uevent('insert-widgets');
+    this.title = title;
+    this.content = content;
+    this.url = url;
   }
 
   onOpen() {
     let { contentEl, modalEl } = this;
     modalEl.style.width = '640px';
-    modalEl.style.height = '500px';
+    modalEl.style.height = '720px';
+    contentEl.style.display = 'flex';
+    contentEl.style.flexDirection = 'column';
+
+    const titleEl = contentEl.createEl('h2', { text: this.title });
+    titleEl.style.marginTop = '0.5em';
+    const content = contentEl.createEl('div');
+    content.setAttr('style', 'margin-bottom:1em;-webkit-user-select: text; user-select: text;');
+    content.appendChild(sanitizeHTMLToDom(this.content));
+
     const iframe = contentEl.createEl('iframe', {
       attr: {
         src: this.url,
         width: '100%',
-        height: '100%',
         allow: 'clipboard-read; clipboard-write',
       },
     });
 
-    iframe.style.border = 'none';
-
-    this.listener = this.handleMessage.bind(this);
-    window.addEventListener('message', this.listener);
-    uevent('open-widgets');
-  }
-
-  handleMessage(event: MessageEvent) {
-    if (event.origin === this.url) {
-      const { type, data } = event.data;
-      if (type === 'cmd') {
-        this.insertMarkdown(data);
-      }
-    }
+    iframe.style.flex = '1';
   }
 
   onClose() {
-    if (this.listener) {
-      window.removeEventListener('message', this.listener);
-    }
+
     let { contentEl } = this;
     contentEl.empty();
   }

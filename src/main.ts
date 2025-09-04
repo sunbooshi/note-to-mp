@@ -34,19 +34,26 @@ export default class NoteToMpPlugin extends Plugin {
 	assetsManager: AssetsManager;
 	constructor(app: App, manifest: PluginManifest) {
 	    super(app, manifest);
-		AssetsManager.setup(app, manifest);
+			AssetsManager.setup(app, manifest);
 	    this.assetsManager = AssetsManager.getInstance();
 	}
 
-	async onload() {
-		console.log('Loading Note to MP');
-		setVersion(this.manifest.version);
-		uevent('load');
+	async loadResource() {
 		await this.loadSettings();
 		await this.assetsManager.loadAssets();
+	}
+
+	async onload() {
+		console.log('Loading NoteToMP');
+		setVersion(this.manifest.version);
+		uevent('load');
+		this.app.workspace.onLayoutReady(()=>{
+			this.loadResource();
+		})
+
 		this.registerView(
 			VIEW_TYPE_NOTE_PREVIEW,
-			(leaf) => new NotePreview(leaf)
+			(leaf) => new NotePreview(leaf, this)
 		);
 
 		const ribbonIconEl = this.addRibbonIcon('clipboard-paste', '复制到公众号', (evt: MouseEvent) => {

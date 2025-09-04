@@ -36,6 +36,7 @@ import { TextHighlight } from "./text-highlight";
 import { Comment } from "./commnet";
 import { Topic } from "./topic";
 import { HeadingRenderer } from "./heading";
+import { FootnoteRenderer } from "./footnote";
 import { cleanUrl } from "../utils";
 
 
@@ -122,6 +123,7 @@ export class MarkedParser {
 		this.extensions.push(new Comment(app, settings, assetsManager, callback));
 		this.extensions.push(new Topic(app, settings, assetsManager, callback));
 		this.extensions.push(new HeadingRenderer(app, settings, assetsManager, callback));
+		this.extensions.push(new FootnoteRenderer(app, settings, assetsManager, callback));
 		if (settings.isAuthKeyVaild()) {
 			this.extensions.push(new MathRenderer(app, settings, assetsManager, callback));
 		}

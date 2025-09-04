@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, Platform, TFile, TFolder, TAbstractFile } from 'obsidian';
-import { uevent } from './utils';
+import { EventRef, ItemView, Workspace, WorkspaceLeaf, Notice, Platform, TFile, TFolder, TAbstractFile, Plugin } from 'obsidian';
+import { uevent, debounce, waitForLayoutReady } from './utils';
 import { NMPSettings } from './settings';
 import AssetsManager from './assets';
 import { MarkedParser } from './markdown/parser';
@@ -34,6 +34,7 @@ export const VIEW_TYPE_NOTE_PREVIEW = 'note-preview';
 
 export class NotePreview extends ItemView {
     workspace: Workspace;
+    plugin: Plugin;
     mainDiv: HTMLDivElement;
     toolbar: HTMLDivElement;
     renderDiv: HTMLDivElement;
@@ -46,7 +47,7 @@ export class NotePreview extends ItemView {
     wechatSelect: HTMLSelectElement;
     themeSelect: HTMLSelectElement;
     highlightSelect: HTMLSelectElement;
-    listeners: EventRef[];
+    listeners?: EventRef[];
     container: Element;
     settings: NMPSettings;
     assetsManager: AssetsManager;
@@ -62,9 +63,10 @@ export class NotePreview extends ItemView {
     isBatchRuning: boolean = false;
 
 
-    constructor(leaf: WorkspaceLeaf) {
+    constructor(leaf: WorkspaceLeaf, plugin: Plugin) {
         super(leaf);
         this.workspace = this.app.workspace;
+        this.plugin = plugin;
         this.settings = NMPSettings.getInstance();
         this.assetsManager = AssetsManager.getInstance();
         this.currentTheme = this.settings.defaultStyle;
@@ -93,34 +95,57 @@ export class NotePreview extends ItemView {
     }
 
     async onOpen() {
-        this.buildUI();
-        this.listeners = [
-            this.workspace.on('active-leaf-change', () => this.update())
-        ];
-
-        this.renderMarkdown();
+        this.viewLoading();
+        this.setup();
         uevent('open');
     }
 
+    async setup() {
+        await waitForLayoutReady(this.app);
+
+        if (!this.settings.isLoaded) {
+            const data = await this.plugin.loadData();
+            NMPSettings.loadSettings(data);
+        }
+        if (!this.assetsManager.isLoaded) {
+            await this.assetsManager.loadAssets();
+        }
+
+        this.buildUI();
+        this.listeners = [
+            this.workspace.on('file-open', () => {
+                this.update();
+            }),
+            this.workspace.on("editor-change", debounce(() => {
+                this.renderMarkdown();
+            }, 1000)) 
+        ];
+
+        this.renderMarkdown();
+    }
+
     async onClose() {
-        this.listeners.forEach(listener => this.workspace.offref(listener));
+        this.listeners?.forEach(listener => this.workspace.offref(listener));
         LocalFile.fileCache.clear();
         uevent('close');
     }
 
     onAppIdChanged() {
         // 清理上传过的图片
-        LocalImageManager.getInstance().cleanup();
-        CardDataManager.getInstance().cleanup();
+        this.cleanArticleData();
     }
 
     async update() {
         if (this.isBatchRuning) {
             return;
         }
+        this.cleanArticleData();
+        this.renderMarkdown();
+    }
+
+    cleanArticleData() {
         LocalImageManager.getInstance().cleanup();
         CardDataManager.getInstance().cleanup();
-        this.renderMarkdown();
     }
 
     buildMsgView(parent: HTMLDivElement) {
@@ -385,6 +410,13 @@ export class NotePreview extends ItemView {
         this.articleDiv = this.renderDiv.createEl('div');
     }
 
+    async viewLoading() {
+        const container = this.containerEl.children[1]
+        container.empty();
+        const loading = container.createDiv({cls: 'loading-wrapper'})
+        loading.createDiv({cls: 'loading-spinner'})
+    }
+
     async renderMarkdown(af: TFile | null = null) {
         if (!af) {
             af = this.app.workspace.getActiveFile();
@@ -475,24 +507,30 @@ export class NotePreview extends ItemView {
     }
 
     async batchPost(folder: TFolder) {
+        const files = folder.children.filter((child: TAbstractFile) => child.path.toLocaleLowerCase().endsWith('.md'));
+        if (!files) {
+            new Notice('没有可渲染的笔记或文件不支持渲染');
+            return;
+        }
+
         this.isCancelUpload = false;
         this.isBatchRuning = true;
+
         try {
-            const files = folder.children.filter((child: TAbstractFile) => child.path.toLocaleLowerCase().endsWith('.md'));
-            if (!files) {
-                new Notice('没有可渲染的笔记或文件不支持渲染');
-                return;
-            }
             for (let file of files) {
+                this.showLoading(`即将发布: ${file.name}`, true);
+                await sleep(5000);
                 if (this.isCancelUpload) {
                     break;
                 }
-                this.showLoading(`即将发布: ${file.name}`, true);
-                await sleep(10000);
+                this.cleanArticleData();
                 await this.renderMarkdown(file as TFile);
                 await this.postArticle();
             }
-            this.showMsg('批量发布完成');
+
+            if (!this.isCancelUpload) {
+                this.showMsg(`批量发布完成：成功发布 ${files.length} 篇笔记`);
+            }
         }
         catch (e) {
             console.error(e);

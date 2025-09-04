@@ -58,7 +58,8 @@ export class CardDataManager {
 			const exp = `<section[^>]*\\sdata-id="${key}"[^>]*>(.*?)<\\/section>`;
 			const regex = new RegExp(exp, 'gs');
 			if (!regex.test(html)) {
-				console.error('未能正确替换公众号卡片');
+				console.warn('没有公众号信息：', key);
+				continue;
 			}
 			html = html.replace(regex, value);
 		}
@@ -140,12 +141,16 @@ export class CodeRenderer extends Extension {
 		const lang = (infostring || '').match(/^\S*/)?.[0];
 		code = code.replace(/\n$/, '');
 
-		if (lang && hljs.getLanguage(lang)) {
-			try {
-				const result = hljs.highlight(code, { language: lang });
-				code = result.value;
-			} catch (err) { }
-		} 
+		try {
+			if (lang && hljs.getLanguage(lang)) {
+				code = hljs.highlight(code, { language: lang }).value;
+			}
+			else {
+				code = hljs.highlightAuto(code).value;
+			}
+		} catch (err) {
+			console.error(err);
+		}
 
 		code = this.replaceSpaces(code);
 		const lines = code.split('\n');
@@ -160,7 +165,7 @@ export class CodeRenderer extends Extension {
 			liItems = liItems + `<li>${parseInt(line)+1}</li>`;
 		}
 
-		let codeSection = '<section class="code-section code-snippet__fix">';
+		let codeSection = '<section class="code-section code-snippet__fix hljs">';
 		if (this.settings.lineNumber) {
 			codeSection = codeSection + '<ul>'
 				+ liItems

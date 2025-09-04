@@ -25,12 +25,11 @@ const css = `
 /* Obsidian的默认样式                                            */
 /* =========================================================== */
 .note-to-mp {
-    padding: 20px 20px;
+    padding: 0;
     user-select: text;
     -webkit-user-select: text;
     color: #222222;
     font-size: 16px;
-    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
 }
 
 .note-to-mp:last-child {
@@ -61,7 +60,7 @@ Heading
 }
 
 .note-to-mp h2 {
-    color: inherit;
+    color: #222;
     font-weight: 600;
     font-size: 1.602em;
     line-height: 1.2;
@@ -70,7 +69,7 @@ Heading
 }
 
 .note-to-mp h3 {
-    color: inherit;
+    color: #222;
     font-weight: 600;
     font-size: 1.424em;
     line-height: 1.3;
@@ -79,7 +78,7 @@ Heading
 }
 
 .note-to-mp h4 {
-    color: inherit;
+    color: #222;
     font-weight: 600;
     font-size: 1.266em;
     line-height: 1.4;
@@ -88,13 +87,13 @@ Heading
 }
 
 .note-to-mp h5 {
-    color: inherit;
+    color: #222;
     margin-block-start: 1em;
     margin-block-end: 0;
 }
 
 .note-to-mp h6 {
-    color: inherit;
+    color: #222;
     margin-block-start: 1em;
     margin-block-end: 0;
 }
@@ -175,13 +174,7 @@ List
     margin: 0;
     margin-top: 1.25em;
     margin-bottom: 1.25em;
-}
-
-.note-to-mp ul>li {
-    /* position: relative; */
-    /* padding-left: 1.75rem; */
-    margin-top: 0.1em;
-    margin-bottom: 0.1em;
+    line-height: 1.6em;
 }
 
 .note-to-mp ul>li::marker {
@@ -199,14 +192,13 @@ List
     margin-top: 1.25em;
     margin-bottom: 0em;
     list-style-type: decimal;
+    line-height: 1.6em;
 }
 
 .note-to-mp ol>li {
     position: relative;
     padding-left: 0.1em;
     margin-left: 2em;
-    margin-top: 0.1em;
-    margin-bottom: 0.1em;
 }
 
 /*
@@ -316,55 +308,42 @@ Code
 */
 .note-to-mp .code-section {
     display: flex;
-    background-color: rgb(250, 250, 250);
     border: rgb(240, 240, 240) 1px solid;
+    line-height: 26px;
+    font-size: 14px;
+    margin: 1em 0;
+    padding: 0.875em;
+    box-sizing: border-box;
 }
 
 .note-to-mp .code-section ul {
-    flex-shrink: 0;
-    counter-reset: line;
-    margin: 0;
-    padding: 0.875em 0 0.875em 0.875em;
-    white-space: normal;
     width: fit-content;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    flex-shrink: 0;
+    height: 100%;
+    padding: 0;
+    line-height: 26px;
+    list-style-type: none;
+    backgroud: transparent !important;
 }
 
 .note-to-mp .code-section ul>li {
-    font-family: Consolas, ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", "Courier New", monospace;
-    position: relative;
-    margin: 0;
-    padding: 0;
-    display: list-item;
     text-align: right;
-    line-height: 1.75em;
-    font-size: 0.875em;
-    padding: 0;
-    list-style-type: none;
-    color: rgba(0, 0, 0, 0.25);
-    text-wrap: nowrap;
 }
 
 .note-to-mp .code-section pre {
-    margin: 0;
-    padding: 0;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    white-space: normal;
     overflow: auto;
+    padding: 0 0 0 0.875em;
 }
 
 .note-to-mp .code-section code {
-    font-family: Consolas, ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", "Courier New", monospace;
-    color: #5c5c5c;
-    background-color: #fafafa;
-    font-size: 0.875em;
-    vertical-align: baseline;
-    padding: 0 0.5em;
-}    
-
-.note-to-mp .code-section pre code {
-    display: block;
+    display: flex;
     text-wrap: nowrap;
-    line-height: 1.75em;
-    padding: 1em;
-    background: unset;
+    font-family: Consolas,Courier,monospace;
 }
 `
 

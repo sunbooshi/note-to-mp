@@ -500,24 +500,57 @@ export class LocalFile extends Extension{
             }
         }
 
+        function isStructuredBlock(line: string) {
+            const trimmed = line.trim();
+            return trimmed.startsWith('-') || trimmed.startsWith('>') || trimmed.startsWith('|') || trimmed.match(/^\d+\./);
+        }
+
         if (block) {
-            let preline = '';
+            let stopAtEmpty = false;
+            let totalLen = 0;
+            let structured = false;
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i];
                 if (line.indexOf(block) >= 0) {
-                    result = line.replace(block, '');
-                    if (result.trim() == '') {
-                        for (let j = i - 1; j >= 0; j--) {
-                            const l = lines[j];
-                            if (l.trim()!= '') {
-                                result = l;
-                                break;
-                            }
+                    result = line.replace(block, '').trim();
+
+                    // 标记和结构化内容位于同一行的时候只返回当前的条目
+                    if (isStructuredBlock(line)) {
+                        break;
+                    }
+
+                    // 向上查找内容
+                    for (let j = i - 1; j >= 0; j--) {
+                        const l = lines[j];
+
+                        if (l.startsWith('#')) {
+                            break;
                         }
+
+                        if (l.trim() == '') {
+                            if (stopAtEmpty) break;
+                            if (j < i - 1 && totalLen > 0) break;
+                            stopAtEmpty = true;
+                            result = l + '\n' + result;
+                            continue;
+                        }
+                        else {
+                            stopAtEmpty = true;
+                        }
+
+                        if (structured && !isStructuredBlock(l)) {
+                           break; 
+                        }
+                        
+                        if (totalLen === 0 && isStructuredBlock(l)) {
+                            structured = true;
+                        }
+
+                        totalLen += result.length;
+                        result = l + '\n' + result;
                     }
                     break;
                 }
-                preline = line;
             }
         }
 

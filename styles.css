@@ -134,3 +134,29 @@
   font-size: 14px;
   color: rgba(0, 0, 0, 0.3);
 }
+
+.loading-wrapper {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-spinner {
+  width: 50px;                    /* 可调整大小 */
+  height: 50px;
+  border: 4px solid #fcd6ff;      /* 底色，浅灰 */
+  border-top: 4px solid #bb0cdf;  /* 主色，蓝色顶部产生旋转感 */
+  border-radius: 50%;             /* 圆形 */
+  animation: spin 1s linear infinite; /* 旋转动画 */
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
