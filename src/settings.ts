@@ -42,6 +42,7 @@ export class NMPSettings {
     useFigcaption: boolean;
     excalidrawToPNG: boolean;
     isLoaded: boolean = false;
+    enableEmptyLine: boolean = false;
 
     private static instance: NMPSettings;
 
@@ -70,6 +71,7 @@ export class NMPSettings {
         this.customCSSNote = '';
         this.excalidrawToPNG = false;
         this.expertSettingsNote = '';
+        this.enableEmptyLine = false;
     }
 
     resetStyelAndHighlight() {
@@ -98,6 +100,7 @@ export class NMPSettings {
             customCSSNote,
             excalidrawToPNG,
             expertSettingsNote,
+            ignoreEmptyLine,
         } = data;
 
         const settings = NMPSettings.getInstance();
@@ -149,6 +152,9 @@ export class NMPSettings {
         if (expertSettingsNote) {
             settings.expertSettingsNote = expertSettingsNote;
         }
+        if (ignoreEmptyLine !== undefined) {
+            settings.enableEmptyLine = ignoreEmptyLine;
+        }
         settings.getExpiredDate();
         settings.isLoaded = true;
     }
@@ -172,6 +178,7 @@ export class NMPSettings {
             'customCSSNote': settings.customCSSNote,
             'excalidrawToPNG': settings.excalidrawToPNG,
             'expertSettingsNote': settings.expertSettingsNote,
+            'ignoreEmptyLine': settings.enableEmptyLine,
         }
     }
 

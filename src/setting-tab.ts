@@ -269,6 +269,16 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 			})
+
+		new Setting(containerEl)
+			.setName('启用空行渲染')
+			.addToggle(toggle => {
+			    toggle.setValue(this.settings.enableEmptyLine);
+				toggle.onChange(async (value) => {
+				    this.settings.enableEmptyLine = value;
+					await this.plugin.saveSettings();
+				});
+			})
 		
 		new Setting(containerEl)
 		.setName('渲染图片标题')

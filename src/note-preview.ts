@@ -53,6 +53,7 @@ export class NotePreview extends ItemView {
     assetsManager: AssetsManager;
     articleHTML: string;
     title: string;
+    currentFile?: TFile;
     currentTheme: string;
     currentHighlight: string;
     currentAppId: string;
@@ -116,9 +117,11 @@ export class NotePreview extends ItemView {
             this.workspace.on('file-open', () => {
                 this.update();
             }),
-            this.workspace.on("editor-change", debounce(() => {
-                this.renderMarkdown();
-            }, 1000)) 
+            this.app.vault.on("modify", (file) => {
+                if (this.currentFile?.path == file.path) {
+                    this.renderMarkdown();
+                }
+            } ) 
         ];
 
         this.renderMarkdown();
@@ -221,6 +224,18 @@ export class NotePreview extends ItemView {
                 }
             }
             this.wechatSelect = wxSelect;
+
+            if (Platform.isDesktop) {
+                const openBtn = lineDiv.createEl('button', { cls: 'refresh-button' }, async (button) => {
+                    button.setText('去公众号后台');
+                })
+
+                openBtn.onclick = async () => {
+                    const { shell } = require('electron');
+                    shell.openExternal('https://mp.weixin.qq.com')
+                    uevent('open-mp');
+                }
+            }
         }
         else if (this.settings.wxInfo.length > 0) {
             this.currentAppId = this.settings.wxInfo[0].appid;
@@ -424,6 +439,7 @@ export class NotePreview extends ItemView {
         if (!af || af.extension.toLocaleLowerCase() !== 'md') {
             return;
         }
+        this.currentFile = af;
         await this.render.renderMarkdown(af);
         const metadata = this.render.getMetadata();
         if (metadata.appid) {
@@ -470,7 +486,7 @@ export class NotePreview extends ItemView {
                 this.showMsg('请选择封面文件');
                 return;
             }
-            const localCover = fileInput.files[0];
+            localCover = fileInput.files[0];
             if (!localCover) {
                 this.showMsg('请选择封面文件');
                 return;

@@ -42,6 +42,7 @@ interface ImageInfo {
     resUrl: string;
     filePath: string;
     url: string | null;
+    media_id: string | null;
 }
 
 export class LocalImageManager {
@@ -104,6 +105,7 @@ export class LocalImageManager {
             }
 
             value.url = res.url;
+            value.media_id = res.media_id;
             result.push(res);
         }
         return result;
@@ -244,6 +246,19 @@ export class LocalImageManager {
         return extToMime[ext.toLowerCase()] || 'image/jpeg';
     }
 
+    getImageInfos(root: HTMLElement) {
+        const images = root.getElementsByTagName('img');
+        const result = [];
+        for (let i = 0; i < images.length; i++) {
+            const img = images[i];
+            const res = this.images.get(img.src);
+            if (res) {
+                result.push(res);
+            }
+        }
+        return result;
+    }
+
     async uploadRemoteImage(root: HTMLElement, token: string, type: string = '') {
         const images = root.getElementsByTagName('img');
         const result = [];
@@ -265,7 +280,8 @@ export class LocalImageManager {
                 const info = {
                     resUrl: img.src,
                     filePath: "",
-                    url: res.url
+                    url: res.url,
+                    media_id: res.media_id,
                 };
                 this.images.set(img.src, info);
                 result.push(res);
@@ -286,7 +302,8 @@ export class LocalImageManager {
                 const info = {
                     resUrl: '#' + img.id,
                     filePath: "",
-                    url: res.url
+                    url: res.url,
+                    media_id: res.media_id,
                 };
                 this.images.set('#' + img.id, info);
                 result.push(res);
@@ -422,6 +439,7 @@ export class LocalFile extends Extension{
         const info = {
             resUrl: res.resUrl,
             filePath: res.filePath,
+            media_id: null,
             url: null
         };
         LocalImageManager.getInstance().setImage(res.resUrl, info);

@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-import { Tokens, MarkedExtension, Parser } from "marked";
+import { Tokens, MarkedExtension } from "marked";
 import { Extension } from "./extension";
 import AssetsManager from "src/assets";
 import { ExpertSettings } from "src/expert-settings";

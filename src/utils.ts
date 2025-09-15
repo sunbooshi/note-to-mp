@@ -142,33 +142,43 @@ function applyStyle(root: HTMLElement, cssRoot: postcss.Root) {
 	const cssText = root.style.cssText;
 	cssRoot.walkRules(rule => {
 		const selector = processPseudoSelector(rule.selector);
-		if (root.matches(selector)) {
-			let item = root;
+		try {
+			if (root.matches(selector)) {
+				let item = root;
 
-			const pseudoType = getPseudoType(rule.selector);
-			if (pseudoType) {
-				let content = '';
-				rule.walkDecls('content', decl => {
-					content = decl.value || '';
+				const pseudoType = getPseudoType(rule.selector);
+				if (pseudoType) {
+					let content = '';
+					rule.walkDecls('content', decl => {
+						content = decl.value || '';
+					})
+					item = createSpan();
+					item.textContent = content.replace(/(^")|("$)/g, '');
+
+					if (pseudoType === 'before') {
+						root.prepend(item);
+					}
+					else if (pseudoType === 'after') {
+						root.appendChild(item);
+					}
+				}
+
+				rule.walkDecls(decl => {
+					// 如果已经设置了，则不覆盖
+					const setted = cssText.includes(decl.prop);
+					if (!setted || decl.important) {
+						item.style.setProperty(decl.prop, decl.value);
+					}
 				})
-				item = createSpan();
-				item.textContent = content.replace(/(^")|("$)/g, '');
-
-				if (pseudoType === 'before') {
-					root.prepend(item);
-				}
-				else if (pseudoType === 'after') {
-					root.appendChild(item);
-				}
 			}
-
-			rule.walkDecls(decl => {
-				// 如果已经设置了，则不覆盖
-				const setted = cssText.includes(decl.prop);
-				if (!setted || decl.important) {
-					item.style.setProperty(decl.prop, decl.value);
-				}
-			})
+		}
+		catch (err) {
+			if (err.message && err.message.includes('is not a valid selector')) {
+				return;
+			}
+			else {
+				throw err;
+			}
 		}
 	});
 

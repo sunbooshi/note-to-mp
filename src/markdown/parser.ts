@@ -37,6 +37,7 @@ import { Comment } from "./commnet";
 import { Topic } from "./topic";
 import { HeadingRenderer } from "./heading";
 import { FootnoteRenderer } from "./footnote";
+import { EmptyLineRenderer } from "./empty-line";
 import { cleanUrl } from "../utils";
 
 
@@ -52,7 +53,7 @@ const customRenderer = {
 	list(body: string, ordered: boolean, start: number | ''): string {
 		const type = ordered ? 'ol' : 'ul';
 		const startatt = (ordered && start !== 1) ? (' start="' + start + '"') : '';
-		return '<' + type + startatt + '>' + body + '</' + type + '>';
+		return '<' + type + startatt + ' class="list-paddingleft-1">' + body + '</' + type + '>';
 	},
 	listitem(text: string, task: boolean, checked: boolean): string {
 		return `<li><section><span leaf="">${text}<span></section></li>`;
@@ -71,6 +72,7 @@ const customRenderer = {
 				const info = {
 					resUrl: res.resUrl,
 					filePath: res.filePath,
+					media_id: null,
 					url: null
 				};
 				LocalImageManager.getInstance().setImage(res.resUrl, info);	
@@ -124,6 +126,9 @@ export class MarkedParser {
 		this.extensions.push(new Topic(app, settings, assetsManager, callback));
 		this.extensions.push(new HeadingRenderer(app, settings, assetsManager, callback));
 		this.extensions.push(new FootnoteRenderer(app, settings, assetsManager, callback));
+		if (settings.enableEmptyLine) {
+			this.extensions.push(new EmptyLineRenderer(app, settings, assetsManager, callback));
+		}
 		if (settings.isAuthKeyVaild()) {
 			this.extensions.push(new MathRenderer(app, settings, assetsManager, callback));
 		}

@@ -112,6 +112,11 @@ section .note-callout-custom {
   max-width: 300% !important;
 }
 
+.block-math-section {
+  text-align: center;
+  overflow: auto;
+}
+
 /* --------------------------------------- */
 /* 高亮 */
 /* --------------------------------------- */

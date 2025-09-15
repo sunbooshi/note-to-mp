@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-import { App, ItemView, Workspace, Notice, sanitizeHTMLToDom, apiVersion, TFile, MarkdownRenderer } from 'obsidian';
+import { App, ItemView, Workspace, Notice, sanitizeHTMLToDom, apiVersion, TFile, MarkdownRenderer, FrontMatterCache } from 'obsidian';
 import { applyCSS } from './utils';
 import { UploadImageToWx } from './imagelib';
 import { NMPSettings } from './settings';
@@ -199,6 +199,16 @@ export class ArticleRender implements MDRendererCallback {
     this.setStyle(this.getCSS());
   }
 
+  getFrontmatterValue(frontmatter: FrontMatterCache, key: string) {
+    const value = frontmatter[key];
+
+    if (value instanceof Array) {
+      return value[0];
+    }
+
+    return value;
+  }
+
   getMetadata() {
     let res: DraftArticle = {
       title: '',
@@ -222,20 +232,20 @@ export class ArticleRender implements MDRendererCallback {
     if (metadata?.frontmatter) {
       const keys = this.assetsManager.expertSettings.frontmatter;
       const frontmatter = metadata.frontmatter;
-      res.title = frontmatter[keys.title];
-      res.author = frontmatter[keys.author];
-      res.digest = frontmatter[keys.digest];
-      res.content_source_url = frontmatter[keys.content_source_url];
-      res.cover = frontmatter[keys.cover];
-      res.thumb_media_id = frontmatter[keys.thumb_media_id] ;
+      res.title = this.getFrontmatterValue(frontmatter, keys.title);
+      res.author = this.getFrontmatterValue(frontmatter, keys.author);
+      res.digest = this.getFrontmatterValue(frontmatter, keys.digest);
+      res.content_source_url = this.getFrontmatterValue(frontmatter, keys.content_source_url);
+      res.cover = this.getFrontmatterValue(frontmatter, keys.cover);
+      res.thumb_media_id = this.getFrontmatterValue(frontmatter, keys.thumb_media_id);
       res.need_open_comment = frontmatter[keys.need_open_comment] ? 1 : undefined;
       res.only_fans_can_comment = frontmatter[keys.only_fans_can_comment] ? 1 : undefined;
-      res.appid = frontmatter[keys.appid];
+      res.appid = this.getFrontmatterValue(frontmatter, keys.appid);
       if (res.appid && !res.appid.startsWith('wx')) {
         res.appid = this.settings.wxInfo.find(wx => wx.name === res.appid)?.appid;
       }
-      res.theme = frontmatter[keys.theme];
-      res.highlight = frontmatter[keys.highlight];
+      res.theme = this.getFrontmatterValue(frontmatter, keys.theme);
+      res.highlight = this.getFrontmatterValue(frontmatter, keys.highlight);
       if (frontmatter[keys.crop]) {
         res.pic_crop_235_1 = '0_0_1_0.5';
         res.pic_crop_1_1 = '0_0.525_0.404_1';
@@ -453,25 +463,26 @@ export class ArticleRender implements MDRendererCallback {
     const imageList: DraftImageMediaId[] = [];
     const lm = LocalImageManager.getInstance();
     // 上传图片
-    const localImages = await lm.uploadLocalImage(token, this.app.vault, 'image');
-    for (const image of localImages) {
-      imageList.push({
-        image_media_id: image.media_id,
-      });
-    }
+    await lm.uploadLocalImage(token, this.app.vault, 'image');
     // 上传图床图片
-    const remoteImages = await lm.uploadRemoteImage(this.articleDiv, token, 'image');
-    for (const image of remoteImages) {
+    await lm.uploadRemoteImage(this.articleDiv, token, 'image');
+
+    const images = lm.getImageInfos(this.articleDiv);
+    for (const image of images) {
+      if (!image.media_id) {
+        console.warn('miss media id:', image.resUrl);
+        continue;
+      }
       imageList.push({
         image_media_id: image.media_id,
       });
     }
-
-    const content = this.getArticleText();
 
     if (imageList.length === 0) {
       throw new Error('没有图片需要发布!');
     }
+
+    const content = this.getArticleText();
 
     const imagesData: DraftImages = {
       article_type: 'newspic',
