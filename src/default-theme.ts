@@ -292,8 +292,7 @@ Images
 ==================================
 */
 .note-to-mp img {
-    margin-top: 2em;
-    margin-bottom: 2em;
+    margin: 2em auto;
 }
 
 .note-to-mp .footnotes hr {

@@ -135,6 +135,7 @@ export class ArticleRender implements MDRendererCallback {
     // 处理话题多余内容
     html = html.replace(/rel="noopener nofollow"/g, '');
     html = html.replace(/target="_blank"/g, '');
+    html = html.replace(/data-leaf=""/g, 'leaf=""');
     return CardDataManager.getInstance().restoreCard(html);
   }
 
