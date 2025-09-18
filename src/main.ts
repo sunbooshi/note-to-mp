@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-import { Plugin, WorkspaceLeaf, App, PluginManifest, Menu, Notice } from 'obsidian';
+import { Plugin, WorkspaceLeaf, App, PluginManifest, Menu, Notice, TAbstractFile, TFile, TFolder } from 'obsidian';
 import { NotePreview, VIEW_TYPE_NOTE_PREVIEW } from './note-preview';
 import { NMPSettings } from './settings';
 import { NoteToMpSettingTab } from './setting-tab';
@@ -34,19 +34,26 @@ export default class NoteToMpPlugin extends Plugin {
 	assetsManager: AssetsManager;
 	constructor(app: App, manifest: PluginManifest) {
 	    super(app, manifest);
-		AssetsManager.setup(app, manifest);
+			AssetsManager.setup(app, manifest);
 	    this.assetsManager = AssetsManager.getInstance();
 	}
 
-	async onload() {
-		console.log('Loading Note to MP');
-		setVersion(this.manifest.version);
-		uevent('load');
+	async loadResource() {
 		await this.loadSettings();
 		await this.assetsManager.loadAssets();
+	}
+
+	async onload() {
+		console.log('Loading NoteToMP');
+		setVersion(this.manifest.version);
+		uevent('load');
+		this.app.workspace.onLayoutReady(()=>{
+			this.loadResource();
+		})
+
 		this.registerView(
 			VIEW_TYPE_NOTE_PREVIEW,
-			(leaf) => new NotePreview(leaf)
+			(leaf) => new NotePreview(leaf, this)
 		);
 
 		const ribbonIconEl = this.addRibbonIcon('clipboard-paste', '复制到公众号', (evt: MouseEvent) => {
@@ -71,6 +78,40 @@ export default class NoteToMpPlugin extends Plugin {
 				new WidgetsModal(this.app).open();
 			}
 		});
+
+		this.addCommand({
+			id: 'note-to-mp-pub',
+			name: '发布公众号文章',
+			callback: async () => {
+				await this.activateView();
+				this.getNotePreview()?.postArticle();
+			}
+		});
+
+		// 监听右键菜单
+    this.registerEvent(
+      this.app.workspace.on('file-menu', (menu, file) => {
+        menu.addItem((item) => {
+          item
+            .setTitle('发布到公众号')
+            .setIcon('lucide-send')
+            .onClick(async () => {
+              if (file instanceof TFile) {
+								if (file.extension.toLowerCase() !== 'md') {
+									new Notice('只能发布 Markdown 文件');
+									return;
+								}
+								await this.activateView();
+								await this.getNotePreview()?.renderMarkdown(file);
+								await this.getNotePreview()?.postArticle();
+              } else if (file instanceof TFolder) {
+								await this.activateView();
+								await this.getNotePreview()?.batchPost(file);
+              }
+            });
+        });
+      })
+    );
 	}
 
 	onunload() {
@@ -99,5 +140,14 @@ export default class NoteToMpPlugin extends Plugin {
 		}
 	
 		if (leaf) workspace.revealLeaf(leaf);
+	}
+
+	getNotePreview(): NotePreview | null {
+		const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_NOTE_PREVIEW);
+		if (leaves.length > 0) {
+			const leaf = leaves[0];
+			return leaf.view as NotePreview;
+		}
+		return null;
 	}
 }

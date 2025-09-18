@@ -21,10 +21,13 @@
  */
 
 import { Notice } from "obsidian";
-import { Tokens } from "marked";
+import { MarkedExtension, Tokens } from "marked";
+import hljs from "highlight.js";
 import { MathRendererQueue } from "./math";
 import { Extension } from "./extension";
 import { UploadImageToWx } from "../imagelib";
+import AssetsManager from "src/assets";
+import { wxWidget } from "src/weixin-api";
 
 export class CardDataManager {
 	private cardData: Map<string, string>;
@@ -55,7 +58,8 @@ export class CardDataManager {
 			const exp = `<section[^>]*\\sdata-id="${key}"[^>]*>(.*?)<\\/section>`;
 			const regex = new RegExp(exp, 'gs');
 			if (!regex.test(html)) {
-				console.error('未能正确替换公众号卡片');
+				console.warn('没有公众号信息：', key);
+				continue;
 			}
 			html = html.replace(regex, value);
 		}
@@ -105,39 +109,97 @@ export class CodeRenderer extends Extension {
 		}
 	}
 
-	codeRenderer(code: string, infostring: string | undefined): string {
-		const lang = (infostring || '').match(/^\S*/)?.[0];
-		code = code.replace(/\n$/, '') + '\n';
-
-		let codeSection = '';
-		if (this.settings.lineNumber) {
-			const lines = code.split('\n');
-
-			let liItems = '';
-			let count = 1;
-			while (count < lines.length) {
-				liItems = liItems + `<li>${count}</li>`;
-				count = count + 1;
+	replaceSpaces(text: string) {
+		let result = '';
+		let inTag = false;
+		for (let char of text) {
+			if (char === '<') {
+				inTag = true;
+				result += char;
+				continue;
+			} else if (char === '>') {
+				inTag = false;
+				result += char;
+				continue;
 			}
-			codeSection = '<section class="code-section"><ul>'
+			if (inTag) {
+				result += char;
+			} else {
+				if (char === ' ') {
+					result += '&nbsp;';
+				} else if (char === '\t') {
+					result += '&nbsp;&nbsp;&nbsp;&nbsp;';
+				} else {
+					result += char;
+				}
+			}
+		}
+		return result;
+	}
+
+	async codeRenderer(code: string, infostring: string | undefined) {
+		const lang = (infostring || '').match(/^\S*/)?.[0];
+		code = code.replace(/\n$/, '');
+
+		try {
+			if (lang && hljs.getLanguage(lang)) {
+				code = hljs.highlight(code, { language: lang }).value;
+			}
+			else {
+				code = hljs.highlightAuto(code).value;
+			}
+		} catch (err) {
+			console.error(err);
+		}
+
+		code = this.replaceSpaces(code);
+		const lines = code.split('\n');
+		let body = '';
+		let liItems = '';
+		for (let line in lines) {
+			let text = lines[line];
+			if (text.length === 0) {
+				text = '<br>'
+			}
+			body = body + '<code>' + text + '</code>';
+			liItems = liItems + `<li>${parseInt(line)+1}</li>`;
+		}
+
+		let codeSection = '<section class="code-section code-snippet__fix hljs">';
+		if (this.settings.lineNumber) {
+			codeSection = codeSection + '<ul>'
 				+ liItems
 				+ '</ul>';
 		}
-		else {
-			codeSection = '<section class="code-section">';
-		}
 
-		if (!lang) {
-			return codeSection + '<pre><code>'
-				+ code
-				+ '</code></pre></section>\n';
-		}
-
-		return codeSection + '<pre><code class="hljs language-'
+		let html = '';
+		if (lang) {
+		html = codeSection + '<pre style="max-width:1000% !important;" class="hljs language-'
 			+ lang
 			+ '">'
-			+ code
-			+ '</code></pre></section>\n';
+			+ body
+			+ '</pre></section>';
+		}
+		else {
+			html = codeSection + '<pre>'
+				+ body
+				+ '</pre></section>';
+		}
+
+		if (!this.settings.isAuthKeyVaild()) {
+			return html;
+		}
+
+		const settings = AssetsManager.getInstance().expertSettings;
+		const id = settings.render?.code;
+		if (id && typeof id === 'number') {
+			const params = JSON.stringify({
+				id: `${id}`,
+				content: html,
+			});
+			html = await wxWidget(this.settings.authKey, params);
+		}
+		return html;
 	}
 
 	static getMathType(lang: string | null) {
@@ -190,25 +252,33 @@ export class CodeRenderer extends Extension {
 		}
 	}
 
-	markedExtension() {
+	markedExtension(): MarkedExtension {
 		return {
+			async: true,
+			walkTokens: async (token: Tokens.Generic) => {
+				if (token.type !== 'code') return;
+				if (this.settings.isAuthKeyVaild()) {
+					const type = CodeRenderer.getMathType(token.lang ?? '');
+					if (type) {
+						token.html = await MathRendererQueue.getInstance().render(token, false, type);
+						return;
+					}
+					if (token.lang && token.lang.trim().toLocaleLowerCase() == 'mermaid') {
+						token.html = this.renderMermaid(token as Tokens.Code);
+						return;
+					}
+				}
+				if (token.lang && token.lang.trim().toLocaleLowerCase() == 'mpcard') {
+					token.html = this.renderCard(token as Tokens.Code);
+					return;
+				}
+				token.html = await this.codeRenderer(token.text, token.lang);
+			},
 			extensions: [{
 				name: 'code',
 				level: 'block',
-				renderer: (token: Tokens.Code) => {
-					if (this.settings.isAuthKeyVaild()) {
-						const type = CodeRenderer.getMathType(token.lang ?? '');
-						if (type) {
-							return MathRendererQueue.getInstance().render(token, false, type, this.callback);
-						}
-						if (token.lang && token.lang.trim().toLocaleLowerCase() == 'mermaid') {
-							return this.renderMermaid(token);
-						}
-					}
-					if (token.lang && token.lang.trim().toLocaleLowerCase() == 'mpcard') {
-						return this.renderCard(token);
-					}
-					return this.codeRenderer(token.text, token.lang);
+				renderer: (token: Tokens.Generic) => {
+					return token.html;
 				},
 			}]
 		}

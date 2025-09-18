@@ -20,36 +20,29 @@
  * THE SOFTWARE.
  */
 
-import { NMPSettings } from "src/settings";
-import { Marked, MarkedExtension } from "marked";
-import { App, Vault } from "obsidian";
-import AssetsManager from "../assets";
+import { Tokens, MarkedExtension } from "marked";
+import { Extension } from "./extension";
 
-export interface MDRendererCallback {
-   settings: NMPSettings;
-   updateElementByID(id:string, html:string):void; // 改为异步渲染后已废弃
-   cacheElement(category: string, id: string, data: string): void;
-}
-
-export abstract class Extension {
-    app: App;
-    vault: Vault;
-    assetsManager: AssetsManager
-    settings: NMPSettings;
-    callback: MDRendererCallback;
-    marked: Marked;
-
-    constructor(app: App, settings: NMPSettings, assetsManager: AssetsManager, callback: MDRendererCallback) {
-        this.app = app;
-        this.vault = app.vault;
-        this.settings = settings;
-        this.assetsManager = assetsManager;
-        this.callback = callback;
+export class EmptyLineRenderer extends Extension {
+  markedExtension(): MarkedExtension {
+    return {
+      extensions: [{
+        name: 'emptyline',
+        level: 'block',
+        tokenizer(src: string) {
+          const match = /^\n\n+/.exec(src);
+          if (match) {
+            console.log('mathced src: ', src)
+            return {
+              type: "emptyline",
+              raw: match[0],
+            };
+          }
+        },
+        renderer: (token: Tokens.Generic) => {
+          return '<p><br></p>'.repeat(token.raw.length - 1);
+        },
+      }]
     }
-
-    async prepare() { return; }
-    async postprocess(html:string) { return html; }
-    async beforePublish() { }
-    async cleanup() { return; }
-    abstract markedExtension(): MarkedExtension
+  }
 }

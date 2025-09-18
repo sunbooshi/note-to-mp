@@ -20,11 +20,12 @@
  * THE SOFTWARE.
  */
 
-import { App, PluginManifest, Notice, requestUrl, FileSystemAdapter, TAbstractFile, TFile } from "obsidian";
+import { App, PluginManifest, Notice, requestUrl, FileSystemAdapter, TAbstractFile, TFile, TFolder } from "obsidian";
 import * as zip from "@zip.js/zip.js";
 import DefaultTheme from "./default-theme";
 import DefaultHighlight from "./default-highlight";
 import { NMPSettings } from "./settings";
+import { ExpertSettings, defaultExpertSettings, expertSettingsFromString } from "./expert-settings";
 
 
 export interface Theme {
@@ -56,6 +57,8 @@ export default class AssetsManager {
     customCSSPath: string;
     iconsPath: string;
     wasmPath: string;
+    expertSettings: ExpertSettings;
+    isLoaded: boolean = false;
 
     private static instance: AssetsManager;
 
@@ -92,6 +95,8 @@ export default class AssetsManager {
         await this.loadThemes();
         await this.loadHighlights();
         await this.loadCustomCSS();
+        await this.loadExpertSettings();
+        this.isLoaded = true;
     }
 
     async loadThemes() {
@@ -156,6 +161,35 @@ export default class AssetsManager {
         } catch (error) {
             console.error(error);
             new Notice('读取CSS失败！');
+        }
+    }
+
+    async loadExpertSettings() {
+        try {
+            const note = NMPSettings.getInstance().expertSettingsNote;
+            if (note != '') {
+                const file = this.searchFile(note);
+                if (file) {
+                    let content = await this.app.vault.adapter.read(file.path);
+                    if (content) {
+                        this.expertSettings = expertSettingsFromString(content);
+                    }
+                    else {
+                        this.expertSettings = defaultExpertSettings;
+                        new Notice(note + '专家设置文件内容为空！');
+                    }
+                }
+                else {
+                    this.expertSettings = defaultExpertSettings;
+                    new Notice(note + '专家设置不存在！');
+                }
+            }
+            else {
+                this.expertSettings = defaultExpertSettings;
+            }
+        } catch (error) {
+            console.error(error);
+            new Notice('读取专家设置失败！');
         }
     }
 
@@ -285,7 +319,7 @@ export default class AssetsManager {
                 const blobWriter = new zip.Uint8ArrayWriter();
                 if (entry.getData) {
                     const data = await entry.getData(blobWriter);
-                    await this.app.vault.adapter.writeBinary(filePath, data);
+                    await this.app.vault.adapter.writeBinary(filePath, data.buffer as ArrayBuffer);
                 }
             }
         }
@@ -329,27 +363,28 @@ export default class AssetsManager {
 		shell.openPath(dst);
 	}
 
-    searchFile(originPath: string): TAbstractFile | null {
-        const resolvedPath = this.resolvePath(originPath);
+    searchFile(nameOrPath: string): TAbstractFile | null {
+        const resolvedPath = this.resolvePath(nameOrPath);
         const vault= this.app.vault;
         const attachmentFolderPath = vault.config.attachmentFolderPath || '';
         let localPath = resolvedPath;
         let file = null;
 
-        // 然后从根目录查找
+        // 先按路径查找
         file = vault.getFileByPath(resolvedPath);
         if (file) {
             return file; 
         }
 
-        file = vault.getFileByPath(originPath);
+        // 在根目录查找
+        file = vault.getFileByPath(nameOrPath);
         if (file) {
             return file; 
         }
 
-        // 先从附件文件夹查找
+        // 从附件文件夹查找
         if (attachmentFolderPath != '') {
-            localPath = attachmentFolderPath + '/' + originPath;
+            localPath = attachmentFolderPath + '/' + nameOrPath;
             file = vault.getFileByPath(localPath)
             if (file) {
                 return file;
@@ -362,10 +397,12 @@ export default class AssetsManager {
             }
         }
 
-        // 最后查找所有文件
+        // 最后查找所有文件，这里只需要判断文件名
         const files = vault.getAllLoadedFiles();
         for (let f of files) {
-            if (f.path.includes(originPath)) {
+            if (f instanceof TFolder) continue
+            file = f as TFile;
+            if (file.basename === nameOrPath || file.name === nameOrPath) {
                 return f;
             }
         }

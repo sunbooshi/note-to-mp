@@ -25,6 +25,7 @@ import NoteToMpPlugin from './main';
 import { wxGetToken,wxEncrypt } from './weixin-api';
 import { cleanMathCache } from './markdown/math';
 import { NMPSettings } from './settings';
+import { DocModal } from './doc-modal';
 
 export class NoteToMpSettingTab extends PluginSettingTab {
 	plugin: NoteToMpPlugin;
@@ -68,11 +69,24 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			return;
 		}
 		try {
+			const docUrl = 'https://mp.weixin.qq.com/s/rk5CTPGr5ftly8PtYgSjCQ';
 			for (let wx of wxInfo) {
 				const res = await wxGetToken(authKey, wx.appid, wx.secret.replace('SECRET', ''));
 				if (res.status != 200) {
 					const data = res.json;
-					new Notice(`${wx.name}|${wx.appid} 测试失败：${data.message}`);
+					const { code, message } = data;
+					let content = message;
+					if (code === 50002) {
+						content = '用户受限，可能是您的公众号被冻结或注销，请联系微信客服处理';
+					}
+					else if (code === 40125) {
+						content = 'AppSecret错误，请检查或者重置，详细操作步骤请参考下方文档';
+					}
+					else if (code === 40164) {
+						content = 'IP地址不在白名单中，请将如下地址添加到白名单：<br>59.110.112.211<br>154.8.198.218<br>详细步骤请参考下方文档';
+					}
+					const modal = new DocModal(this.app, `${wx.name} 测试失败`, content, docUrl);
+					modal.open();
 					break
 				}
 
@@ -95,7 +109,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 		}
 
 		if (this.settings.wxInfo.length > 0) {
-		    new Notice('已经加密过了，请先清除！');
+		    new Notice('已经保存过了，请先清除！');
 		    return false;
 		}
 
@@ -112,8 +126,8 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 				return false;
 			}
 			const name = items[0];
-			const appid = items[1];
-			const secret = items[2];
+			const appid = items[1].trim();
+			const secret = items[2].trim();
 			wechat.push({name, appid, secret});
 		}
 
@@ -138,11 +152,11 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			await this.plugin.saveSettings();
 			this.wxInfo = this.parseWXInfo();
 			this.displayWXInfo(this.wxInfo);
-			new Notice('加密成功');
+			new Notice('保存成功');
 			return true;
 
 		} catch (error) {
-			new Notice(`加密失败：${error}`);
+			new Notice(`保存失败：${error}`);
 			console.error(error);	
 		}
 
@@ -255,6 +269,16 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 			})
+
+		new Setting(containerEl)
+			.setName('启用空行渲染')
+			.addToggle(toggle => {
+			    toggle.setValue(this.settings.enableEmptyLine);
+				toggle.onChange(async (value) => {
+				    this.settings.enableEmptyLine = value;
+					await this.plugin.saveSettings();
+				});
+			})
 		
 		new Setting(containerEl)
 		.setName('渲染图片标题')
@@ -338,6 +362,22 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					this.settings.customCSSNote = value.trim();
 					await this.plugin.saveSettings();
+					await this.plugin.assetsManager.loadCustomCSS();
+				})
+				.inputEl.setAttr('style', 'width: 320px;')
+		});
+
+		const expertDoc = '使用指南：<a href="https://sunboshi.tech/expert">https://sunboshi.tech/expert</a>';
+		new Setting(containerEl)
+			.setName('专家设置笔记')
+			.setDesc(sanitizeHTMLToDom(expertDoc))
+			.addText(text => {
+				text.setPlaceholder('请输入专家设置笔记标题')
+				.setValue(this.settings.expertSettingsNote)
+				.onChange(async (value) => {
+					this.settings.expertSettingsNote = value.trim();
+					await this.plugin.saveSettings();
+					await this.plugin.assetsManager.loadExpertSettings();
 				})
 				.inputEl.setAttr('style', 'width: 320px;')
 		});
@@ -367,7 +407,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 		
 		let isClear = this.settings.wxInfo.length > 0;
 		let isRealClear = false;
-		const buttonText = isClear ? '清空公众号信息' : '加密公众号信息';
+		const buttonText = isClear ? '清空公众号信息' : '保存公众号信息';
 		new Setting(containerEl)
 			.setName('公众号信息')
 			.addTextArea(text => {
@@ -392,17 +432,17 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 					isRealClear = false;
 					isClear = false;
 					this.clear();
-					button.setButtonText('加密公众号信息');
+					button.setButtonText('保存公众号信息');
 				}
 				else {
-					button.setButtonText('加密中...');
+					button.setButtonText('保存中...');
 					if (await this.encrypt()) {
 						isClear = true;
 						isRealClear = false;
 						button.setButtonText('清空公众号信息');
 					}
 					else {
-						button.setButtonText('加密公众号信息');
+						button.setButtonText('保存公众号信息');
 					}
 				}
 			});

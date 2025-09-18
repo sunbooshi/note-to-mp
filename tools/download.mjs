@@ -20,7 +20,6 @@
  * THE SOFTWARE.
  */
 
-import fs from 'node:fs';
 import https from 'node:https';
 import { exec } from 'node:child_process';
 

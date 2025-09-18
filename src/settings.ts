@@ -32,6 +32,7 @@ export class NMPSettings {
     authKey: string;
     useCustomCss: boolean;
     customCSSNote: string;
+    expertSettingsNote: string;
     wxInfo: {name:string, appid:string, secret:string}[];
     math: string;
     expireat: Date | null = null;
@@ -40,6 +41,8 @@ export class NMPSettings {
     watermark: string;
     useFigcaption: boolean;
     excalidrawToPNG: boolean;
+    isLoaded: boolean = false;
+    enableEmptyLine: boolean = false;
 
     private static instance: NMPSettings;
 
@@ -67,6 +70,8 @@ export class NMPSettings {
         this.useFigcaption = false;
         this.customCSSNote = '';
         this.excalidrawToPNG = false;
+        this.expertSettingsNote = '';
+        this.enableEmptyLine = false;
     }
 
     resetStyelAndHighlight() {
@@ -94,6 +99,8 @@ export class NMPSettings {
             useFigcaption,
             customCSSNote,
             excalidrawToPNG,
+            expertSettingsNote,
+            ignoreEmptyLine,
         } = data;
 
         const settings = NMPSettings.getInstance();
@@ -142,7 +149,14 @@ export class NMPSettings {
         if (excalidrawToPNG !== undefined) {
             settings.excalidrawToPNG = excalidrawToPNG;
         }
+        if (expertSettingsNote) {
+            settings.expertSettingsNote = expertSettingsNote;
+        }
+        if (ignoreEmptyLine !== undefined) {
+            settings.enableEmptyLine = ignoreEmptyLine;
+        }
         settings.getExpiredDate();
+        settings.isLoaded = true;
     }
 
     public static allSettings() {
@@ -163,6 +177,8 @@ export class NMPSettings {
             'useFigcaption': settings.useFigcaption,
             'customCSSNote': settings.customCSSNote,
             'excalidrawToPNG': settings.excalidrawToPNG,
+            'expertSettingsNote': settings.expertSettingsNote,
+            'ignoreEmptyLine': settings.enableEmptyLine,
         }
     }
 

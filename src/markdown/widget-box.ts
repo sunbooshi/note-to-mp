@@ -21,10 +21,10 @@
  */
 
 import { Tokens, MarkedExtension } from "marked";
-import { requestUrl } from "obsidian";
 import { Extension } from "./extension";
 import { NMPSettings } from "src/settings";
 import { uevent } from "src/utils";
+import { wxWidget } from "src/weixin-api";
 
 const widgetCache = new Map<string, string>();
 
@@ -110,33 +110,13 @@ export class WidgetBox extends Extension {
   }
 
   async reqContent(id: string, title: string, style: Map<string, string>, content: string) {
-    const host = 'https://obplugin.sunboshi.tech';
-    const path = '/math/widget';
-    const url = `${host}${path}`;
-    try {
-      const res = await requestUrl({
-        url,
-        throw: false,
-        method: 'POST',
-        contentType: 'application/json',
-        headers: {
-            authkey: NMPSettings.getInstance().authKey
-        },
-        body: JSON.stringify({
-            id,
-            title,
-            style: Object.fromEntries(style),
-            content
-        })
-      })
-      if (res.status === 200) {
-        return res.json.content;
-      }
-      return res.json.msg;
-    } catch (error) {
-      console.log(error);
-      return error.message;
-    }
+    const params = JSON.stringify({
+      id,
+      title,
+      style: Object.fromEntries(style),
+      content
+    });
+    return wxWidget(NMPSettings.getInstance().authKey, params)
   }
 
   processColor(style: Map<string, string>) {
