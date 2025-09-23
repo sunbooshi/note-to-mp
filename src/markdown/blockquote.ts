@@ -59,7 +59,7 @@ export class Blockquote extends Extension {
       return await this.box.renderer(token);
     }
 
-    const body = this.marked.parser(token.tokens);
+    const body = await this.marked.parse(token.text);
     return `<blockquote>${body}</blockquote>`;
   }
 

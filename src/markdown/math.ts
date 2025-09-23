@@ -136,7 +136,7 @@ export class MathRenderer extends Extension {
             async: true,
             walkTokens: async (token: Tokens.Generic) => {
                 if (token.type === 'InlineMath' || token.type === 'BlockMath') {
-                    token.html = await this.renderer(token, token.type === 'InlineMath', token.displayMode ? 'latex' : 'asciimath');
+                    token.html = await this.renderer(token, token.type === 'InlineMath');
                 }
             },
             extensions: [
@@ -181,7 +181,7 @@ export class MathRenderer extends Extension {
                 }
             },
             renderer: (token: Tokens.Generic) => {
-               return token.html;
+                return token.html;
             }
         }
     }

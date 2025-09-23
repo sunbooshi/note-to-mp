@@ -28,10 +28,8 @@ const defRule = /^ *\[\^([^\]]+)\]:/; // 匹配 [^label]:
 
 export class FootnoteRenderer extends Extension {
   allDefs: any[] = [];
-  defCounter = 0;
   async prepare() {
     this.allDefs = [];
-    this.defCounter = 0;
   }
 
   async postprocess(html: string) {
@@ -70,9 +68,9 @@ export class FootnoteRenderer extends Extension {
             }
           },
           renderer: (token: Tokens.Generic) => {
-            this.defCounter += 1;
-            const id = `fnref-${this.defCounter}`;
-            return `<sup id="${id}">${this.defCounter}</sup>`;
+            const index = this.allDefs.findIndex((def) => def.label == token.text) + 1;
+            const id = `fnref-${index}`;
+            return `<sup id="${id}">${index}</sup>`;
           }
         },
         {

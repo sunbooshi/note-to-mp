@@ -112,9 +112,17 @@ section .note-callout-custom {
   max-width: 300% !important;
 }
 
+.block-math-svg svg {
+  scale: 0.85;
+}
+
 .block-math-section {
   text-align: center;
   overflow: auto;
+}
+
+.inline-math-svg svg {
+  font-size: 0.85em;
 }
 
 /* --------------------------------------- */
