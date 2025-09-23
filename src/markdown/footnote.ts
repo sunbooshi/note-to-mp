@@ -70,7 +70,7 @@ export class FootnoteRenderer extends Extension {
           renderer: (token: Tokens.Generic) => {
             const index = this.allDefs.findIndex((def) => def.label == token.text) + 1;
             const id = `fnref-${index}`;
-            return `<sup id="${id}">${index}</sup>`;
+            return `<sup id="${id}" class="fnref-sup">${index}</sup>`;
           }
         },
         {
