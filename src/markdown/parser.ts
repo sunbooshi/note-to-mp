@@ -56,7 +56,7 @@ const customRenderer = {
 		return '<' + type + startatt + ' class="list-paddingleft-1">' + body + '</' + type + '>';
 	},
 	listitem(text: string, task: boolean, checked: boolean): string {
-		return `<li><section><span data-leaf="">${text}<span></section></li>`;
+		return `<li><section>${text}</section></li>`;
 	},
 	image(href: string, title: string | null, text: string): string {
     const cleanHref = cleanUrl(href);
