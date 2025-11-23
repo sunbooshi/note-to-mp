@@ -54,7 +54,6 @@ export default class AssetsManager {
     customCSS: string = '';
     themeCfg: string;
     hilightCfg: string;
-    customCSSPath: string;
     iconsPath: string;
     wasmPath: string;
     expertSettings: ExpertSettings;
@@ -82,7 +81,6 @@ export default class AssetsManager {
         this.hilightPath = this.assetsPath + 'highlights/';
         this.themeCfg = this.assetsPath + 'themes.json';
         this.hilightCfg = this.assetsPath + 'highlights.json';
-        this.customCSSPath = this.assetsPath + 'custom.css';
         this.iconsPath = this.assetsPath + 'icons/';
         this.wasmPath = this.assetsPath + 'lib.wasm';
     }
@@ -137,31 +135,30 @@ export default class AssetsManager {
         try {
             const customCSSNote = NMPSettings.getInstance().customCSSNote;
             if (customCSSNote != '') {
-                const file = this.searchFile(customCSSNote);
-                if (file) {
-                    const cssContent = await this.app.vault.adapter.read(file.path);
-                    if (cssContent) {
-                        this.customCSS = cssContent.replace(/```css/gi, '').replace(/```/g, '');
-                    }
+                const css = await this.loadCSSFromNote(customCSSNote);
+                if (css != null) {
+                    this.customCSS = css;
                 }
                 else {
                     new Notice(customCSSNote + '自定义CSS文件不存在！');
                 }
                 return;
             }
-
-            if (!await this.app.vault.adapter.exists(this.customCSSPath)) {
-                return;
-            }
-
-            const cssContent = await this.app.vault.adapter.read(this.customCSSPath);
-            if (cssContent) {
-                this.customCSS = cssContent;
-            }
         } catch (error) {
             console.error(error);
             new Notice('读取CSS失败！');
         }
+    }
+
+    async loadCSSFromNote(note: string) {
+        const file = this.searchFile(note);
+        if (file) {
+            const cssContent = await this.app.vault.adapter.read(file.path);
+            if (cssContent) {
+                return cssContent.replace(/```css/gi, '').replace(/```/g, '');
+            }
+        }
+        return null;
     }
 
     async loadExpertSettings() {

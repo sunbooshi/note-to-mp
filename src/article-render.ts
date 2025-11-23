@@ -121,17 +121,17 @@ export class ArticleRender implements MDRendererCallback {
     this.styleEl.appendChild(document.createTextNode(css));
   }
 
-  reloadStyle() {
-    this.setStyle(this.getCSS());
+  async reloadStyle() {
+    this.setStyle(await this.getCSS());
   }
 
   getArticleSection() {
     return this.articleDiv.querySelector('#article-section') as HTMLElement;
   }
 
-  getArticleContent() {
+  async getArticleContent() {
     const content = this.articleDiv.innerHTML;
-    let html = applyCSS(content, this.getCSS());
+    let html = applyCSS(content, await this.getCSS());
     // 处理话题多余内容
     html = html.replace(/rel="noopener nofollow"/g, '');
     html = html.replace(/target="_blank"/g, '');
@@ -167,7 +167,7 @@ export class ArticleRender implements MDRendererCallback {
       }
 
       this.articleHTML = await this.markedParser.parse(md);
-      this.setStyle(this.getCSS());
+      this.setStyle(await this.getCSS());
       this.setArticle(this.articleHTML);
       await this.processCachedElements();
     }
@@ -176,11 +176,21 @@ export class ArticleRender implements MDRendererCallback {
       this.setArticle(this.errorContent(e));
     }
   }
-  getCSS() {
+
+  async getCSS() {
     try {
       const theme = this.assetsManager.getTheme(this.currentTheme);
       const highlight = this.assetsManager.getHighlight(this.currentHighlight);
-      const customCSS = this.settings.customCSSNote.length > 0 || this.settings.useCustomCss ? this.assetsManager.customCSS : '';
+      let customCSS = this.settings.customCSSNote.length > 0 ? this.assetsManager.customCSS : '';
+      const metadata = this.getMetadata();
+      if (metadata.css) {
+        const note = metadata.css.replace('[[', '').replace(']]', '');
+        console.log('custom css: ', note);
+        const css = await this.assetsManager.loadCSSFromNote(note);
+        if (css) {
+          customCSS = css;
+        }
+      }
       const baseCSS = this.settings.baseCSS ? `.note-to-mp {${this.settings.baseCSS}}` : '';
       return `${InlineCSS}\n\n${highlight!.css}\n\n${theme!.css}\n\n${baseCSS}\n\n${customCSS}`;
     } catch (error) {
@@ -190,14 +200,14 @@ export class ArticleRender implements MDRendererCallback {
     return '';
   }
 
-  updateStyle(styleName: string) {
+  async updateStyle(styleName: string) {
     this.currentTheme = styleName;
-    this.setStyle(this.getCSS());
+    this.setStyle(await this.getCSS());
   }
 
-  updateHighLight(styleName: string) {
+  async updateHighLight(styleName: string) {
     this.currentHighlight = styleName;
-    this.setStyle(this.getCSS());
+    this.setStyle(await this.getCSS());
   }
 
   getFrontmatterValue(frontmatter: FrontMatterCache, key: string) {
@@ -226,6 +236,7 @@ export class ArticleRender implements MDRendererCallback {
       appid: undefined,
       theme: undefined,
       highlight: undefined,
+      css: undefined,
     }
     const file = this.app.workspace.getActiveFile();
     if (!file) return res;
@@ -251,6 +262,7 @@ export class ArticleRender implements MDRendererCallback {
         res.pic_crop_235_1 = '0_0_1_0.5';
         res.pic_crop_1_1 = '0_0.525_0.404_1';
       }
+      res.css = this.getFrontmatterValue(frontmatter, keys.css);
     }
     return res;
   }
@@ -348,10 +360,34 @@ export class ArticleRender implements MDRendererCallback {
   }
 
   async copyArticle() {
-    const content = this.getArticleContent();
+    const content = await this.getArticleContent();
     await navigator.clipboard.write([new ClipboardItem({
       'text/html': new Blob([content], { type: 'text/html' })
     })])
+  }
+
+  async copyWithoutCSS() {
+    await this.cachedElementsToImages();
+    const clonedArticleDiv = this.articleDiv.cloneNode(true) as HTMLDivElement;
+    // 移除公众号名片
+    clonedArticleDiv.querySelectorAll('.note-mpcard-wrapper').forEach(node => node.remove());
+    // TODO：小部件处理
+    if (!this.settings.isAuthKeyVaild()) {
+      const content = clonedArticleDiv.innerHTML;
+      await navigator.clipboard.write([new ClipboardItem({
+        'text/html': new Blob([content], { type: 'text/html' })
+      })]);
+      new Notice('复制成功，快去粘贴吧！如需复制本地图片，请购买会员，感谢支持！');
+      return;
+    }
+
+    await LocalImageManager.getInstance().uploadToOSS(clonedArticleDiv, this.settings.authKey, this.app.vault);
+
+    const content = clonedArticleDiv.innerHTML;
+    await navigator.clipboard.write([new ClipboardItem({
+      'text/html': new Blob([content], { type: 'text/html' })
+    })]);
+    new Notice('复制成功，快去粘贴吧！');
   }
 
   getSecret(appid: string) {
@@ -420,7 +456,7 @@ export class ArticleRender implements MDRendererCallback {
     }
 
     metadata.title = metadata.title || this.title;
-    metadata.content = this.getArticleContent();
+    metadata.content = await this.getArticleContent();
     metadata.thumb_media_id = mediaId;
 
     // 创建草稿
@@ -518,7 +554,7 @@ export class ArticleRender implements MDRendererCallback {
     const lm = LocalImageManager.getInstance();
     const content = await lm.embleImages(this.articleDiv, this.app.vault);
     const globalStyle = await this.assetsManager.getStyle();
-    const html = applyCSS(content, this.getCSS() + globalStyle);
+    const html = applyCSS(content, await this.getCSS() + globalStyle);
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

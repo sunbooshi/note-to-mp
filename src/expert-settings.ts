@@ -43,6 +43,7 @@ export interface ExpertSettings {
     theme: string;
     highlight: string;
     crop: string;
+    css: string;
   }
 }
 
@@ -61,6 +62,7 @@ export const defaultExpertSettings: ExpertSettings = {
     theme: '样式',
     highlight: '代码高亮',
     crop: '封面裁剪',
+    css: '自定义样式笔记',
   }
 };
 

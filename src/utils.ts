@@ -249,3 +249,32 @@ export async function waitForLayoutReady(app: App): Promise<void> {
     app.workspace.onLayoutReady(() => resolve());
   });
 }
+
+
+export function mimeToImageExt(type: string): string {
+	const mimeToExt: { [key: string]: string } = {
+		'image/jpeg': '.jpg',
+		'image/jpg': '.jpg',
+		'image/png': '.png',
+		'image/gif': '.gif',
+		'image/bmp': '.bmp',
+		'image/webp': '.webp',
+		'image/svg+xml': '.svg',
+		'image/tiff': '.tiff'
+	};
+	return mimeToExt[type] || '.jpg';
+}
+
+export function imageExtToMime(ext: string): string {
+	const extToMime: { [key: string]: string } = {
+		'.jpg': 'image/jpeg',
+		'.jpeg': 'image/jpeg',
+		'.png': 'image/png',
+		'.gif': 'image/gif',
+		'.bmp': 'image/bmp',
+		'.webp': 'image/webp',
+		'.svg': 'image/svg+xml',
+		'.tiff': 'image/tiff'
+	};
+	return extToMime[ext.toLowerCase()] || 'image/jpeg';
+}

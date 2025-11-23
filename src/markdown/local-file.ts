@@ -25,6 +25,8 @@ import { Notice, TAbstractFile, TFile, Vault, MarkdownView, requestUrl, Platform
 import { Extension } from "./extension";
 import { NMPSettings } from "../settings";
 import { IsImageLibReady, PrepareImageLib, WebpToJPG, UploadImageToWx } from "../imagelib";
+import { mimeToImageExt, imageExtToMime } from "../utils";
+import { uploadImageToOSS } from "../weixin-api";
 
 declare module 'obsidian' {
     interface Vault {
@@ -75,6 +77,23 @@ export class LocalImageManager {
         return name.endsWith('.webp');
     }
 
+    async readImageData(vault: Vault, path: string) {
+        const file = vault.getFileByPath(path);
+        if (file == null) return null;
+        let fileData = await vault.readBinary(file);
+        let fileName = file.name;
+        if (this.isWebp(file)) {
+            if (IsImageLibReady()) {
+                fileData = WebpToJPG(fileData);
+                fileName = fileName.toLowerCase().replace('.webp', '.jpg');
+            }
+            else {
+                console.error('wasm not ready for webp');
+            }
+        }
+        return {fileName, fileData};
+    }
+
     async uploadLocalImage(token: string, vault: Vault, type: string = '') {
         const keys = this.images.keys();
         await PrepareImageLib();
@@ -83,21 +102,11 @@ export class LocalImageManager {
             const value = this.images.get(key);
             if (value == null) continue;
             if (value.url != null) continue;
-            const file = vault.getFileByPath(value.filePath);
-            if (file == null) continue;
-            let fileData = await vault.readBinary(file);
-            let name = file.name;
-            if (this.isWebp(file)) {
-                if (IsImageLibReady()) {
-                    fileData = WebpToJPG(fileData);
-                    name = name.toLowerCase().replace('.webp', '.jpg');
-                }
-                else {
-                    console.error('wasm not ready for webp');
-                }
-            }
+            const data = await this.readImageData(vault, value.filePath);
+            if (data == null) continue;
+            const {fileName, fileData} = data;
 
-            const res = await UploadImageToWx(new Blob([fileData]), name, token, type);
+            const res = await UploadImageToWx(new Blob([fileData]), fileName, token, type);
             if (res.errcode != 0) {
                 const msg = `上传图片失败: ${res.errcode} ${res.errmsg}`;
                 new Notice(msg);
@@ -137,7 +146,7 @@ export class LocalImageManager {
             let filename = pathname.split('/').pop() || '';
             filename = decodeURIComponent(filename);
             if (!this.checkImageExt(filename)) {
-                filename = filename + this.getImageExt(type);
+                filename = filename + mimeToImageExt(type);
             }
             return filename;
         } catch (e) {
@@ -151,23 +160,10 @@ export class LocalImageManager {
     }
 
     getImageExtFromBlob(blob: Blob): string {
-        // MIME类型到文件扩展名的映射
-        const mimeToExt: { [key: string]: string } = {
-            'image/jpeg': '.jpg',
-            'image/jpg': '.jpg',
-            'image/png': '.png',
-            'image/gif': '.gif',
-            'image/bmp': '.bmp',
-            'image/webp': '.webp',
-            'image/svg+xml': '.svg',
-            'image/tiff': '.tiff'
-        };
-    
         // 获取MIME类型
         const mimeType = blob.type.toLowerCase();
-        
         // 返回对应的扩展名，如果找不到则返回空字符串
-        return mimeToExt[mimeType] || '';
+        return mimeToImageExt(mimeType);
     }
 
     base64ToBlob(src: string) {
@@ -184,7 +180,7 @@ export class LocalImageManager {
 			byteNumbers[i] = byteCharacters.charCodeAt(i);
 		}
 		const byteArray = new Uint8Array(byteNumbers);
-		return {blob: new Blob([byteArray], { type: mineType }), ext: this.getImageExt(mineType)};
+		return {blob: new Blob([byteArray], { type: mineType }), ext: mimeToImageExt(mineType)};
 	}
 
     async uploadImageFromUrl(url: string, token: string, type: string = '') {
@@ -216,34 +212,6 @@ export class LocalImageManager {
             console.error(e);
             throw new Error('上传图片失败:' + e.message + '|' + url);
         }
-    }
-
-    getImageExt(type: string): string {
-        const mimeToExt: { [key: string]: string } = {
-            'image/jpeg': '.jpg',
-            'image/jpg': '.jpg',
-            'image/png': '.png',
-            'image/gif': '.gif',
-            'image/bmp': '.bmp',
-            'image/webp': '.webp',
-            'image/svg+xml': '.svg',
-            'image/tiff': '.tiff'
-        };
-        return mimeToExt[type] || '.jpg';
-    }
-
-    getMimeType(ext: string): string {
-        const extToMime: { [key: string]: string } = {
-            '.jpg': 'image/jpeg',
-            '.jpeg': 'image/jpeg',
-            '.png': 'image/png',
-            '.gif': 'image/gif',
-            '.bmp': 'image/bmp',
-            '.webp': 'image/webp',
-            '.svg': 'image/svg+xml',
-            '.tiff': 'image/tiff'
-        };
-        return extToMime[ext.toLowerCase()] || 'image/jpeg';
     }
 
     getImageInfos(root: HTMLElement) {
@@ -350,7 +318,7 @@ export class LocalImageManager {
             if (file == null) continue;
             let fileData = await vault.readBinary(file);
             const base64 = this.arrayBufferToBase64(fileData);
-            const mimeType = this.getMimeType(file.extension);
+            const mimeType = imageExtToMime(file.extension);
             const data = `data:${mimeType};base64,${base64}`;
             result.set(value.resUrl, data);
         }
@@ -370,7 +338,7 @@ export class LocalImageManager {
             }
 
             const base64 = this.arrayBufferToBase64(data);
-            const mimeType = this.getMimeType(ext);
+            const mimeType = imageExtToMime(ext);
             return `data:${mimeType};base64,${base64}`;
         }
         catch (e) {
@@ -413,6 +381,48 @@ export class LocalImageManager {
             }
         }
         return result.innerHTML;
+    }
+
+    async uploadToOSS(root: HTMLElement, authkey: string, vault: Vault) {
+        const images = Array.from(root.querySelectorAll('img'));
+        const localImages = Array.from(this.images.values());
+
+        const uploadLocal = async(info: ImageInfo) => {
+            const data = await this.readImageData(vault, info.filePath);
+            if (!data) return;
+            const {fileName, fileData} = data;
+            return await uploadImageToOSS(authkey, new Blob([fileData]), fileName);
+        };
+
+        for (const img of images) {
+            const src = img.getAttribute('src');
+            if (!src) continue;
+            console.log('src: ' + src);
+            try {
+                let newUrl: string | null = null;
+
+                if (src.startsWith('data:image')) {
+                    const blob = await (await fetch(src)).blob();
+                    const filename = `image_${Date.now()}.${blob.type.split('/')[1] || 'png'}`;
+                    newUrl = await uploadImageToOSS(authkey, blob, filename);
+                } else if (src.startsWith('app://')) {
+                    const info = this.images.get(src);
+                    if (!info) continue;
+                    newUrl = await uploadLocal(info);
+                } else if (src.includes('mmbiz.qpic.cn')) {
+                    const info = localImages.find(info => info.url == src);
+                    if (!info) continue;
+                    newUrl = await uploadLocal(info);
+                }
+
+                if (newUrl) {
+                    img.src = newUrl;
+                }
+            } catch (error) {
+                console.error('Failed to upload image and replace src:', error);
+                new Notice(`上传到OSS失败: ${src.substring(0, 50)}...`);
+            }
+        }
     }
 
     async cleanup() {

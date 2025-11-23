@@ -309,6 +309,35 @@ export class NotePreview extends ItemView {
             }
         }
 
+        // 知乎，小红书等平台支持
+        lineDiv = this.toolbar.createDiv({ cls: 'toolbar-line' }); 
+
+        const zhihuBtn = lineDiv.createEl('button', { cls: 'copy-button' }, async (button) => {
+            button.setText('复制知乎格式');
+        })
+
+        zhihuBtn.onclick = async() => {
+            await this.copyWithoutCSS();
+            uevent('zhihu-copy');
+        }
+
+        const toutiaoBtn = lineDiv.createEl('button', { cls: 'copy-button' }, async (button) => {
+            button.setText('复制头条格式');
+        })
+
+        toutiaoBtn.onclick = async() => {
+            await this.copyWithoutCSS();
+            uevent('toutiao-copy');
+        }
+
+        const bilibiliBtn = lineDiv.createEl('button', { cls: 'copy-button' }, async (button) => {
+            button.setText('复制哔哩哔哩格式');
+        })
+
+        bilibiliBtn.onclick = async() => {
+            await this.copyWithoutCSS();
+            uevent('bilibili-copy');
+        }
 
         // 封面
         lineDiv = this.toolbar.createDiv({ cls: 'toolbar-line' }); 
@@ -555,6 +584,19 @@ export class NotePreview extends ItemView {
         finally {
             this.isBatchRuning = false;
             this.isCancelUpload = false;
+        }
+    }
+
+    async copyWithoutCSS() {
+        this.showLoading('处理中...');
+        try {
+            await this.render.copyWithoutCSS();
+            const msg = this.settings.isAuthKeyVaild() ? '复制成功，快去粘贴吧！' : '复制成功，快去粘贴吧！如需复制本地图片，请购买会员，感谢支持！';
+            this.showMsg(msg);
+        }
+        catch (error) {
+            this.showMsg('图片上传失败: ' + error.message);
+            return;
         }
     }
 }

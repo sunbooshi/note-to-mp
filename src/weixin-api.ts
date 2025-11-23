@@ -21,6 +21,7 @@
  */
 
 import { requestUrl, RequestUrlParam, getBlobArrayBuffer } from "obsidian";
+import { imageExtToMime } from "./utils";
 
 const PluginHost = 'https://obplugin.sunboshi.tech';
 
@@ -151,6 +152,7 @@ export interface DraftArticle {
     appid?: string;
     theme?: string;
     highlight?: string;
+    css?: string;
 }
 
 export async function wxAddDraft(token: string, data: DraftArticle) {
@@ -225,4 +227,40 @@ export async function wxBatchGetMaterial(token: string, type: string, offset: nu
     });
 
     return await res.json;
+}
+
+export async function getUploadImageURL(authkey: string, ext: string) {
+    const url = PluginHost + '/v1/img/uploadurl/' + ext + '/' + authkey;
+    const res = await requestUrl({
+        url,
+        method: 'GET',
+        throw: false,
+    });
+
+    if (res.status !== 200) {
+        throw new Error(`获取上传地址失败：${res.status} ${res.text}`);
+    }
+    return await res.json;
+}
+
+export async function putImageToOSS(authKey:string, uploadURL: string, data: Blob, ext: string) {
+    const contentType = imageExtToMime('.'+ext);
+    const res = await requestUrl({
+        url: uploadURL,
+        method: 'PUT',
+        throw: false,
+        headers: {
+            'x-oss-meta-authkey': authKey,
+            'Content-Type': contentType,
+        },
+        body: await getBlobArrayBuffer(data),
+    });
+    return res;
+}
+
+export async function uploadImageToOSS(authkey: string, data: Blob, filename: string) {
+    const ext = filename.split('.').pop() || 'jpg';
+    const {uploadURL, downloadURL} = await getUploadImageURL(authkey, ext);
+    await putImageToOSS(authkey, uploadURL, data, ext);
+    return downloadURL;
 }
