@@ -1,0 +1,29 @@
+.Root {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Replace height: 100% with flex-grow */
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.Panel {
+  display: flex;
+  flex-direction: row;
+  padding: 10px; /* Consistent padding */
+  border-bottom: 1px solid var(--color-base-40);
+  flex-shrink: 0; /* Keep the panel fixed at its content height */
+}
+
+.PanelRight {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 0 10px;
+  align-items: center;
+}
+
+.RenderWrapper {
+  flex-grow: 1;
+  min-height: 0;
+  display: flex;
+}

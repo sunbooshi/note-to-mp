@@ -28,11 +28,14 @@ import { MarkedParser } from './markdown/parser';
 import { LocalImageManager, LocalFile } from './markdown/local-file';
 import { CardDataManager } from './markdown/code';
 import { ArticleRender } from './article-render';
+import { createPreview } from './ui/preview';
+import * as ReactDOM from 'react-dom/client';
 
 
 export const VIEW_TYPE_NOTE_PREVIEW = 'note-preview';
 
 export class NotePreview extends ItemView {
+    preview: ReactDOM.Root | null = null;
     workspace: Workspace;
     plugin: Plugin;
     mainDiv: HTMLDivElement;
@@ -96,40 +99,15 @@ export class NotePreview extends ItemView {
     }
 
     async onOpen() {
-        this.viewLoading();
-        this.setup();
+        this.preview = createPreview(this.containerEl.children[1] as HTMLElement, this.app, this);
         uevent('open');
-    }
-
-    async setup() {
-        await waitForLayoutReady(this.app);
-
-        if (!this.settings.isLoaded) {
-            const data = await this.plugin.loadData();
-            NMPSettings.loadSettings(data);
-        }
-        if (!this.assetsManager.isLoaded) {
-            await this.assetsManager.loadAssets();
-        }
-
-        this.buildUI();
-        this.listeners = [
-            this.workspace.on('file-open', () => {
-                this.update();
-            }),
-            this.app.vault.on("modify", (file) => {
-                if (this.currentFile?.path == file.path) {
-                    this.renderMarkdown();
-                }
-            } ) 
-        ];
-
-        this.renderMarkdown();
     }
 
     async onClose() {
         this.listeners?.forEach(listener => this.workspace.offref(listener));
         LocalFile.fileCache.clear();
+        this.preview?.unmount();
+        this.preview = null;
         uevent('close');
     }
 

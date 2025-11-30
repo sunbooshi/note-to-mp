@@ -14,19 +14,27 @@
 	"license": "MIT",
 	"devDependencies": {
 		"@types/node": "^16.11.6",
+		"@types/react": "^19.2.7",
+		"@types/react-dom": "^19.2.3",
 		"@typescript-eslint/eslint-plugin": "5.29.0",
 		"@typescript-eslint/parser": "5.29.0",
 		"builtin-modules": "3.3.0",
-		"esbuild": "0.17.3",
+		"esbuild": "^0.27.0",
 		"obsidian": "latest",
 		"tslib": "2.4.0",
 		"typescript": "4.7.4"
 	},
 	"dependencies": {
+		"@radix-ui/colors": "^3.0.0",
+		"@radix-ui/react-icons": "^1.3.2",
 		"@zip.js/zip.js": "^2.7.43",
+		"classnames": "^2.5.1",
 		"highlight.js": "^11.9.0",
 		"html-to-image": "^1.11.11",
 		"marked": "^12.0.1",
-		"marked-highlight": "^2.1.3"
+		"marked-highlight": "^2.1.3",
+		"radix-ui": "^1.4.3",
+		"react": "^19.2.0",
+		"react-dom": "^19.2.0"
 	}
 }

@@ -1,0 +1,89 @@
+/*
+ * Copyright (c) 2024-2025 Sun Booshi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+import * as React from "react";
+import { Select } from "radix-ui";
+import classnames from "classnames";
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+} from "@radix-ui/react-icons";
+import { NMPSettings } from "src/settings";
+import styles from "./AccountSelect.module.css";
+
+function AccountSelect() {
+  const settings = NMPSettings.getInstance();
+  const accounts = !settings.wxInfo ? [] : settings.wxInfo.map((account) => {
+    return (
+      <SelectItem value={account.appid} key={account.appid}>{account.name}</SelectItem>
+    );
+  });
+  const defaultAccount = settings.wxInfo && settings.wxInfo.length > 0 ? settings.wxInfo[0].appid : '';
+
+  return (
+    <Select.Root defaultValue={defaultAccount}>
+      <Select.Trigger className={styles.Trigger} aria-label="Food">
+        <Select.Value placeholder="请在设置添加公众号" />
+        <Select.Icon className={styles.Icon}>
+          <ChevronDownIcon />
+        </Select.Icon>
+      </Select.Trigger>
+      <Select.Portal>
+        <Select.Content className={styles.Content}>
+          <Select.ScrollUpButton className={styles.ScrollButton}>
+            <ChevronUpIcon />
+          </Select.ScrollUpButton>
+          <Select.Viewport className={styles.Viewport}>
+            <Select.Group>
+              <Select.Label className={styles.Label}>公众号</Select.Label>
+              {accounts}
+            </Select.Group>
+          </Select.Viewport>
+          <Select.ScrollDownButton className={styles.ScrollButton}>
+            <ChevronDownIcon />
+          </Select.ScrollDownButton>
+        </Select.Content>
+      </Select.Portal>
+    </Select.Root>
+  );
+}
+
+const SelectItem = React.forwardRef<
+  HTMLDivElement,
+  { children: React.ReactNode; className?: string; value: string;[key: string]: any }
+>(({ children, className, value, ...props }, forwardedRef) => {
+  return (
+    <Select.Item
+      className={classnames(styles.Item, className)}
+      value={value}
+      {...props}
+      ref={forwardedRef}
+    >
+      <Select.ItemText>{children}</Select.ItemText>
+      <Select.ItemIndicator className={styles.ItemIndicator}>
+        <CheckIcon />
+      </Select.ItemIndicator>
+    </Select.Item>
+  );
+});
+
+export default AccountSelect;

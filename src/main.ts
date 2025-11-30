@@ -27,6 +27,8 @@ import { NoteToMpSettingTab } from './setting-tab';
 import AssetsManager from './assets';
 import { setVersion, uevent } from './utils';
 import { WidgetsModal } from './widgets-modal';
+import { resourceState } from './ui/hooks/resource-state'; // Import the state manager
+import './styles.css';
 
 
 export default class NoteToMpPlugin extends Plugin {
@@ -41,6 +43,7 @@ export default class NoteToMpPlugin extends Plugin {
 	async loadResource() {
 		await this.loadSettings();
 		await this.assetsManager.loadAssets();
+		resourceState.setLoaded(true); // Set the state to loaded
 	}
 
 	async onload() {
