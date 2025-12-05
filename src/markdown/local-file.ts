@@ -810,7 +810,7 @@ export class LocalFile extends Extension{
 
                 const id = this.generateId();
                 const content = await this.renderFile(token.href, id);
-                const tag = this.callback.settings.embedStyle === 'quote' ? 'blockquote' : 'section';
+                const tag = this.settings.embedStyle === 'quote' ? 'blockquote' : 'section';
                 token.html = `<${tag} class="note-embed-file" id="${id}">${content}</${tag}>`
             },
 

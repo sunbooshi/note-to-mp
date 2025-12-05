@@ -20,34 +20,27 @@
  * THE SOFTWARE.
  */
 
-import { NMPSettings } from "src/settings";
-import { Marked, MarkedExtension } from "marked";
-import { App, TFile, Vault } from "obsidian";
-import AssetsManager from "../assets";
+import { TFile } from 'obsidian';
+import { create } from 'zustand';
+import { createSelectors } from './createSelectors';
+import { immer } from 'zustand/middleware/immer';
 
-export interface MDRendererCallback {
-   cacheElement(category: string, id: string, data: string): void;
+interface IRenderState {
+  note: TFile | null;
+  setNote: (note: TFile | null) => void;
+  renderVersion: number;
+  triggerRender: (note: TFile | null) => void;
+  setRenderVersion: () => void;
 }
 
-export abstract class Extension {
-    app: App;
-    vault: Vault;
-    assetsManager: AssetsManager
-    settings: NMPSettings;
-    callback: MDRendererCallback;
-    marked: Marked;
-
-    constructor(app: App, settings: NMPSettings, assetsManager: AssetsManager, callback: MDRendererCallback) {
-        this.app = app;
-        this.vault = app.vault;
-        this.settings = settings;
-        this.assetsManager = assetsManager;
-        this.callback = callback;
+export const useRenderStore = createSelectors(create(immer<IRenderState>((set) => ({
+  note: null,
+  setNote: (note) => set((state) => { state.note = note; }),
+  renderVersion: 0,
+  triggerRender: (note) => set((state) => {
+    if (note && state.note && note.path === state.note.path) {
+      state.renderVersion++;
     }
-
-    async prepare() { return; }
-    async postprocess(html:string) { return html; }
-    async beforePublish() { }
-    async cleanup() { return; }
-    abstract markedExtension(): MarkedExtension
-}
+  }),
+  setRenderVersion: () => set((state) => { state.renderVersion++; }),
+}))));

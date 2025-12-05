@@ -20,8 +20,10 @@
  * THE SOFTWARE.
  */
 
-import { requestUrl, RequestUrlParam, getBlobArrayBuffer } from "obsidian";
+import { requestUrl, RequestUrlParam, getBlobArrayBuffer, App, FrontMatterCache, TFile } from "obsidian";
 import { imageExtToMime } from "./utils";
+import AssetsManager from "./assets";
+import { NMPSettings } from "./settings";
 
 const PluginHost = 'https://obplugin.sunboshi.tech';
 
@@ -263,4 +265,61 @@ export async function uploadImageToOSS(authkey: string, data: Blob, filename: st
     const {uploadURL, downloadURL} = await getUploadImageURL(authkey, ext);
     await putImageToOSS(authkey, uploadURL, data, ext);
     return downloadURL;
+}
+
+function getFrontmatterValue(frontmatter: FrontMatterCache, key: string) {
+    const value = frontmatter[key];
+
+    if (value instanceof Array) {
+        return value[0];
+    }
+
+    return value;
+}
+
+export function getMetadata(app: App, file: TFile) {
+    const assetsManager = AssetsManager.getInstance();
+    const settings = NMPSettings.getInstance();
+    let res: DraftArticle = {
+        title: '',
+        author: undefined,
+        digest: undefined,
+        content: '',
+        content_source_url: undefined,
+        cover: undefined,
+        thumb_media_id: '',
+        need_open_comment: undefined,
+        only_fans_can_comment: undefined,
+        pic_crop_235_1: undefined,
+        pic_crop_1_1: undefined,
+        appid: undefined,
+        theme: undefined,
+        highlight: undefined,
+        css: undefined,
+    }
+    const metadata = app.metadataCache.getFileCache(file);
+    if (metadata?.frontmatter) {
+        const keys = assetsManager.expertSettings.frontmatter;
+        const frontmatter = metadata.frontmatter;
+        res.title = getFrontmatterValue(frontmatter, keys.title);
+        res.author = getFrontmatterValue(frontmatter, keys.author);
+        res.digest = getFrontmatterValue(frontmatter, keys.digest);
+        res.content_source_url = getFrontmatterValue(frontmatter, keys.content_source_url);
+        res.cover = getFrontmatterValue(frontmatter, keys.cover);
+        res.thumb_media_id = getFrontmatterValue(frontmatter, keys.thumb_media_id);
+        res.need_open_comment = frontmatter[keys.need_open_comment] ? 1 : undefined;
+        res.only_fans_can_comment = frontmatter[keys.only_fans_can_comment] ? 1 : undefined;
+        res.appid = getFrontmatterValue(frontmatter, keys.appid);
+        if (res.appid && !res.appid.startsWith('wx')) {
+            res.appid = settings.wxInfo.find(wx => wx.name === res.appid)?.appid;
+        }
+        res.theme = getFrontmatterValue(frontmatter, keys.theme);
+        res.highlight = getFrontmatterValue(frontmatter, keys.highlight);
+        if (frontmatter[keys.crop]) {
+            res.pic_crop_235_1 = '0_0_1_0.5';
+            res.pic_crop_1_1 = '0_0.525_0.404_1';
+        }
+        res.css = getFrontmatterValue(frontmatter, keys.css);
+    }
+    return res;
 }

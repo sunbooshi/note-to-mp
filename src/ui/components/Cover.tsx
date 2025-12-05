@@ -21,18 +21,20 @@
  */
 
 import * as React from "react";
-import { useWechatContext } from "../context/WechatContext";
+import { useConfigContext } from "src/store/ConfigStore";
 import styles from "./Cover.module.css";
 
 export function Cover() {
-	const { coverFile, setCoverFile } = useWechatContext();
+	const cover = useConfigContext(s=>s.cover);
+	const setCover = useConfigContext(s=>s.setCover);
+
 	const fileInputRef = React.useRef<HTMLInputElement>(null);
 
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		if (event.target.files && event.target.files.length > 0) {
-			setCoverFile(event.target.files[0]);
+			setCover(event.target.files[0]);
 		} else {
-			setCoverFile(null);
+			setCover(null);
 		}
 	};
 
@@ -46,12 +48,12 @@ export function Cover() {
 		event.preventDefault();
 		// Stop event propagation to prevent the parent label's onClick from firing
 		event.stopPropagation();
-		setCoverFile(null);
+		setCover(null);
 	};
 
 	return (
 		<div className={styles.CoverContainer}>
-			<label className={styles.CoverLabel} onClick={coverFile ? handleImageClick : undefined}>
+			<label className={styles.CoverLabel} onClick={cover ? handleImageClick : undefined}>
 				<input
 					type="file"
 					accept=".jpeg, .jpg, .png"
@@ -59,10 +61,10 @@ export function Cover() {
 					onChange={handleFileChange}
 					ref={fileInputRef} // Attach ref to the input
 				/>
-				{coverFile ? (
+				{cover ? (
 					<>
 						<img
-							src={URL.createObjectURL(coverFile)}
+							src={URL.createObjectURL(cover)}
 							alt="Cover Preview"
 							className={styles.CoverPreview}
 						/>

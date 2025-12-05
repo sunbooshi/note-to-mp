@@ -20,35 +20,20 @@
  * THE SOFTWARE.
  */
 
-import { forwardRef, useImperativeHandle, useRef } from 'react';
-import styles from './RenderContainer.module.css';
+import { App } from 'obsidian';
+import { create } from 'zustand';
+import { createSelectors } from './createSelectors';
 
-// 定义 ref 暴露的句柄类型
-export interface RenderContainerRef {
-  styleEl: HTMLStyleElement | null;
-  contentEl: HTMLDivElement | null;
+interface IPluginState {
+  app: App;
+  setApp: (app: App) => void;
+  isReourceLoaded: boolean;
+  setResourceLoaded: (loaded: boolean) => void;
 }
 
-// 使用 forwardRef 来允许父组件访问内部 DOM 节点
-export const RenderContainer = forwardRef<RenderContainerRef, {}>((props, ref) => {
-  const styleRef = useRef<HTMLStyleElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  // 使用 useImperativeHandle 将内部 ref 暴露给父组件
-  useImperativeHandle(ref, () => ({
-    styleEl: styleRef.current,
-    contentEl: contentRef.current,
-  }));
-
-  return (
-    <div className={styles.RenderRoot}>
-      {/* 用于注入动态 CSS */}
-      <style ref={styleRef}></style>
-      {/* 用于渲染 Markdown HTML */}
-      <div ref={contentRef} className="braft-output-content">
-        {/* 内容将由 ArticleRender 动态填充 */}
-        <p>正在等待渲染...</p>
-      </div>
-    </div>
-  );
-});
+export const usePluginStore = createSelectors(create<IPluginState>((set) => ({
+  app: null as unknown as App,
+  setApp: (app) => set({ app }),
+  isReourceLoaded: false,
+  setResourceLoaded: (loaded) => set({isReourceLoaded:loaded}),
+})));

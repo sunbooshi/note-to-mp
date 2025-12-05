@@ -28,6 +28,7 @@ import { MarkedParser } from './markdown/parser';
 import { LocalImageManager, LocalFile } from './markdown/local-file';
 import { CardDataManager } from './markdown/code';
 import { ArticleRender } from './article-render';
+import { useRenderStore } from './store/RenderStore';
 import { createPreview } from './ui/preview';
 import * as ReactDOM from 'react-dom/client';
 
@@ -90,16 +91,20 @@ export class NotePreview extends ItemView {
     }
 
     get render() {
-        if (!this._articleRender) {
-            this._articleRender = new ArticleRender(this.app, this, this.styleEl, this.articleDiv);
-            this._articleRender.currentTheme = this.currentTheme;
-            this._articleRender.currentHighlight = this.currentHighlight;
-        }
         return this._articleRender;
     }
 
     async onOpen() {
-        this.preview = createPreview(this.containerEl.children[1] as HTMLElement, this.app, this);
+        useRenderStore.getState().setNote(this.app.workspace.getActiveFile());
+        this.listeners = [
+            this.workspace.on('file-open', (file) => {
+                useRenderStore.getState().setNote(file);
+            }),
+            this.app.vault.on("modify", (file) => {
+                useRenderStore.getState().triggerRender(file as TFile);
+            }),
+        ];
+        this.preview = createPreview(this.containerEl.children[1] as HTMLElement);
         uevent('open');
     }
 
@@ -111,6 +116,7 @@ export class NotePreview extends ItemView {
         uevent('close');
     }
 
+/*
     onAppIdChanged() {
         // 清理上传过的图片
         this.cleanArticleData();
@@ -577,4 +583,5 @@ export class NotePreview extends ItemView {
             return;
         }
     }
+        */
 }

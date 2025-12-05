@@ -101,6 +101,8 @@ export class NMPSettings {
             excalidrawToPNG,
             expertSettingsNote,
             ignoreEmptyLine,
+            isVip,
+            expireat,
         } = data;
 
         const settings = NMPSettings.getInstance();
@@ -155,7 +157,12 @@ export class NMPSettings {
         if (ignoreEmptyLine !== undefined) {
             settings.enableEmptyLine = ignoreEmptyLine;
         }
-        settings.getExpiredDate();
+        if (isVip !== undefined) {
+            settings.isVip = isVip;
+        }
+        if (expireat) {
+            settings.expireat = new Date(expireat);
+        }
         settings.isLoaded = true;
     }
 
@@ -179,19 +186,27 @@ export class NMPSettings {
             'excalidrawToPNG': settings.excalidrawToPNG,
             'expertSettingsNote': settings.expertSettingsNote,
             'ignoreEmptyLine': settings.enableEmptyLine,
+            'isVip': settings.isVip,
+            'expireat': settings.expireat,
         }
     }
 
-    getExpiredDate() {
-        if (this.authKey.length == 0) return;
-        wxKeyInfo(this.authKey).then((res) => {
-            if (res.status == 200) {
-                if (res.json.vip) {
-                    this.isVip = true;
-                }
-                this.expireat = new Date(res.json.expireat);
+    async updateKeyInfo() {
+        if (this.authKey.length == 0) return false;
+        const res = await wxKeyInfo(this.authKey);
+        let updated = false;
+        if (res.status == 200) {
+            if (res.json.vip !== this.isVip) {
+                this.isVip = res.json.vip;
+                updated = true;
             }
-        })
+            const expireat = new Date(res.json.expireat);
+            if (expireat != this.expireat) {
+                this.expireat = expireat;
+                updated = true;
+            }
+        }
+        return updated;
     }
 
     isAuthKeyVaild() {

@@ -22,21 +22,17 @@
 
 import * as Tabs from "@radix-ui/react-tabs";
 import * as ReactDOM from 'react-dom/client';
-import { App, ItemView } from "obsidian";
-import { ObsidianProvider } from "./context/ObsidianContext";
 import { NotificationProvider } from "./components/Notification";
-import { useResourceStatus } from "./hooks/useResourceStatus";
+import { usePluginStore } from "src/store/PluginStore";
 import { Wechat } from "./components/Wechat";
-import { useObsidian } from "./context/ObsidianContext";
-import { ArticleRender } from "src/article-render";
 import { PageLoading } from "./components/Loading";
 
-import styles from "./styles.module.css";
+import styles from "./preview.module.css";
 
 export function Preview() {
-  const resourceStatus = useResourceStatus();
+  const isReourceLoaded = usePluginStore.use.isReourceLoaded();
 
-  if (!resourceStatus) {
+  if (!isReourceLoaded) {
     return <PageLoading />;
   }
 
@@ -66,12 +62,8 @@ export function Preview() {
   );
 }
 
-export function createPreview(conatainer: HTMLElement, app: App, itemView: ItemView) {
+export function createPreview(conatainer: HTMLElement) {
   const root = ReactDOM.createRoot(conatainer);
-  root.render(
-    <ObsidianProvider app={app} itemView={itemView}>
-      <Preview />
-    </ObsidianProvider>
-  );
+  root.render(<Preview />);
   return root;
 }

@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-import { App, sanitizeHTMLToDom, requestUrl, Platform } from "obsidian";
+import { App, sanitizeHTMLToDom, requestUrl, Platform, TFile } from "obsidian";
 import * as postcss from "./postcss/postcss";
 
 let PluginVersion = "0.0.0";
@@ -277,4 +277,8 @@ export function imageExtToMime(ext: string): string {
 		'.tiff': 'image/tiff'
 	};
 	return extToMime[ext.toLowerCase()] || 'image/jpeg';
+}
+
+export function trimEmbedTag(name: string) {
+	return name.trim().replace(/^!\[\[/, '').replace(/^\[\[/, '').replace(/]]$/, '');
 }

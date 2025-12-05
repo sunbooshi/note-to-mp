@@ -28,19 +28,21 @@ import {
   ChevronUpIcon,
 } from "@radix-ui/react-icons";
 import { NMPSettings } from "src/settings";
+import { useConfigContext } from "src/store/ConfigStore";
 import styles from "./AccountSelect.module.css";
 
 function AccountSelect() {
+  const setAppId = useConfigContext((s)=>s.setAppId);
+  const defaultAccount = useConfigContext((s)=>s.appid) || '';
   const settings = NMPSettings.getInstance();
   const accounts = !settings.wxInfo ? [] : settings.wxInfo.map((account) => {
     return (
       <SelectItem value={account.appid} key={account.appid}>{account.name}</SelectItem>
     );
   });
-  const defaultAccount = settings.wxInfo && settings.wxInfo.length > 0 ? settings.wxInfo[0].appid : '';
 
   return (
-    <Select.Root defaultValue={defaultAccount}>
+    <Select.Root defaultValue={defaultAccount} onValueChange={setAppId}>
       <Select.Trigger className={styles.Trigger} aria-label="Food">
         <Select.Value placeholder="请在设置添加公众号" />
         <Select.Icon className={styles.Icon}>

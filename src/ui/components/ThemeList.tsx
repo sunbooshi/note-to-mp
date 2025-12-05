@@ -20,30 +20,23 @@
  * THE SOFTWARE.
  */
 
-import * as React from "react";
 import { DropdownMenu } from "radix-ui";
 import {
 	DotFilledIcon,
 	ChevronRightIcon,
 } from "@radix-ui/react-icons";
 import AssetsManager from "src/assets";
-import { NMPSettings } from "src/settings";
-import { useWechatContext } from "../context/WechatContext";
+import { useConfigContext } from "src/store/ConfigStore";
 import styles from "./ThemeList.module.css";
 
 export default function ThemeList() {
-  const settings = NMPSettings.getInstance();
-	const [curTheme, setCurTheme] = React.useState(settings.defaultStyle);
-  const [curHighlight, setCurHighlight] = React.useState(settings.defaultHighlight);
-  const { setTheme, setHighlight } = useWechatContext();
-
   const mananger = AssetsManager.getInstance();
 
-  const onThemeChange = (themeClassName: string) => {
-    setCurTheme(themeClassName);
-    setTheme(themeClassName);
-  }
-  
+  const theme = useConfigContext((s) => s.theme);
+  const highlight = useConfigContext((s) => s.highlight);
+  const setTheme = useConfigContext((s) => s.setTheme);
+  const setHighlight = useConfigContext((s) => s.setHighlight);
+
   const themes = mananger.themes === undefined ? [] : mananger.themes.map(t => {
     return (
       <DropdownMenu.RadioItem className={styles.RadioItem} value={t.className} key={t.className}>
@@ -88,7 +81,7 @@ export default function ThemeList() {
 								sideOffset={2}
 								alignOffset={-5}
 							>
-                <DropdownMenu.RadioGroup value={curTheme} onValueChange={onThemeChange}>
+                <DropdownMenu.RadioGroup value={theme} onValueChange={setTheme}>
                   {themes}
                 </DropdownMenu.RadioGroup>
 							</DropdownMenu.SubContent>
@@ -107,7 +100,7 @@ export default function ThemeList() {
 								sideOffset={2}
 								alignOffset={-5}
 							>
-                <DropdownMenu.RadioGroup value={curHighlight} onValueChange={setCurHighlight}>
+                <DropdownMenu.RadioGroup value={highlight} onValueChange={setHighlight}>
                   {highlights}
                 </DropdownMenu.RadioGroup>
 							</DropdownMenu.SubContent>

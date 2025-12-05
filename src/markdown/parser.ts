@@ -157,7 +157,7 @@ export class MarkedParser {
 		return result;
 	}
 
-	async parse(content: string) {
+	async parse(content: string): Promise<string> {
 		if (!this.marked) await this.buildMarked();
 		await this.prepare();
 		let html = await this.marked.parse(content);	

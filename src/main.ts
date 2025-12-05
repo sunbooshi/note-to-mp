@@ -27,7 +27,8 @@ import { NoteToMpSettingTab } from './setting-tab';
 import AssetsManager from './assets';
 import { setVersion, uevent } from './utils';
 import { WidgetsModal } from './widgets-modal';
-import { resourceState } from './ui/hooks/resource-state'; // Import the state manager
+import { NotePubModal } from './note-pub';
+import { usePluginStore } from './store/PluginStore';
 import './styles.css';
 
 
@@ -43,13 +44,13 @@ export default class NoteToMpPlugin extends Plugin {
 	async loadResource() {
 		await this.loadSettings();
 		await this.assetsManager.loadAssets();
-		resourceState.setLoaded(true); // Set the state to loaded
+		usePluginStore.getState().setResourceLoaded(true);
 	}
 
 	async onload() {
 		console.log('Loading NoteToMP');
+		usePluginStore.getState().setApp(this.app);
 		setVersion(this.manifest.version);
-		uevent('load');
 		this.app.workspace.onLayoutReady(()=>{
 			this.loadResource();
 		})
@@ -86,8 +87,7 @@ export default class NoteToMpPlugin extends Plugin {
 			id: 'note-to-mp-pub',
 			name: '发布公众号文章',
 			callback: async () => {
-				await this.activateView();
-				this.getNotePreview()?.postArticle();
+				new NotePubModal(this.app).open();
 			}
 		});
 
@@ -104,17 +104,16 @@ export default class NoteToMpPlugin extends Plugin {
 									new Notice('只能发布 Markdown 文件');
 									return;
 								}
-								await this.activateView();
-								await this.getNotePreview()?.renderMarkdown(file);
-								await this.getNotePreview()?.postArticle();
+								new NotePubModal(this.app, undefined, file).open();
               } else if (file instanceof TFolder) {
-								await this.activateView();
-								await this.getNotePreview()?.batchPost(file);
+								new NotePubModal(this.app, file, undefined).open();
               }
             });
         });
       })
     );
+
+		uevent('load');
 	}
 
 	onunload() {
@@ -123,6 +122,11 @@ export default class NoteToMpPlugin extends Plugin {
 
 	async loadSettings() {
 		NMPSettings.loadSettings(await this.loadData());
+		NMPSettings.getInstance().updateKeyInfo().then(updated => {
+			if (updated) {
+				this.saveSettings();
+			}
+		});
 	}
 
 	async saveSettings() {

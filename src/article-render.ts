@@ -20,13 +20,13 @@
  * THE SOFTWARE.
  */
 
-import { App, ItemView, Workspace, Notice, sanitizeHTMLToDom, apiVersion, TFile, MarkdownRenderer, FrontMatterCache } from 'obsidian';
+import { App, ItemView, Workspace, Notice, sanitizeHTMLToDom, apiVersion, TFile, MarkdownRenderer, FrontMatterCache, Component } from 'obsidian';
 import { applyCSS } from './utils';
 import { UploadImageToWx } from './imagelib';
 import { NMPSettings } from './settings';
 import AssetsManager from './assets';
 import InlineCSS from './inline-css';
-import { wxGetToken, wxAddDraft, wxBatchGetMaterial, DraftArticle, DraftImageMediaId, DraftImages, wxAddDraftImages } from './weixin-api';
+import { wxGetToken, wxAddDraft, wxBatchGetMaterial, DraftArticle, DraftImageMediaId, DraftImages, wxAddDraftImages, getMetadata } from './weixin-api';
 import { MDRendererCallback } from './markdown/extension';
 import { MarkedParser } from './markdown/parser';
 import { LocalImageManager, LocalFile } from './markdown/local-file';
@@ -40,98 +40,39 @@ const FRONT_MATTER_REGEX = /^(---)$.+?^(---)$.+?/ims;
 
 export class ArticleRender implements MDRendererCallback {
   app: App;
-  itemView: ItemView;
-  workspace: Workspace;
-  styleEl: HTMLElement;
-  articleDiv: HTMLDivElement;
+  note: TFile | null = null;
   settings: NMPSettings;
   assetsManager: AssetsManager;
   articleHTML: string;
   title: string;
-  _currentTheme: string;
-  _currentHighlight: string;
-  _currentAppId: string;
   markedParser: MarkedParser;
   cachedElements: Map<string, string> = new Map();
   debouncedRenderMarkdown: (...args: any[]) => void;
 
-  constructor(app: App, itemView: ItemView, styleEl: HTMLElement, articleDiv: HTMLDivElement) {
+  constructor(app: App) {
     this.app = app;
-    this.itemView = itemView;
-    this.styleEl = styleEl;
-    this.articleDiv = articleDiv;
     this.settings = NMPSettings.getInstance();
     this.assetsManager = AssetsManager.getInstance();
     this.articleHTML = '';
     this.title = '';
-    this._currentTheme = 'default';
-    this._currentHighlight = 'default';
     this.markedParser = new MarkedParser(app, this);
     this.debouncedRenderMarkdown = debounce(this.renderMarkdown.bind(this), 1000);
   }
 
-  set currentTheme(value: string) {
-    this._currentTheme = value;
-  }
 
-  get currentTheme() {
-    const { theme } = this.getMetadata();
-    if (theme) {
-      return theme;
-    }
-    return this._currentTheme;
-  }
-
-  set currentHighlight(value: string) {
-    this._currentHighlight = value;
-  }
-
-  get currentHighlight() {
-    const { highlight } = this.getMetadata();
-    if (highlight) {
-      return highlight;
-    }
-    return this._currentHighlight;
-  }
-
-  isOldTheme() {
-    const theme = this.assetsManager.getTheme(this.currentTheme);
-    if (theme) {
-      return theme.css.indexOf('.note-to-mp') < 0;
-    }
-    return false;
-  }
-
-  setArticle(article: string) {
-    this.articleDiv.empty();
+  setArticle(container:HTMLElement, article: string) {
+    container.empty();
     let className = 'note-to-mp';
-    // 兼容旧版本样式
-    if (this.isOldTheme()) {
-      className = this.currentTheme;
-    }
     const html = `<section class="${className}" id="article-section">${article}</section>`;
     const doc = sanitizeHTMLToDom(html);
     if (doc.firstChild) {
-      this.articleDiv.appendChild(doc.firstChild);
+      container.appendChild(doc.firstChild);
     }
   }
 
-  setStyle(css: string) {
-    this.styleEl.empty();
-    this.styleEl.appendChild(document.createTextNode(css));
-  }
-
-  async reloadStyle() {
-    this.setStyle(await this.getCSS());
-  }
-
-  getArticleSection() {
-    return this.articleDiv.querySelector('#article-section') as HTMLElement;
-  }
-
-  async getArticleContent() {
-    const content = this.articleDiv.innerHTML;
-    let html = applyCSS(content, await this.getCSS());
+  async getArticleContent(container: HTMLElement, css: string) {
+    const content = container.innerHTML;
+    let html = applyCSS(content, css);
     // 处理话题多余内容
     html = html.replace(/rel="noopener nofollow"/g, '');
     html = html.replace(/target="_blank"/g, '');
@@ -139,8 +80,8 @@ export class ArticleRender implements MDRendererCallback {
     return CardDataManager.getInstance().restoreCard(html);
   }
 
-  getArticleText() {
-    return this.articleDiv.innerText.trimStart();
+  getArticleText(container: HTMLElement) {
+    return container.innerText.trimStart();
   }
 
   errorContent(error: any) {
@@ -152,11 +93,11 @@ export class ArticleRender implements MDRendererCallback {
       + `${error}`;
   }
 
-  async renderMarkdown(af: TFile | null = null) {
+  async renderMarkdown(contianer:HTMLElement, af: TFile) {
     try {
       let md = '';
-      if (af && af.extension.toLocaleLowerCase() === 'md') {
-        md = await this.app.vault.adapter.read(af.path);
+      if (af.extension.toLocaleLowerCase() === 'md') {
+        md = await this.app.vault.cachedRead(af);
         this.title = af.basename;
       }
       else {
@@ -165,106 +106,41 @@ export class ArticleRender implements MDRendererCallback {
       if (md.startsWith('---')) {
         md = md.replace(FRONT_MATTER_REGEX, '');
       }
+      this.note = af;
 
       this.articleHTML = await this.markedParser.parse(md);
-      this.setStyle(await this.getCSS());
-      this.setArticle(this.articleHTML);
-      await this.processCachedElements();
+      this.setArticle(contianer, this.articleHTML);
+      await this.processCachedElements(contianer);
     }
     catch (e) {
       console.error(e);
-      this.setArticle(this.errorContent(e));
+      this.setArticle(contianer, this.errorContent(e));
     }
   }
 
-  async getCSS() {
+  async getCSS(note: TFile, themeName:string, highlightName: string) {
     try {
-      const theme = this.assetsManager.getTheme(this.currentTheme);
-      const highlight = this.assetsManager.getHighlight(this.currentHighlight);
       let customCSS = this.settings.customCSSNote.length > 0 ? this.assetsManager.customCSS : '';
-      const metadata = this.getMetadata();
+      const metadata = getMetadata(this.app, note);
       if (metadata.css) {
         const note = metadata.css.replace('[[', '').replace(']]', '');
-        console.log('custom css: ', note);
         const css = await this.assetsManager.loadCSSFromNote(note);
         if (css) {
           customCSS = css;
         }
       }
+
+      themeName = metadata.theme || themeName;
+      highlightName = metadata.highlight || highlightName;
+      const theme = this.assetsManager.getTheme(themeName);
+      const highlight = this.assetsManager.getHighlight(highlightName);
       const baseCSS = this.settings.baseCSS ? `.note-to-mp {${this.settings.baseCSS}}` : '';
       return `${InlineCSS}\n\n${highlight!.css}\n\n${theme!.css}\n\n${baseCSS}\n\n${customCSS}`;
     } catch (error) {
       console.error(error);
-      new Notice(`获取样式失败${this.currentTheme}|${this.currentHighlight}，请检查主题是否正确安装。`);
+      new Notice(`获取样式失败${themeName}|${highlightName}，请检查主题是否正确安装。`);
     }
     return '';
-  }
-
-  async updateStyle(styleName: string) {
-    this.currentTheme = styleName;
-    this.setStyle(await this.getCSS());
-  }
-
-  async updateHighLight(styleName: string) {
-    this.currentHighlight = styleName;
-    this.setStyle(await this.getCSS());
-  }
-
-  getFrontmatterValue(frontmatter: FrontMatterCache, key: string) {
-    const value = frontmatter[key];
-
-    if (value instanceof Array) {
-      return value[0];
-    }
-
-    return value;
-  }
-
-  getMetadata() {
-    let res: DraftArticle = {
-      title: '',
-      author: undefined,
-      digest: undefined,
-      content: '',
-      content_source_url: undefined,
-      cover: undefined,
-      thumb_media_id: '',
-      need_open_comment: undefined,
-      only_fans_can_comment: undefined,
-      pic_crop_235_1: undefined,
-      pic_crop_1_1: undefined,
-      appid: undefined,
-      theme: undefined,
-      highlight: undefined,
-      css: undefined,
-    }
-    const file = this.app.workspace.getActiveFile();
-    if (!file) return res;
-    const metadata = this.app.metadataCache.getFileCache(file);
-    if (metadata?.frontmatter) {
-      const keys = this.assetsManager.expertSettings.frontmatter;
-      const frontmatter = metadata.frontmatter;
-      res.title = this.getFrontmatterValue(frontmatter, keys.title);
-      res.author = this.getFrontmatterValue(frontmatter, keys.author);
-      res.digest = this.getFrontmatterValue(frontmatter, keys.digest);
-      res.content_source_url = this.getFrontmatterValue(frontmatter, keys.content_source_url);
-      res.cover = this.getFrontmatterValue(frontmatter, keys.cover);
-      res.thumb_media_id = this.getFrontmatterValue(frontmatter, keys.thumb_media_id);
-      res.need_open_comment = frontmatter[keys.need_open_comment] ? 1 : undefined;
-      res.only_fans_can_comment = frontmatter[keys.only_fans_can_comment] ? 1 : undefined;
-      res.appid = this.getFrontmatterValue(frontmatter, keys.appid);
-      if (res.appid && !res.appid.startsWith('wx')) {
-        res.appid = this.settings.wxInfo.find(wx => wx.name === res.appid)?.appid;
-      }
-      res.theme = this.getFrontmatterValue(frontmatter, keys.theme);
-      res.highlight = this.getFrontmatterValue(frontmatter, keys.highlight);
-      if (frontmatter[keys.crop]) {
-        res.pic_crop_235_1 = '0_0_1_0.5';
-        res.pic_crop_1_1 = '0_0.525_0.404_1';
-      }
-      res.css = this.getFrontmatterValue(frontmatter, keys.css);
-    }
-    return res;
   }
 
   async uploadVaultCover(name: string, token: string) {
@@ -326,12 +202,12 @@ export class ArticleRender implements MDRendererCallback {
     return token;
   }
 
-  async uploadImages(appid: string) {
+  async uploadImages(appid: string, container: HTMLElement) {
     if (!this.settings.authKey) {
-      throw new Error('请先设置注册码（AuthKey）');
+      return;
     }
 
-    let metadata = this.getMetadata();
+    let metadata = getMetadata(this.app, this.note!);
     if (metadata.appid) {
       appid = metadata.appid;
     }
@@ -346,29 +222,30 @@ export class ArticleRender implements MDRendererCallback {
       return;
     }
 
-    await this.cachedElementsToImages();
+    await this.cachedElementsToImages(container);
 
     const lm = LocalImageManager.getInstance();
     // 上传图片
     await lm.uploadLocalImage(token, this.app.vault);
     // 上传图床图片
-    await lm.uploadRemoteImage(this.articleDiv, token);
+    await lm.uploadRemoteImage(container, token);
     // 替换图片链接
-    lm.replaceImages(this.articleDiv);
-
-    await this.copyArticle();
+    lm.replaceImages(container);
   }
 
-  async copyArticle() {
-    const content = await this.getArticleContent();
+  async copyArticle(container: HTMLElement, css: string, appid?: string) {
+    if (appid) {
+      await this.uploadImages(appid, container);
+    }
+    const content = await this.getArticleContent(container, css);
     await navigator.clipboard.write([new ClipboardItem({
       'text/html': new Blob([content], { type: 'text/html' })
     })])
   }
 
-  async copyWithoutCSS() {
-    await this.cachedElementsToImages();
-    const clonedArticleDiv = this.articleDiv.cloneNode(true) as HTMLDivElement;
+  async copyWithoutCSS(container: HTMLElement) {
+    await this.cachedElementsToImages(container);
+    const clonedArticleDiv = container.cloneNode(true) as HTMLDivElement;
     // 移除公众号名片
     clonedArticleDiv.querySelectorAll('.note-mpcard-wrapper').forEach(node => node.remove());
     // TODO：小部件处理
@@ -399,12 +276,12 @@ export class ArticleRender implements MDRendererCallback {
     return '';
   }
 
-  async postArticle(appid:string, localCover: File | null = null) {
+  async postArticle(appid:string, localCover: File | null = null, container: HTMLElement, css: string) {
     if (!this.settings.authKey) {
       throw new Error('请先设置注册码（AuthKey）');
     }
 
-    let metadata = this.getMetadata();
+    let metadata = getMetadata(this.app, this.note!);
     if (metadata.appid) {
       appid = metadata.appid;
     }
@@ -417,14 +294,14 @@ export class ArticleRender implements MDRendererCallback {
     if (token === '') {
       throw new Error('获取token失败,请检查网络链接!');
     }
-    await this.cachedElementsToImages();
+    await this.cachedElementsToImages(container);
     const lm = LocalImageManager.getInstance();
     // 上传图片
     await lm.uploadLocalImage(token, this.app.vault);
     // 上传图床图片
-    await lm.uploadRemoteImage(this.articleDiv, token);
+    await lm.uploadRemoteImage(container, token);
     // 替换图片链接
-    lm.replaceImages(this.articleDiv);
+    lm.replaceImages(container);
     // 上传封面
     let mediaId = metadata.thumb_media_id;
     if (!mediaId) {
@@ -456,7 +333,7 @@ export class ArticleRender implements MDRendererCallback {
     }
 
     metadata.title = metadata.title || this.title;
-    metadata.content = await this.getArticleContent();
+    metadata.content = await this.getArticleContent(container, css);
     metadata.thumb_media_id = mediaId;
 
     // 创建草稿
@@ -477,12 +354,12 @@ export class ArticleRender implements MDRendererCallback {
     }
   }
 
-  async postImages(appid: string) {
+  async postImages(appid: string, container: HTMLElement) {
     if (!this.settings.authKey) {
       throw new Error('请先设置注册码（AuthKey）');
     }
 
-    let metadata = this.getMetadata();
+    let metadata = getMetadata(this.app, this.note!);
     if (metadata.appid) {
       appid = metadata.appid;
     }
@@ -502,9 +379,9 @@ export class ArticleRender implements MDRendererCallback {
     // 上传图片
     await lm.uploadLocalImage(token, this.app.vault, 'image');
     // 上传图床图片
-    await lm.uploadRemoteImage(this.articleDiv, token, 'image');
+    await lm.uploadRemoteImage(container, token, 'image');
 
-    const images = lm.getImageInfos(this.articleDiv);
+    const images = lm.getImageInfos(container);
     for (const image of images) {
       if (!image.media_id) {
         console.warn('miss media id:', image.resUrl);
@@ -519,7 +396,7 @@ export class ArticleRender implements MDRendererCallback {
       throw new Error('没有图片需要发布!');
     }
 
-    const content = this.getArticleText();
+    const content = this.getArticleText(container);
 
     const imagesData: DraftImages = {
       article_type: 'newspic',
@@ -549,12 +426,12 @@ export class ArticleRender implements MDRendererCallback {
     }
   }
 
-  async exportHTML() {
-    await this.cachedElementsToImages();
+  async exportHTML(container: HTMLElement, css: string) {
+    await this.cachedElementsToImages(container);
     const lm = LocalImageManager.getInstance();
-    const content = await lm.embleImages(this.articleDiv, this.app.vault);
+    const content = await lm.embleImages(container, this.app.vault);
     const globalStyle = await this.assetsManager.getStyle();
-    const html = applyCSS(content, await this.getCSS() + globalStyle);
+    const html = applyCSS(content, css + globalStyle);
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -565,27 +442,30 @@ export class ArticleRender implements MDRendererCallback {
     a.remove();
   }
 
-  async processCachedElements() {
-    const af = this.app.workspace.getActiveFile();
+  async processCachedElements(root: HTMLElement) {
+    const af = this.note;
     if (!af) {
       console.error('当前没有打开文件，无法处理缓存元素');
       return;
     }
+    const component = new Component();
+    component.load();
     for (const [key, value] of this.cachedElements) {
       const [category, id] = key.split(':');
       if (category === 'mermaid' || category === 'excalidraw') {
-        const container = this.articleDiv.querySelector('#' + id) as HTMLElement;
+        const container = root.querySelector('#' + id) as HTMLElement;
         if (container) {
-          await MarkdownRenderer.render(this.app, value, container, af.path, this.itemView);
+          await MarkdownRenderer.render(this.app, value, container, af.path, component);
         }
       }
     }
+    component.unload();
   }
 
-  async cachedElementsToImages() {
+  async cachedElementsToImages(root: HTMLElement) {
     for (const [key, cached] of this.cachedElements) {
       const [category, elementId] = key.split(':');
-      const container = this.articleDiv.querySelector(`#${elementId}`) as HTMLElement;
+      const container = root.querySelector(`#${elementId}`) as HTMLElement;
       if (!container) continue;
 
       if (category === 'mermaid') {
@@ -640,12 +520,12 @@ export class ArticleRender implements MDRendererCallback {
       }
     } else {
       const svg = await LocalFile.renderExcalidraw(innerDiv.innerHTML);
-      this.updateElementByID(id, svg);
+      this.updateElementByID(container, id, svg);
     }
   }
 
-  updateElementByID(id: string, html: string): void {
-    const item = this.articleDiv.querySelector('#' + id) as HTMLElement;
+  updateElementByID(container:HTMLElement, id: string, html: string): void {
+    const item = container.querySelector('#' + id) as HTMLElement;
     if (!item) return;
     const doc = sanitizeHTMLToDom(html);
     item.empty();

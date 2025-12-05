@@ -20,32 +20,42 @@
  * THE SOFTWARE.
  */
 
-import { useState, useEffect } from 'react';
-import { resourceState } from './resource-state';
+import { App, Modal, TFolder, TFile } from "obsidian";
+import { createPubview } from "./ui/pubview";
+import * as ReactDOM from 'react-dom/client';
 
-/**
- * A custom React hook that subscribes to the plugin's resource loading state.
- *
- * @returns {boolean} `true` if resources are loaded, otherwise `false`.
- */
-export function useResourceStatus(): boolean {
-  // Initialize state with the current snapshot from the store.
-  const [isLoaded, setIsLoaded] = useState(() => resourceState.isReady());
+export class NotePubModal extends Modal {
+  pubview: ReactDOM.Root | null = null;
+  folder?: TFolder;
+  note?: TFile;
 
-  useEffect(() => {
-    // Define the function to update local state.
-    const handleStateChange = () => {
-      setIsLoaded(resourceState.isReady());
-    };
+  constructor(app: App, folder?: TFolder, note?: TFile) {
+    super(app);
+    this.folder = folder;
+    this.note = note;
+  }
 
-    // Subscribe to the store on component mount.
-    const unsubscribe = resourceState.subscribe(handleStateChange);
+  onOpen() {
+    console.log(this);
+    let { contentEl } = this;
+    const notes: TFile[] = [];
+    if (this.folder) {
+      this.folder.children.forEach((child) => {
+        if (child instanceof TFile && child.extension === "md") {
+          notes.push(child);
+        }
+      });
+    }
+    else if (this.note) {
+      notes.push(this.note);
+    }
+    this.pubview = createPubview(contentEl, this, notes);
+  }
 
-    // Clean up the subscription on component unmount.
-    return () => {
-      unsubscribe();
-    };
-  }, []); // Empty dependency array ensures this runs only once on mount.
-
-  return isLoaded;
+  onClose() {
+    let { contentEl } = this;
+    this.pubview?.unmount();
+    this.pubview = null;
+    contentEl.empty();
+  }
 }
