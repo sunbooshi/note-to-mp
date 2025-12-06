@@ -36,7 +36,6 @@ export class NotePubModal extends Modal {
   }
 
   onOpen() {
-    console.log(this);
     let { contentEl } = this;
     const notes: TFile[] = [];
     if (this.folder) {

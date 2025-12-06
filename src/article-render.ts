@@ -233,7 +233,7 @@ export class ArticleRender implements MDRendererCallback {
     lm.replaceImages(container);
   }
 
-  async copyArticle(container: HTMLElement, css: string, appid?: string) {
+  async copyArticle(container: HTMLElement, css: string, appid: string | null) {
     if (appid) {
       await this.uploadImages(appid, container);
     }

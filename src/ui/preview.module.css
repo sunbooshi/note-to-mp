@@ -55,10 +55,14 @@
 }
 
 .Content {
-  display: flex; /* Retain for internal layout of WechatRoot */
-  flex-direction: column; /* Retain for internal layout of WechatRoot */
-	padding: 0; /* Let the Wechat component handle its own padding */
+	flex: 1;
+  display: flex;
+  flex-direction: column;
+	padding: 0;
 	overflow-y: auto;
+	&[data-state="inactive"] {
+		display: none;
+	}
 }
 
 .Text {

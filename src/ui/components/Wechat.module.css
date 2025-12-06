@@ -4,6 +4,7 @@
   flex-grow: 1; /* Replace height: 100% with flex-grow */
   box-sizing: border-box;
   overflow-y: auto;
+  position: relative;
 }
 
 .Panel {
@@ -35,4 +36,27 @@
   padding: 10px;
   background-color: #FFFFFF;
   box-sizing: border-box;
+}
+
+.Loading {
+  position: absolute;
+  z-index: 99999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.LoadingWrapper {
+  width: 120px;
+  height: 120px;
+  background-color: #FFFFFF;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

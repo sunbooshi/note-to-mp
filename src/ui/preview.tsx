@@ -45,16 +45,16 @@ export function Preview() {
           <Tabs.Trigger className={styles.Trigger} value="toutiao">头条</Tabs.Trigger>
           <Tabs.Trigger className={styles.Trigger} value="redbook">小红书</Tabs.Trigger>
         </Tabs.List>
-        <Tabs.Content value="wechat" className={styles.Content}>
+        <Tabs.Content value="wechat" forceMount className={styles.Content}>
           <Wechat />
         </Tabs.Content>
-        <Tabs.Content value="zhihu" className={styles.Content}>
+        <Tabs.Content value="zhihu" forceMount className={styles.Content}>
           Hello, Zhihu!
         </Tabs.Content>
-        <Tabs.Content value="toutiao" className={styles.Content}>
+        <Tabs.Content value="toutiao" forceMount className={styles.Content}>
           Toutiao
         </Tabs.Content>
-        <Tabs.Content value="redbook" className={styles.Content}>
+        <Tabs.Content value="redbook" forceMount className={styles.Content}>
           redbook
         </Tabs.Content>
       </Tabs.Root>

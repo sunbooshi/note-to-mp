@@ -30,8 +30,11 @@ import { usePluginStore } from 'src/store/PluginStore';
 import { useRenderStore } from 'src/store/RenderStore';
 import { ConfigStore, createConfigStore, ConfigContext, useConfigContext } from 'src/store/ConfigStore'
 import { uevent } from 'src/utils';
+import { Loading } from './Loading';
 
 import styles from './Wechat.module.css';
+import { NMPSettings } from 'src/settings';
+import { error } from 'console';
 
 const WechatInternal: React.FC = () => {
   const { notify } = useNotification();
@@ -50,23 +53,46 @@ const WechatInternal: React.FC = () => {
   const renderRef = useRef<ArticleRender>(new ArticleRender(app));
 
   const [cssContent, setCSSContent] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const isMember = NMPSettings.getInstance().isAuthKeyVaild();
+
+  const showMsg = (msg: string) => {
+    notify({type: 'success', title: msg});
+  };
+
+  const showErr = (msg: string) => {
+    notify({type: 'error', title: msg});
+  };
 
   useEffect(()=>{
     if (!contentRef.current) return;
     if (!activeNote) return;
-    renderRef.current.renderMarkdown(contentRef.current, activeNote);
+    renderRef.current.renderMarkdown(contentRef.current, activeNote).catch(error=>{
+      showErr('渲染失败：' + error.message);
+    });
   }, [activeNote, renderVersion, contentRef]);
 
   useEffect(()=> {
     if (!activeNote) return;
-    renderRef.current.getCSS(activeNote, theme, highlight).then(res=>setCSSContent(res));
+    renderRef.current.getCSS(activeNote, theme, highlight).then(res=>setCSSContent(res)).catch(error=>{
+      showErr('设置样式失败：' + error.message); 
+    });
   }, [activeNote, theme, highlight]);
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     if (!activeNote) return;
-    useRenderStore.getState().setRenderVersion();
-    renderRef.current.getCSS(activeNote, theme, highlight).then(res=>setCSSContent(res));
-    notify({ type: 'success', title: '刷新成功' });
+    setLoading(true);
+    try {
+      useRenderStore.getState().setRenderVersion();
+      const res = await renderRef.current.getCSS(activeNote, theme, highlight);
+      setCSSContent(res);
+      setLoading(false);
+      showMsg('刷新成功');
+    } catch (error) {
+      setLoading(false); 
+      showErr('失败：' + error.message);
+    }
   };
   
   const onHelpClick = () => {
@@ -83,21 +109,87 @@ const WechatInternal: React.FC = () => {
 
   const handlePost = async () => {
     if (!appid) {
-      notify({ type: 'error', title: '请先选择一个公众号账号' });
+      showErr('请先选择一个公众号账号');
       return;
     }
+
     if (contentRef.current == null) {
-      notify({ type: 'error', title: 'UI未初始化！' });
+      showErr('未初始化！');
+      return;
     }
-    renderRef.current.postArticle(appid, cover, contentRef.current!, cssContent);
-  }
+
+    try {
+      setLoading(true);
+      await renderRef.current.postArticle(appid, cover, contentRef.current!, cssContent);
+      setLoading(false);
+      showMsg('发布成功');
+    }
+    catch(error) {
+      setLoading(false);
+      showErr('发布失败:' + error.message);
+    }
+  };
 
   const handlePostImage = async () => {
+    if (!appid) {
+      showErr('请先选择一个公众号账号');
+      return;
+    }
 
-  }
+    if (contentRef.current == null) {
+      showErr('未初始化！');
+      return;
+    }
 
-  const handleCopy = () => {
+    try {
+      setLoading(true);
+      await renderRef.current.postImages(appid, contentRef.current!);
+      setLoading(false);
+      showMsg('发布成功');
+    }
+    catch(error) {
+      setLoading(false);
+      showErr('发布失败:' + error.message);
+    }
+  };
 
+  const handleCopy = async () => {
+    if (contentRef.current == null) {
+      showErr('未初始化！');
+      return;
+    }
+    try {
+      setLoading(true);
+      await renderRef.current.copyArticle(contentRef.current!, cssContent, appid);
+      setLoading(false);
+      if (NMPSettings.getInstance().isAuthKeyVaild()) {
+        showMsg('复制成功，快去粘贴吧！');
+      }
+      else {
+        showMsg('复制成功，快去粘贴吧！如需复制本地图片请购买会员，感谢支持！');
+      }
+    } catch (error) {
+      setLoading(false);
+      showErr('错误：' + error.message);
+    }
+  };
+
+    const handleExport = async () => {
+    if (contentRef.current == null) {
+      showErr('未初始化！');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await renderRef.current.exportHTML(contentRef.current!, cssContent);
+      setLoading(false);
+      showMsg('导出成功');
+    }
+    catch(error) {
+      setLoading(false);
+      showErr('导出失败:' + error.message);
+    }
   };
 
   return (
@@ -113,7 +205,10 @@ const WechatInternal: React.FC = () => {
           <button onClick={handlePostImage}>图片/文字</button>
           <button onClick={handleCopy}>复制</button>
           <ThemeList />
-          <button onClick={onHelpClick}>帮助</button>
+          { isMember ? 
+            (<button onClick={handleExport}>导出</button>) :
+            (<button onClick={onHelpClick}>帮助</button>)
+          }
         </div>
       </div>
       <div className={styles.RenderWrapper}>
@@ -122,6 +217,13 @@ const WechatInternal: React.FC = () => {
           <div ref={contentRef}></div>
         </div>
       </div>
+      {loading ? ( 
+        <div className={styles.Loading}>
+          <div className={styles.LoadingWrapper}>
+            <Loading />
+          </div>
+        </div>
+        ) : (<></>)}
     </div>
   );
 };

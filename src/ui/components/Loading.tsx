@@ -35,3 +35,9 @@ export function PageLoading() {
     </div>
   );
 }
+
+export function LoadingOrb() {
+  return (
+    <div className={styles.LoadingOrb}></div>
+  );
+}

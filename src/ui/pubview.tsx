@@ -20,15 +20,15 @@
  * THE SOFTWARE.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, forwardRef, useImperativeHandle, createRef } from "react";
 import { Modal, TFile } from "obsidian";
 import * as ReactDOM from 'react-dom/client';
-import { PageLoading } from "./components/Loading";
+import { PageLoading, LoadingOrb } from "./components/Loading";
 import { ArticleRender } from "src/article-render";
 import { usePluginStore } from 'src/store/PluginStore';
 import { NMPSettings } from "src/settings";
 
-import styles from "./preview.module.css";
+import styles from "./pubview.module.css";
 
 function defaultAppId() {
   const settings = NMPSettings.getInstance();
@@ -55,9 +55,63 @@ export function Pubview({modal, notes}: {modal: Modal, notes: TFile[]}) {
   const [buttonTitle, setButtonTitle] = useState("取消发布");
   const [message, setMessage] = useState('');
   const [cssContent, setCSSContent] = useState('');
+  const [canceled, setCanceled] = useState(false);
 
   const onCancel = () => {
+    setCanceled(true);
     modal.close();
+  }
+
+  const renderNote = async (note: TFile) => {
+    const noteCSS = await renderRef.current.getCSS(note, defaultTheme(), defaultHighlight());
+    setCSSContent(noteCSS);
+    if (!contentRef.current) return '';
+    await renderRef.current.renderMarkdown(contentRef.current!, note);
+    return noteCSS;
+  };
+
+  const pubNote = async (index: number, css: string) => {
+    if (canceled) {
+      setMessage('发布已取消!');
+      setTimeout(() => {
+        modal.close();
+      }, 2000);
+      return;
+    }
+    if (!contentRef.current) return;
+    const note = notes[index];
+    setMessage('发布中：' + note.basename);
+    await renderRef.current.postArticle(defaultAppId()!, undefined, contentRef.current!, css);
+    prepare(index+1);
+  };
+
+  const prepare = async (index: number) => {
+    if (canceled) {
+      setMessage('发布已取消!');
+      setTimeout(() => {
+        modal.close();
+      }, 2000);
+      return;
+    }
+    if (index >= notes.length) {
+      setMessage('发布完成!');
+      setTimeout(() => {
+        modal.close();
+      }, 2000);
+      return;
+    }
+    const note = notes[index];
+    try {
+      setMessage('即将发布：' + note.basename);
+      contentRef.current?.empty();
+      const css = await renderNote(note);
+      setTimeout(() => {
+        pubNote(index, css);
+      }, 5000);
+    }
+    catch(error) {
+      setMessage(note.basename + ' 渲染失败：' + error.message);
+    }
   }
 
   useEffect(() => {
@@ -70,12 +124,11 @@ export function Pubview({modal, notes}: {modal: Modal, notes: TFile[]}) {
       setMessage('请先设置公众号');
       return;
     }
-
-    for (let note of notes) {
-      renderRef.current.getCSS(note, defaultTheme(), defaultHighlight()).then(res=>setCSSContent(res));
-      renderRef.current.renderMarkdown(contentRef.current!, note);
+    if (notes.length == 0) {
+      setMessage('没有需要发布的笔记');
+      return;
     }
-
+    prepare(0);
   }, [notes, isReourceLoaded, styleRef, contentRef]);
 
 
@@ -85,13 +138,16 @@ export function Pubview({modal, notes}: {modal: Modal, notes: TFile[]}) {
 
   return (
     <div>
-      <div className={styles.Header}>{message}</div>
+      <div className={styles.Header}>
+        <LoadingOrb></LoadingOrb>
+        <div className={styles.Message}>{message}</div>
+      </div>
       <div className={styles.Content}>
-          <style ref={styleRef}>{cssContent}</style>
-          <div ref={contentRef}></div>
+        <style ref={styleRef}>{cssContent}</style>
+        <div ref={contentRef}></div>
       </div> 
       <div className={styles.Footer}>
-        <button onClick={onCancel}>{buttonTitle}</button>
+        <button onClick={onCancel}>取消发布</button>
       </div>
     </div>
   );
