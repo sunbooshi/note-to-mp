@@ -81,7 +81,7 @@ export function Pubview({modal, notes}: {modal: Modal, notes: TFile[]}) {
     if (!contentRef.current) return;
     const note = notes[index];
     setMessage('发布中：' + note.basename);
-    await renderRef.current.postArticle(defaultAppId()!, undefined, contentRef.current!, css);
+    // await renderRef.current.postArticle(defaultAppId()!, undefined, contentRef.current!, css);
     prepare(index+1);
   };
 

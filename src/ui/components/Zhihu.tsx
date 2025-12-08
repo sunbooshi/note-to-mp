@@ -21,16 +21,13 @@
  */
 
 import { useRef, useEffect, useState } from 'react';
-import { Cover } from './Cover';
-import AccountSelect from "./AccountSelect";
-import ThemeList from './ThemeList';
 import { useNotification } from './Notification';
-import { ArticleRender } from 'src/article-render';
 import { usePluginStore } from 'src/store/PluginStore';
 import { useRenderStore } from 'src/store/RenderStore';
-import { ConfigStore, createConfigStore, ConfigContext, useConfigContext } from 'src/store/ConfigStore'
+import { ConfigStore, createConfigStore, ConfigContext } from 'src/store/ConfigStore'
 import { uevent } from 'src/utils';
 import { Loading } from './Loading';
+import { BaseRender } from 'src/base-render';
 
 import styles from './Wechat.module.css';
 import { NMPSettings } from 'src/settings';
@@ -41,20 +38,12 @@ const WechatInternal: React.FC = () => {
   const activeNote = useRenderStore.use.note();
   const renderVersion = useRenderStore.use.renderVersion();
 
-  const appid = useConfigContext(s=>s.appid);
-  const cover = useConfigContext(s=>s.cover);
-  const theme = useConfigContext(s=>s.theme);
-  const highlight = useConfigContext(s=>s.highlight);
-
-  const styleRef = useRef<HTMLStyleElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   
-  const renderRef = useRef<ArticleRender>(new ArticleRender(app));
+  const renderRef = useRef<BaseRender>(new BaseRender(app));
 
-  const [cssContent, setCSSContent] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const isMember = NMPSettings.getInstance().isAuthKeyVaild();
 
   const showMsg = (msg: string) => {
     notify({type: 'success', title: msg});
@@ -72,20 +61,11 @@ const WechatInternal: React.FC = () => {
     });
   }, [activeNote, renderVersion, contentRef]);
 
-  useEffect(()=> {
-    if (!activeNote) return;
-    renderRef.current.getCSS(activeNote, theme, highlight).then(res=>setCSSContent(res)).catch(error=>{
-      showErr('设置样式失败：' + error.message); 
-    });
-  }, [activeNote, theme, highlight]);
-
   const handleRefresh = async () => {
     if (!activeNote) return;
     setLoading(true);
     try {
       useRenderStore.getState().setRenderVersion();
-      const res = await renderRef.current.getCSS(activeNote, theme, highlight);
-      setCSSContent(res);
       setLoading(false);
       showMsg('刷新成功');
     } catch (error) {
@@ -100,57 +80,11 @@ const WechatInternal: React.FC = () => {
     uevent('open-help');
   };
 
-  const gotoMP = () => {
+  const gotoZhihu = () => {
     const { shell } = require('electron');
-    shell.openExternal('https://mp.weixin.qq.com')
-    uevent('open-mp');
+    shell.openExternal('https://zhuanlan.zhihu.com/write')
+    uevent('open-zhihu');
   }
-
-  const handlePost = async () => {
-    if (!appid) {
-      showErr('请先选择一个公众号账号');
-      return;
-    }
-
-    if (contentRef.current == null) {
-      showErr('未初始化！');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      await renderRef.current.postArticle(appid, cover, contentRef.current!, cssContent);
-      setLoading(false);
-      showMsg('发布成功');
-    }
-    catch(error) {
-      setLoading(false);
-      showErr('发布失败:' + error.message);
-    }
-  };
-
-  const handlePostImage = async () => {
-    if (!appid) {
-      showErr('请先选择一个公众号账号');
-      return;
-    }
-
-    if (contentRef.current == null) {
-      showErr('未初始化！');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      await renderRef.current.postImages(appid, contentRef.current!);
-      setLoading(false);
-      showMsg('发布成功');
-    }
-    catch(error) {
-      setLoading(false);
-      showErr('发布失败:' + error.message);
-    }
-  };
 
   const handleCopy = async () => {
     if (contentRef.current == null) {
@@ -159,7 +93,7 @@ const WechatInternal: React.FC = () => {
     }
     try {
       setLoading(true);
-      await renderRef.current.copyArticle(contentRef.current!, cssContent, appid);
+      await renderRef.current.copyWithoutCSS(contentRef.current!);
       setLoading(false);
       if (NMPSettings.getInstance().isAuthKeyVaild()) {
         showMsg('复制成功，快去粘贴吧！');
@@ -173,46 +107,18 @@ const WechatInternal: React.FC = () => {
     }
   };
 
-    const handleExport = async () => {
-    if (contentRef.current == null) {
-      showErr('未初始化！');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      await renderRef.current.exportHTML(contentRef.current!, cssContent);
-      setLoading(false);
-      showMsg('导出成功');
-    }
-    catch(error) {
-      setLoading(false);
-      showErr('导出失败:' + error.message);
-    }
-  };
-
   return (
     <div className={styles.Root}>
       <div className={styles.Panel}>
-        <Cover />
         <div className={styles.PanelRight}>
-          <AccountSelect />
-          <button onClick={gotoMP}>去公众号后台</button>
-          <button onClick={handleRefresh}>刷新</button>
-          <div style={{ flexBasis: '100%' }}></div>
-          <button onClick={handlePost}>发文章</button>
-          <button onClick={handlePostImage}>发图文</button>
           <button onClick={handleCopy}>复制</button>
-          <ThemeList />
-          { isMember ? 
-            (<button onClick={handleExport}>导出</button>) :
-            (<button onClick={onHelpClick}>帮助</button>)
-          }
+          <button onClick={gotoZhihu}>去知乎</button>
+          <button onClick={handleRefresh}>刷新</button>
+          <button onClick={onHelpClick}>帮助</button>
         </div>
       </div>
       <div className={styles.RenderWrapper}>
         <div className={styles.RenderRoot}>
-          <style ref={styleRef}>{cssContent}</style>
           <div ref={contentRef}></div>
         </div>
       </div>
@@ -228,15 +134,8 @@ const WechatInternal: React.FC = () => {
 };
 
 // 保持 Wechat 组件作为 Provider 的包装器
-export function Wechat() {
-  const storeRef = useRef<ConfigStore>(null);
-  if (!storeRef.current) {
-    storeRef.current = createConfigStore();
-  }
-
+export function Zhihu() {
   return (
-    <ConfigContext.Provider value={storeRef.current}>
-      <WechatInternal />
-    </ConfigContext.Provider>
+    <WechatInternal />
   )
 }

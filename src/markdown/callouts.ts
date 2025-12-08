@@ -215,10 +215,12 @@ export class CalloutRenderer extends Extension {
         if (index > 0) {
             token.text = token.text.slice(index+1)
             body = await this.marked.parse(token.text);
-        } 
+        }
+
+        const isWechat = this.callback.isWechat();
 
         const setting = AssetsManager.getInstance().expertSettings.render?.callout as { [key: string]: any };
-        if (setting && callout.toLocaleLowerCase() in setting) {
+        if (isWechat && setting && callout.toLocaleLowerCase() in setting) {
             const authkey = this.settings.authKey;
             const widget = setting[callout.toLocaleLowerCase()];
             if (typeof widget === 'number') {
@@ -250,8 +252,15 @@ export class CalloutRenderer extends Extension {
             }
         }
 
-        
-        return `<section class="note-callout ${info?.style}"><section class="note-callout-title-wrap"><span class="note-callout-icon">${info?.icon}</span><span class="note-callout-title">${title}<span></section><section class="note-callout-content">${body}</section></section>`;
+        if (isWechat) {
+            return `<section class="note-callout ${info?.style}"><section class="note-callout-title-wrap"><span class="note-callout-icon">${info?.icon}</span><span class="note-callout-title">${title}<span></section><section class="note-callout-content">${body}</section></section>`;
+        }
+        else {
+            if (title.toLowerCase() === callout.toLowerCase()) {
+                return `<blockquote>${body}</blockquote>`
+            }
+            return `<blockquote><strong>${title}</strong><br>${body}</blockquote>`;
+        }
      }
 
     markedExtension(): MarkedExtension {

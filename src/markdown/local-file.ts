@@ -287,7 +287,7 @@ export class LocalImageManager {
             let value = this.images.get(img.src);
             if (value == null) {
                 if (!img.id) {
-                    console.error('miss image id, ' + img.src);
+                    console.warn('miss image id, ' + img.src);
                     continue;
                 }
                 value = this.images.get('#' + img.id);

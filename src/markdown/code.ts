@@ -141,6 +141,10 @@ export class CodeRenderer extends Extension {
 		const lang = (infostring || '').match(/^\S*/)?.[0];
 		code = code.replace(/\n$/, '');
 
+		if (!this.callback.isWechat()) {
+			return `<pre><code class="${lang}">${code}</code></pre>`;
+		}
+
 		try {
 			if (lang && hljs.getLanguage(lang)) {
 				code = hljs.highlight(code, { language: lang }).value;
@@ -253,6 +257,7 @@ export class CodeRenderer extends Extension {
 	}
 
 	markedExtension(): MarkedExtension {
+		const isWechat = this.callback.isWechat();
 		return {
 			async: true,
 			walkTokens: async (token: Tokens.Generic) => {
@@ -269,7 +274,7 @@ export class CodeRenderer extends Extension {
 					}
 				}
 				if (token.lang && token.lang.trim().toLocaleLowerCase() == 'mpcard') {
-					token.html = this.renderCard(token as Tokens.Code);
+					token.html = isWechat ? this.renderCard(token as Tokens.Code) : "";
 					return;
 				}
 				token.html = await this.codeRenderer(token.text, token.lang);

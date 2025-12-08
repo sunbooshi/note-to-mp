@@ -26,7 +26,8 @@ import { App, TFile, Vault } from "obsidian";
 import AssetsManager from "../assets";
 
 export interface MDRendererCallback {
-   cacheElement(category: string, id: string, data: string): void;
+    isWechat(): boolean;
+    cacheElement(category: string, id: string, data: string): void;
 }
 
 export abstract class Extension {

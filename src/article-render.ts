@@ -20,13 +20,13 @@
  * THE SOFTWARE.
  */
 
-import { App, ItemView, Workspace, Notice, sanitizeHTMLToDom, apiVersion, TFile, MarkdownRenderer, FrontMatterCache, Component } from 'obsidian';
+import { App, Notice, sanitizeHTMLToDom, apiVersion, TFile, MarkdownRenderer, Component } from 'obsidian';
 import { applyCSS } from './utils';
 import { UploadImageToWx } from './imagelib';
 import { NMPSettings } from './settings';
 import AssetsManager from './assets';
 import InlineCSS from './inline-css';
-import { wxGetToken, wxAddDraft, wxBatchGetMaterial, DraftArticle, DraftImageMediaId, DraftImages, wxAddDraftImages, getMetadata } from './weixin-api';
+import { wxGetToken, wxAddDraft, wxBatchGetMaterial, DraftImageMediaId, DraftImages, wxAddDraftImages, getMetadata } from './weixin-api';
 import { MDRendererCallback } from './markdown/extension';
 import { MarkedParser } from './markdown/parser';
 import { LocalImageManager, LocalFile } from './markdown/local-file';
@@ -542,5 +542,9 @@ export class ArticleRender implements MDRendererCallback {
   cacheElement(category: string, id: string, data: string): void {
     const key = category + ':' + id;
     this.cachedElements.set(key, data);
+  }
+
+  isWechat(): boolean {
+    return true;
   }
 }

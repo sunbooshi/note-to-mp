@@ -26,29 +26,16 @@ import * as ReactDOM from 'react-dom/client';
 
 export class NotePubModal extends Modal {
   pubview: ReactDOM.Root | null = null;
-  folder?: TFolder;
-  note?: TFile;
+  notes: TFile[];
 
-  constructor(app: App, folder?: TFolder, note?: TFile) {
+  constructor(app: App, notes: TFile[]) {
     super(app);
-    this.folder = folder;
-    this.note = note;
+    this.notes = notes;
   }
 
   onOpen() {
     let { contentEl } = this;
-    const notes: TFile[] = [];
-    if (this.folder) {
-      this.folder.children.forEach((child) => {
-        if (child instanceof TFile && child.extension === "md") {
-          notes.push(child);
-        }
-      });
-    }
-    else if (this.note) {
-      notes.push(this.note);
-    }
-    this.pubview = createPubview(contentEl, this, notes);
+    this.pubview = createPubview(contentEl, this, this.notes);
   }
 
   onClose() {
