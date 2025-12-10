@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-import { Plugin, WorkspaceLeaf, App, PluginManifest, Menu, Notice, TAbstractFile, TFile, TFolder } from 'obsidian';
+import { Plugin, WorkspaceLeaf, App, PluginManifest, Menu, Notice, TAbstractFile, TFile, TFolder, EventRef } from 'obsidian';
 import { NotePreview, VIEW_TYPE_NOTE_PREVIEW } from './note-preview';
 import { NMPSettings } from './settings';
 import { NoteToMpSettingTab } from './setting-tab';
@@ -98,6 +98,92 @@ export default class NoteToMpPlugin extends Plugin {
 		});
 
 		// 监听右键菜单
+		this.registerEvents();
+    // this.registerEvent(
+    //   this.app.workspace.on('file-menu', (menu, file) => {
+    //     menu.addItem((item) => {
+    //       item
+    //         .setTitle('发布到公众号')
+    //         .setIcon('lucide-send')
+    //         .onClick(async () => {
+    //           if (file instanceof TFile) {
+		// 						if (file.extension.toLowerCase() !== 'md') {
+		// 							new Notice('只能发布 Markdown 文件');
+		// 							return;
+		// 						}
+		// 						new NotePubModal(this.app, [file]).open();
+    //           } else if (file instanceof TFolder) {
+		// 						const files: TFile[] = [];
+		// 						file.children.forEach((child) => {
+		// 							if (child instanceof TFile && child.extension.toLocaleLowerCase() === "md") {
+		// 								files.push(child);
+		// 							}
+		// 						});
+		// 						new NotePubModal(this.app, files).open();
+    //           }
+    //         });
+    //     });
+    //   })
+    // );
+
+		// this.registerEvent(
+    //   this.app.workspace.on('files-menu', (menu, files, source) => {
+    //     menu.addItem((item) => {
+    //       item
+    //         .setTitle('发布到公众号')
+    //         .setIcon('lucide-send')
+    //         .onClick(async () => {
+		// 					const notes: TFile[] = [];
+		// 					files.forEach((child) => {
+		// 						if (child instanceof TFile && child.extension.toLocaleLowerCase() === "md") {
+		// 							notes.push(child);
+		// 						}
+		// 					});
+
+		// 					new NotePubModal(this.app, notes).open();
+    //         });
+    //     });
+    //   })
+    // );
+
+		uevent('load');
+	}
+
+	onunload() {
+
+	}
+
+	registerEvents() {
+		const clickOnFile = (file: TAbstractFile, merge: boolean) => {
+			if (file instanceof TFile) {
+				if (file.extension.toLowerCase() !== 'md') {
+					new Notice('只能发布 Markdown 文件');
+					return;
+				}
+				new NotePubModal(this.app, [file], merge).open();
+			} else if (file instanceof TFolder) {
+				const files: TFile[] = [];
+				file.children.forEach((child) => {
+					if (child instanceof TFile && child.extension.toLocaleLowerCase() === "md") {
+						files.push(child);
+					}
+				});
+				new NotePubModal(this.app, files, merge).open();
+			}
+		}
+
+		const clickOnFiles = (files: TAbstractFile[], merge: boolean) => {
+			const notes: TFile[] = [];
+			files.forEach((child) => {
+				if (child instanceof TFile && child.extension.toLocaleLowerCase() === "md") {
+					notes.push(child);
+				}
+			});
+
+			new NotePubModal(this.app, notes, merge).open();
+		};
+
+		// 监听右键菜单
     this.registerEvent(
       this.app.workspace.on('file-menu', (menu, file) => {
         menu.addItem((item) => {
@@ -105,21 +191,20 @@ export default class NoteToMpPlugin extends Plugin {
             .setTitle('发布到公众号')
             .setIcon('lucide-send')
             .onClick(async () => {
-              if (file instanceof TFile) {
-								if (file.extension.toLowerCase() !== 'md') {
-									new Notice('只能发布 Markdown 文件');
-									return;
-								}
-								new NotePubModal(this.app, [file]).open();
-              } else if (file instanceof TFolder) {
-								const files: TFile[] = [];
-								file.children.forEach((child) => {
-									if (child instanceof TFile && child.extension.toLocaleLowerCase() === "md") {
-										files.push(child);
-									}
-								});
-								new NotePubModal(this.app, files).open();
-              }
+              clickOnFile(file, false);
+            });
+        });
+      })
+    );
+
+		this.registerEvent(
+      this.app.workspace.on('file-menu', (menu, file) => {
+        menu.addItem((item) => {
+          item
+            .setTitle('合并发布到公众号')
+            .setIcon('lucide-send')
+            .onClick(async () => {
+              clickOnFile(file, true);
             });
         });
       })
@@ -131,25 +216,25 @@ export default class NoteToMpPlugin extends Plugin {
           item
             .setTitle('发布到公众号')
             .setIcon('lucide-send')
-            .onClick(async () => {
-							const notes: TFile[] = [];
-							files.forEach((child) => {
-								if (child instanceof TFile && child.extension.toLocaleLowerCase() === "md") {
-									notes.push(child);
-								}
-							});
-
-							new NotePubModal(this.app, notes).open();
+            .onClick(() => {
+							clickOnFiles(files, false);
             });
         });
       })
     );
 
-		uevent('load');
-	}
-
-	onunload() {
-
+		this.registerEvent(
+      this.app.workspace.on('files-menu', (menu, files, source) => {
+        menu.addItem((item) => {
+          item
+            .setTitle('合并发布到公众号')
+            .setIcon('lucide-send')
+            .onClick(() => {
+							clickOnFiles(files, true);
+            });
+        });
+      })
+    );
 	}
 
 	async loadSettings() {

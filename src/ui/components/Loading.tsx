@@ -36,8 +36,12 @@ export function PageLoading() {
   );
 }
 
-export function LoadingOrb() {
+export function LoadingOrb({fontSize, width, height, color}:{fontSize?:number, width?:number, height?:number, color?:string}) {
+  fontSize = fontSize || 32;
+  width = width || 44;
+  height = height || 44;
+  color = color || 'rgb(169, 84, 248)';
   return (
-    <div className={styles.LoadingOrb}></div>
+    <div className={styles.LoadingOrb} style={{fontSize, width, height, color}}></div>
   );
 }

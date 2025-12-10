@@ -397,7 +397,6 @@ export class LocalImageManager {
         for (const img of images) {
             const src = img.getAttribute('src');
             if (!src) continue;
-            console.log('src: ' + src);
             try {
                 let newUrl: string | null = null;
 

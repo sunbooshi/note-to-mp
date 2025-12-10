@@ -157,9 +157,8 @@ export interface DraftArticle {
     css?: string;
 }
 
-export async function wxAddDraft(token: string, data: DraftArticle) {
-    const url = 'https://api.weixin.qq.com/cgi-bin/draft/add?access_token=' + token;
-    const body = {articles:[{
+function convertArticle(data: DraftArticle) {
+    return {
         title: data.title,
         content: data.content,
         digest: data.digest,
@@ -170,7 +169,27 @@ export async function wxAddDraft(token: string, data: DraftArticle) {
         ... data.need_open_comment !== undefined && {need_open_comment: data.need_open_comment},
         ... data.only_fans_can_comment !== undefined && {only_fans_can_comment: data.only_fans_can_comment},
         ... data.author && {author: data.author},
-    }]};
+    };
+}
+
+export async function wxAddDraft(token: string, data: DraftArticle) {
+    const url = 'https://api.weixin.qq.com/cgi-bin/draft/add?access_token=' + token;
+    const body = {articles:[convertArticle(data)]};
+
+    const res = await requestUrl({
+        method: 'POST',
+        url: url,
+        throw: false,
+        body: JSON.stringify(body)
+    });
+
+    return res;
+}
+
+export async function wxAddDrafts(token: string, data: DraftArticle[]) {
+    const url = 'https://api.weixin.qq.com/cgi-bin/draft/add?access_token=' + token;
+    const articles = data.map(d=>convertArticle(d));
+    const body = {articles};
 
     const res = await requestUrl({
         method: 'POST',
@@ -233,6 +252,7 @@ export async function wxBatchGetMaterial(token: string, type: string, offset: nu
 
 export async function getUploadImageURL(authkey: string, ext: string) {
     const url = PluginHost + '/v1/img/uploadurl/' + ext + '/' + authkey;
+    console.log(url);
     const res = await requestUrl({
         url,
         method: 'GET',

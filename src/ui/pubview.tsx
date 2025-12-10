@@ -20,13 +20,16 @@
  * THE SOFTWARE.
  */
 
-import { useEffect, useRef, useState, forwardRef, useImperativeHandle, createRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Modal, TFile } from "obsidian";
 import * as ReactDOM from 'react-dom/client';
-import { PageLoading, LoadingOrb } from "./components/Loading";
 import { ArticleRender } from "src/article-render";
 import { usePluginStore } from 'src/store/PluginStore';
 import { NMPSettings } from "src/settings";
+import { DraftArticle, wxAddDrafts } from "src/weixin-api";
+import { PageLoading, LoadingOrb } from "./components/Loading";
+import NoteList, { NoteItem, NoteItemStatus } from './components/NoteList';
+import { BellIcon } from "@radix-ui/react-icons"
 
 import styles from "./pubview.module.css";
 
@@ -43,16 +46,15 @@ function defaultHighlight() {
   return NMPSettings.getInstance().defaultHighlight;
 }
 
-export function Pubview({modal, notes}: {modal: Modal, notes: TFile[]}) {
-  const app = usePluginStore(s=>s.app);
-  const isReourceLoaded = usePluginStore(s=>s.isReourceLoaded);
+export function Pubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
+  const app = usePluginStore(s => s.app);
+  const isReourceLoaded = usePluginStore(s => s.isReourceLoaded);
 
   const styleRef = useRef<HTMLStyleElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  
+
   const renderRef = useRef<ArticleRender>(new ArticleRender(app));
 
-  const [buttonTitle, setButtonTitle] = useState("取消发布");
   const [message, setMessage] = useState('');
   const [cssContent, setCSSContent] = useState('');
   const [canceled, setCanceled] = useState(false);
@@ -81,8 +83,8 @@ export function Pubview({modal, notes}: {modal: Modal, notes: TFile[]}) {
     if (!contentRef.current) return;
     const note = notes[index];
     setMessage('发布中：' + note.basename);
-    // await renderRef.current.postArticle(defaultAppId()!, undefined, contentRef.current!, css);
-    prepare(index+1);
+    await renderRef.current.postArticle(defaultAppId()!, undefined, contentRef.current!, css);
+    prepare(index + 1);
   };
 
   const prepare = async (index: number) => {
@@ -109,7 +111,7 @@ export function Pubview({modal, notes}: {modal: Modal, notes: TFile[]}) {
         pubNote(index, css);
       }, 5000);
     }
-    catch(error) {
+    catch (error) {
       setMessage(note.basename + ' 渲染失败：' + error.message);
     }
   }
@@ -145,9 +147,169 @@ export function Pubview({modal, notes}: {modal: Modal, notes: TFile[]}) {
       <div className={styles.Content}>
         <style ref={styleRef}>{cssContent}</style>
         <div ref={contentRef}></div>
-      </div> 
+      </div>
       <div className={styles.Footer}>
         <button onClick={onCancel}>取消发布</button>
+      </div>
+    </div>
+  );
+}
+
+function MergePubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
+  const app = usePluginStore(s => s.app);
+  const isReourceLoaded = usePluginStore(s => s.isReourceLoaded);
+
+  const styleRef = useRef<HTMLStyleElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const renderRef = useRef<ArticleRender>(new ArticleRender(app));
+  const articlesRef = useRef<DraftArticle[]>([]);
+
+  const [message, setMessage] = useState('拖动笔记可以调整顺序');
+  const [cssContent, setCSSContent] = useState('');
+  const [canceled, setCanceled] = useState(false);
+  const [disableDrag, setDisabeDrag] = useState(false);
+
+  const [noteItems, setNoteItems] = useState<NoteItem[]>(
+    notes.map(n => {
+      return {
+        note: n,
+        id: n.basename,
+        title: n.basename,
+        status: NoteItemStatus.Init,
+      }
+    })
+  );
+
+  const onCancel = () => {
+    setCanceled(true);
+    modal.close();
+  }
+
+  const onPublish = () => {
+    if (!isReourceLoaded || !styleRef.current || !contentRef.current) {
+      setMessage('请等待初始化完成！')
+      return;
+    }
+
+    const appid = defaultAppId();
+    if (!appid) {
+      setMessage('请先设置公众号');
+      return;
+    }
+    if (notes.length == 0) {
+      setMessage('没有需要发布的笔记');
+      return;
+    }
+
+    setDisabeDrag(true);
+    articlesRef.current = [];
+    prepare(0);
+  }
+
+  const updateItemStatus = (index: number, status: NoteItemStatus) => {
+    setNoteItems(items =>
+      items.map((item, i) =>
+        i === index ? { ...item, status } : item
+      )
+    );
+  }
+
+  const renderNote = async (note: TFile) => {
+    const noteCSS = await renderRef.current.getCSS(note, defaultTheme(), defaultHighlight());
+    setCSSContent(noteCSS);
+    if (!contentRef.current) return '';
+    await renderRef.current.renderMarkdown(contentRef.current!, note);
+    return noteCSS;
+  };
+
+  const prepareNote = async (index: number, css: string) => {
+    if (canceled) {
+      setMessage('发布已取消!');
+      setTimeout(() => {
+        modal.close();
+      }, 2000);
+      return;
+    }
+    if (!contentRef.current) return;
+    const { token, metadata } = await renderRef.current.prepareArticle(defaultAppId()!, undefined, contentRef.current!, css);
+    articlesRef.current.push(metadata);
+    if (index + 1 == notes.length) {
+      await publish(token)
+      updateItemStatus(index, NoteItemStatus.Done)
+    }
+    else {
+      updateItemStatus(index, NoteItemStatus.Done)
+    }
+    prepare(index + 1);
+  };
+
+  const publish = async (token: string) => {
+    const res = await wxAddDrafts(token, articlesRef.current);
+
+    if (res.status != 200) {
+      console.error(res.text);
+      setMessage(`创建草稿失败, https状态码: ${res.status} 可能是文章包含异常内容，请尝试手动复制到公众号编辑器！`);
+    }
+    setDisabeDrag(false);
+    setMessage('发布成功！');
+    setTimeout(() => {
+      modal.close();
+    }, 2000);
+  }
+
+  const prepare = async (index: number) => {
+    if (canceled) {
+      setMessage('发布已取消!');
+      setTimeout(() => {
+        modal.close();
+      }, 2000);
+      return;
+    }
+    if (index >= noteItems.length) {
+      setMessage('发布完成!');
+      setTimeout(() => {
+        modal.close();
+      }, 2000);
+      return;
+    }
+    const noteItem = noteItems[index];
+    try {
+      contentRef.current?.empty();
+      updateItemStatus(index, NoteItemStatus.Rendering);
+      const css = await renderNote(noteItem.note);
+      setTimeout(() => {
+        prepareNote(index, css);
+      }, 5000);
+    }
+    catch (error) {
+      setMessage(noteItem.note.basename + ' 渲染失败：' + error.message);
+    }
+  }
+
+  if (!isReourceLoaded) {
+    return <PageLoading />;
+  }
+
+  return (
+    <div>
+      <div className={styles.Header}>
+        <div className={styles.Message}>{message}</div>
+      </div>
+      <div className={styles.List}>
+        <NoteList items={noteItems} setItems={setNoteItems} disable={disableDrag} />
+      </div>
+      <div className={styles.Content}>
+        <style ref={styleRef}>{cssContent}</style>
+        <div ref={contentRef}></div>
+      </div>
+      <div className={styles.Footer}>
+        <div className={styles.Tips}><BellIcon style={{ marginRight: 10 }} /><span>最多能够包含8篇笔记</span></div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <button onClick={onCancel} style={{ width: 80 }}>取消</button>
+          <div style={{ width: 20 }}></div>
+          <button onClick={onPublish} style={{ width: 80 }}>发布</button>
+        </div>
       </div>
     </div>
   );
@@ -156,5 +318,11 @@ export function Pubview({modal, notes}: {modal: Modal, notes: TFile[]}) {
 export function createPubview(conatainer: HTMLElement, modal: Modal, notes: TFile[]) {
   const root = ReactDOM.createRoot(conatainer);
   root.render(<Pubview modal={modal} notes={notes} />);
+  return root;
+}
+
+export function createMergePubview(conatainer: HTMLElement, modal: Modal, notes: TFile[]) {
+  const root = ReactDOM.createRoot(conatainer);
+  root.render(<MergePubview modal={modal} notes={notes} />);
   return root;
 }

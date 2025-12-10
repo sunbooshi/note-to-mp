@@ -24,15 +24,15 @@ import { useRef, useEffect, useState } from 'react';
 import { useNotification } from './Notification';
 import { usePluginStore } from 'src/store/PluginStore';
 import { useRenderStore } from 'src/store/RenderStore';
-import { ConfigStore, createConfigStore, ConfigContext } from 'src/store/ConfigStore'
 import { uevent } from 'src/utils';
 import { Loading } from './Loading';
 import { BaseRender } from 'src/base-render';
 
 import styles from './Wechat.module.css';
 import { NMPSettings } from 'src/settings';
+import AssetsManager from 'src/assets';
 
-const WechatInternal: React.FC = () => {
+export function NoteRender({platform}:{platform:string}) {
   const { notify } = useNotification();
   const app = usePluginStore((s) => s.app);
   const activeNote = useRenderStore.use.note();
@@ -43,7 +43,7 @@ const WechatInternal: React.FC = () => {
   const renderRef = useRef<BaseRender>(new BaseRender(app));
 
   const [loading, setLoading] = useState(false);
-
+  const cssContent = AssetsManager.getInstance().getTheme('obsidian-light')?.css.replace(/\.note-to-mp/g, '.note-to-mp-base');
 
   const showMsg = (msg: string) => {
     notify({type: 'success', title: msg});
@@ -56,6 +56,7 @@ const WechatInternal: React.FC = () => {
   useEffect(()=>{
     if (!contentRef.current) return;
     if (!activeNote) return;
+
     renderRef.current.renderMarkdown(contentRef.current, activeNote).catch(error=>{
       showErr('渲染失败：' + error.message);
     });
@@ -80,10 +81,17 @@ const WechatInternal: React.FC = () => {
     uevent('open-help');
   };
 
-  const gotoZhihu = () => {
+  const gotoPlatform = () => {
     const { shell } = require('electron');
-    shell.openExternal('https://zhuanlan.zhihu.com/write')
-    uevent('open-zhihu');
+    let url = '';
+    if (platform == 'zhihu') {
+      url = 'https://zhuanlan.zhihu.com/write';
+    }
+    else if (platform == 'toutiao') {
+      url = 'https://mp.toutiao.com/profile_v4/graphic/publish';
+    }
+    shell.openExternal(url);
+    uevent('open-' + platform);
   }
 
   const handleCopy = async () => {
@@ -107,18 +115,27 @@ const WechatInternal: React.FC = () => {
     }
   };
 
+  let btnTitle = '';
+    if (platform == 'zhihu') {
+    btnTitle = '去知乎';
+  }
+  else if (platform == 'toutiao') {
+    btnTitle = '去头条';
+  } 
+
   return (
     <div className={styles.Root}>
       <div className={styles.Panel}>
         <div className={styles.PanelRight}>
           <button onClick={handleCopy}>复制</button>
-          <button onClick={gotoZhihu}>去知乎</button>
+          <button onClick={gotoPlatform}>{btnTitle}</button>
           <button onClick={handleRefresh}>刷新</button>
           <button onClick={onHelpClick}>帮助</button>
         </div>
       </div>
       <div className={styles.RenderWrapper}>
         <div className={styles.RenderRoot}>
+          <style>{cssContent}</style>
           <div ref={contentRef}></div>
         </div>
       </div>
@@ -132,10 +149,3 @@ const WechatInternal: React.FC = () => {
     </div>
   );
 };
-
-// 保持 Wechat 组件作为 Provider 的包装器
-export function Zhihu() {
-  return (
-    <WechatInternal />
-  )
-}

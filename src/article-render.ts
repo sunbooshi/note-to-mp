@@ -26,7 +26,7 @@ import { UploadImageToWx } from './imagelib';
 import { NMPSettings } from './settings';
 import AssetsManager from './assets';
 import InlineCSS from './inline-css';
-import { wxGetToken, wxAddDraft, wxBatchGetMaterial, DraftImageMediaId, DraftImages, wxAddDraftImages, getMetadata } from './weixin-api';
+import { wxGetToken, wxAddDraft, wxBatchGetMaterial, DraftImageMediaId, DraftImages, wxAddDraftImages, getMetadata, DraftArticle } from './weixin-api';
 import { MDRendererCallback } from './markdown/extension';
 import { MarkedParser } from './markdown/parser';
 import { LocalImageManager, LocalFile } from './markdown/local-file';
@@ -59,11 +59,19 @@ export class ArticleRender implements MDRendererCallback {
     this.debouncedRenderMarkdown = debounce(this.renderMarkdown.bind(this), 1000);
   }
 
-
   setArticle(container:HTMLElement, article: string) {
     container.empty();
     let className = 'note-to-mp';
     const html = `<section class="${className}" id="article-section">${article}</section>`;
+    const doc = sanitizeHTMLToDom(html);
+    if (doc.firstChild) {
+      container.appendChild(doc.firstChild);
+    }
+  }
+
+  showLoading(container: HTMLElement) {
+    container.empty();
+    const html = '<div class="loading-wrapper"><div class="loading-spinner"></div></div>'
     const doc = sanitizeHTMLToDom(html);
     if (doc.firstChild) {
       container.appendChild(doc.firstChild);
@@ -96,6 +104,7 @@ export class ArticleRender implements MDRendererCallback {
   async renderMarkdown(contianer:HTMLElement, af: TFile) {
     try {
       let md = '';
+      this.showLoading(contianer);
       if (af.extension.toLocaleLowerCase() === 'md') {
         md = await this.app.vault.cachedRead(af);
         this.title = af.basename;
@@ -109,7 +118,7 @@ export class ArticleRender implements MDRendererCallback {
       this.note = af;
 
       this.articleHTML = await this.markedParser.parse(md);
-      this.setArticle(contianer, this.articleHTML);
+      this.setArticle(contianer, this.articleHTML); 
       await this.processCachedElements(contianer);
     }
     catch (e) {
@@ -276,7 +285,7 @@ export class ArticleRender implements MDRendererCallback {
     return '';
   }
 
-  async postArticle(appid:string, localCover: File | null = null, container: HTMLElement, css: string) {
+  async prepareArticle(appid:string, localCover: File | null = null, container: HTMLElement, css: string) {
     if (!this.settings.authKey) {
       throw new Error('请先设置注册码（AuthKey）');
     }
@@ -294,6 +303,7 @@ export class ArticleRender implements MDRendererCallback {
     if (token === '') {
       throw new Error('获取token失败,请检查网络链接!');
     }
+
     await this.cachedElementsToImages(container);
     const lm = LocalImageManager.getInstance();
     // 上传图片
@@ -335,6 +345,12 @@ export class ArticleRender implements MDRendererCallback {
     metadata.title = metadata.title || this.title;
     metadata.content = await this.getArticleContent(container, css);
     metadata.thumb_media_id = mediaId;
+
+    return {token, metadata};
+  }
+
+  async postArticle(appid:string, localCover: File | null = null, container: HTMLElement, css: string) {
+    const { token, metadata } = await this.prepareArticle(appid, localCover, container, css);
 
     // 创建草稿
     const res = await wxAddDraft(token, metadata);
@@ -484,7 +500,7 @@ export class ArticleRender implements MDRendererCallback {
     if (!svg) return;
 
     try {
-      const pngDataUrl = await toPng(mermaidContainer.firstElementChild as HTMLElement, { pixelRatio: 2 });
+      const pngDataUrl = await toPng(mermaidContainer.firstElementChild as HTMLElement, { pixelRatio: 2, style: {margin: "0"} });
       const img = document.createElement('img');
       img.id = `img-${id}`;
       img.src = pngDataUrl;
@@ -507,7 +523,7 @@ export class ArticleRender implements MDRendererCallback {
 
       const style = originalImg.getAttribute('style') || '';
       try {
-        const pngDataUrl = await toPng(originalImg, { pixelRatio: 2 });
+        const pngDataUrl = await toPng(originalImg, { pixelRatio: 2, style: {margin: "0"} });
 
         const img = document.createElement('img');
         img.id = `img-${id}`;

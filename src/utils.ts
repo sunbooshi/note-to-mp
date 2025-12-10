@@ -282,3 +282,15 @@ export function imageExtToMime(ext: string): string {
 export function trimEmbedTag(name: string) {
 	return name.trim().replace(/^!\[\[/, '').replace(/^\[\[/, '').replace(/]]$/, '');
 }
+
+const escapeMap: Record<string, string> = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#39;"
+};
+
+export function escapeHTML(str: string) {
+  return str.replace(/[&<>"']/g, (ch) => escapeMap[ch]);
+}

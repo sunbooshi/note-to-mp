@@ -21,21 +21,30 @@
  */
 
 import { App, Modal, TFolder, TFile } from "obsidian";
-import { createPubview } from "./ui/pubview";
+import { createPubview, createMergePubview } from "./ui/pubview";
 import * as ReactDOM from 'react-dom/client';
 
 export class NotePubModal extends Modal {
   pubview: ReactDOM.Root | null = null;
   notes: TFile[];
+  merge: boolean = false;
 
-  constructor(app: App, notes: TFile[]) {
+  constructor(app: App, notes: TFile[], merge?:boolean) {
     super(app);
     this.notes = notes;
+    if (merge !== undefined) {
+      this.merge = merge;
+    }
   }
 
   onOpen() {
     let { contentEl } = this;
-    this.pubview = createPubview(contentEl, this, this.notes);
+    if (this.merge) {
+      this.pubview = createMergePubview(contentEl, this, this.notes);
+    }
+    else {
+      this.pubview = createPubview(contentEl, this, this.notes);
+    }
   }
 
   onClose() {

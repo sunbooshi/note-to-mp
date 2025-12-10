@@ -56,7 +56,7 @@ export class BaseRender implements MDRendererCallback {
 
   setArticle(container:HTMLElement, article: string) {
     container.empty();
-    const html = `<section id="article-section">${article}</section>`;
+    const html = `<section class="note-to-mp-base">${article}</section>`;
     const doc = sanitizeHTMLToDom(html);
     if (doc.firstChild) {
       container.appendChild(doc.firstChild);
@@ -103,21 +103,17 @@ export class BaseRender implements MDRendererCallback {
 
   async copyWithoutCSS(container: HTMLElement) {
     await this.cachedElementsToImages(container);
-    const clonedArticleDiv = container.cloneNode(true) as HTMLDivElement;
-    // 移除公众号名片
-    clonedArticleDiv.querySelectorAll('.note-mpcard-wrapper').forEach(node => node.remove());
-    // TODO：小部件处理
     if (!this.settings.isAuthKeyVaild()) {
-      const content = clonedArticleDiv.innerHTML;
+      const content = container.innerHTML;
       await navigator.clipboard.write([new ClipboardItem({
         'text/html': new Blob([content], { type: 'text/html' })
       })]);
       return;
     }
 
-    await LocalImageManager.getInstance().uploadToOSS(clonedArticleDiv, this.settings.authKey, this.app.vault);
+    await LocalImageManager.getInstance().uploadToOSS(container, this.settings.authKey, this.app.vault);
 
-    const content = clonedArticleDiv.innerHTML;
+    const content = container.innerHTML;
     await navigator.clipboard.write([new ClipboardItem({
       'text/html': new Blob([content], { type: 'text/html' })
     })]);
@@ -181,7 +177,7 @@ export class BaseRender implements MDRendererCallback {
     if (!svg) return;
 
     try {
-      const pngDataUrl = await toPng(mermaidContainer.firstElementChild as HTMLElement, { pixelRatio: 2 });
+      const pngDataUrl = await toPng(mermaidContainer.firstElementChild as HTMLElement, { pixelRatio: 2, style: { margin: "0"} });
       const img = document.createElement('img');
       img.id = `img-${id}`;
       img.src = pngDataUrl;
@@ -204,7 +200,7 @@ export class BaseRender implements MDRendererCallback {
 
       const style = originalImg.getAttribute('style') || '';
       try {
-        const pngDataUrl = await toPng(originalImg, { pixelRatio: 2 });
+        const pngDataUrl = await toPng(originalImg, { pixelRatio: 2, style: { margin: "0"} });
 
         const img = document.createElement('img');
         img.id = `img-${id}`;

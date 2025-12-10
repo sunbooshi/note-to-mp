@@ -141,10 +141,6 @@ export class CodeRenderer extends Extension {
 		const lang = (infostring || '').match(/^\S*/)?.[0];
 		code = code.replace(/\n$/, '');
 
-		if (!this.callback.isWechat()) {
-			return `<pre><code class="${lang}">${code}</code></pre>`;
-		}
-
 		try {
 			if (lang && hljs.getLanguage(lang)) {
 				code = hljs.highlight(code, { language: lang }).value;
@@ -157,6 +153,10 @@ export class CodeRenderer extends Extension {
 		}
 
 		code = this.replaceSpaces(code);
+
+		if (!this.callback.isWechat()) {
+			return `<pre class="note-light-bg"><code class="language-${lang}">${code}</code></pre>`;
+		}
 		const lines = code.split('\n');
 		let body = '';
 		let liItems = '';

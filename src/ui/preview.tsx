@@ -25,7 +25,7 @@ import * as ReactDOM from 'react-dom/client';
 import { NotificationProvider } from "./components/Notification";
 import { usePluginStore } from "src/store/PluginStore";
 import { Wechat } from "./components/Wechat";
-import { Zhihu } from "./components/Zhihu";
+import { NoteRender } from "./components/NoteRender";
 import { PageLoading } from "./components/Loading";
 
 import styles from "./preview.module.css";
@@ -50,10 +50,10 @@ export function Preview() {
           <Wechat />
         </Tabs.Content>
         <Tabs.Content value="zhihu" forceMount className={styles.Content}>
-          <Zhihu />
+          <NoteRender platform="zhihu"/>
         </Tabs.Content>
         <Tabs.Content value="toutiao" forceMount className={styles.Content}>
-          Toutiao
+          <NoteRender platform="toutiao"/>
         </Tabs.Content>
         <Tabs.Content value="redbook" forceMount className={styles.Content}>
           redbook

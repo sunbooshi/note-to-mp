@@ -25,13 +25,8 @@
 }
 
 .LoadingOrb {
-  font-size: 32px;
-  display: flex;
   justify-content: center;
   align-items: center;
-  width: 44px;
-  height: 44px;
-  color: rgb(169, 84, 248);
 }
 
 .LoadingOrb::before {

@@ -60,7 +60,7 @@ export class Blockquote extends Extension {
     }
 
     const body = await this.marked.parse(token.text);
-    return `<blockquote>${body}</blockquote>`;
+    return `<blockquote>${body.replace(/[\r\n]+$/, "")}</blockquote>`;
   }
 
   markedExtension(): MarkedExtension {

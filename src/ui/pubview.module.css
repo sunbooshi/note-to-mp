@@ -12,9 +12,11 @@
   height: 240px;
   overflow-y: auto;
   margin: 20px 0;
+  background-color: white;
 }
 
 .Footer {
   display: flex;
-  flex-direction: row-reverse;
+  justify-content: space-between;
+  align-items: center;
 }
