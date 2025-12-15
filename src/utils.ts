@@ -202,7 +202,7 @@ export function applyCSS(html: string, css: string) {
 }
 
 export function uevent(name: string) {
-	const url = `https://u.sunboshi.tech/event?name=${name}&platform=${PlugPlatform}&v=${PluginVersion}`;
+	const url = `https://u.dualhue.cn/event?name=${name}&platform=${PlugPlatform}&v=${PluginVersion}`;
 	requestUrl(url).then().catch(error => {
 		console.error("Failed to send event: " + url, error);
 	});

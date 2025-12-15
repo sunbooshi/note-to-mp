@@ -604,13 +604,13 @@ export class LocalFile extends Extension{
         let { path, head: header, block} = this.parseFileLink(link);
         let file = null;
         if (path === '') {
-            file = this.app.workspace.getActiveFile();
+            file = this.callback.note;
         }
         else {
             if (!path.endsWith('.md')) {
                 path = path + '.md';
             }
-            file = this.assetsManager.searchFile(path);
+            file = this.assetsManager.searchFile(path, this.callback.note);
         }
 
         if (file == null) {

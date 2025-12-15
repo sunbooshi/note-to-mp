@@ -360,8 +360,8 @@ export default class AssetsManager {
 		shell.openPath(dst);
 	}
 
-    searchFile(nameOrPath: string): TAbstractFile | null {
-        const resolvedPath = this.resolvePath(nameOrPath);
+    searchFile(nameOrPath: string, base: TFile|null = null): TAbstractFile | null {
+        const resolvedPath = this.resolvePath(nameOrPath, base);
         const vault= this.app.vault;
         const attachmentFolderPath = vault.config.attachmentFolderPath || '';
         let localPath = resolvedPath;
@@ -407,8 +407,8 @@ export default class AssetsManager {
         return null;
     }
 
-    getResourcePath(path: string): {resUrl:string, filePath:string}|null {
-        const file = this.searchFile(path) as TFile;
+    getResourcePath(path: string, base: TFile|null = null): {resUrl:string, filePath:string}|null {
+        const file = this.searchFile(path, base) as TFile;
         if (file == null) {
             return null;
         }
@@ -416,26 +416,53 @@ export default class AssetsManager {
         return {resUrl, filePath: file.path};
     }
 
-    resolvePath(relativePath: string): string {
-        const basePath = this.getActiveFileDir();
-        if (!relativePath.includes('/')) {
+    resolvePath(relativePath: string, af: TFile|null = null): string {
+        // 如果relativePath是绝对路径（以/开头），直接返回
+        if (relativePath.startsWith('/')) {
             return relativePath;
         }
-        const stack = basePath.split("/");
-        const parts = relativePath.split("/");
-      
-        stack.pop(); // Remove the current file name (or empty string)
-    
+        
+        // 如果relativePath不包含任何路径分隔符或相对路径符号，则认为它是同一目录下的文件名
+        const isSimpleFilename = !relativePath.includes('/') && !relativePath.includes('./') && !relativePath.includes('../');
+        if (isSimpleFilename) {
+            const basePath = this.getActiveFileDir(af);
+            // 如果没有基础路径，直接返回relativePath
+            if (!basePath) {
+                return relativePath;
+            }
+            // 将文件名附加到基础路径
+            return basePath + "/" + relativePath;
+        }
+        
+        const basePath = this.getActiveFileDir(af);
+        // 如果没有基础路径，无法解析相对路径
+        if (!basePath) {
+            return relativePath;
+        }
+        
+        // 将基础路径和相对路径组合
+        const fullPath = basePath + "/" + relativePath;
+        const stack: string[] = [];
+        const parts = fullPath.split("/");
+
         for (const part of parts) {
-            if (part === ".") continue;
-            if (part === "..") stack.pop();
-            else stack.push(part);
+            if (part === "." || part === "") continue;
+            if (part === "..") {
+                if (stack.length > 0) {
+                    stack.pop();
+                }
+            } else {
+                stack.push(part);
+            }
         }
         return stack.join("/");
     }
 
-    getActiveFileDir() {
-        const af = this.app.workspace.getActiveFile();
+    getActiveFileDir(af: TFile|null = null) {
+        if (!af) {
+            console.warn('getActiveFileDir: active file is null');
+        }
+        af = af || this.app.workspace.getActiveFile();
         if (af == null) {
             return '';
         }

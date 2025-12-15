@@ -26,11 +26,14 @@ import AccountSelect from "./AccountSelect";
 import ThemeList from './ThemeList';
 import { useNotification } from './Notification';
 import { ArticleRender } from 'src/article-render';
+import { getMetadata } from 'src/weixin-api';
 import { usePluginStore } from 'src/store/PluginStore';
 import { useRenderStore } from 'src/store/RenderStore';
 import { ConfigStore, createConfigStore, ConfigContext, useConfigContext } from 'src/store/ConfigStore'
 import { uevent } from 'src/utils';
 import { Loading } from './Loading';
+import { LocalImageManager } from 'src/markdown/local-file';
+import { CardDataManager } from 'src/markdown/code';
 
 import styles from './Wechat.module.css';
 import { NMPSettings } from 'src/settings';
@@ -40,6 +43,19 @@ const WechatInternal: React.FC = () => {
   const app = usePluginStore((s) => s.app);
   const activeNote = useRenderStore.use.note();
   const renderVersion = useRenderStore.use.renderVersion();
+
+  const [metadataAppid, setMetadataAppid] = useState('');
+  const [metadataTheme, setMetadataTheme] = useState('');
+  const [metadataCover, setMetadataCover] = useState('');
+
+  useEffect(() => {
+    if (activeNote) {
+      const metadata = getMetadata(app, activeNote);
+      setMetadataAppid(metadata.appid || '');
+      setMetadataTheme(metadata.theme || '');
+      setMetadataCover(metadata.cover || '');
+    }
+  }, [activeNote, app]);
 
   const appid = useConfigContext(s=>s.appid);
   const cover = useConfigContext(s=>s.cover);
@@ -63,6 +79,11 @@ const WechatInternal: React.FC = () => {
   const showErr = (msg: string) => {
     notify({type: 'error', title: msg});
   };
+
+  useEffect(()=> {
+    LocalImageManager.getInstance().cleanup();
+    CardDataManager.getInstance().cleanup();
+  }, [appid]);
 
   useEffect(()=>{
     if (!contentRef.current) return;
@@ -194,16 +215,16 @@ const WechatInternal: React.FC = () => {
   return (
     <div className={styles.Root}>
       <div className={styles.Panel}>
-        <Cover />
+        <Cover readOnly={!!metadataCover} initialCover={metadataCover} />
         <div className={styles.PanelRight}>
-          <AccountSelect />
+          <AccountSelect disabled={!!metadataAppid} />
           <button onClick={gotoMP}>去公众号后台</button>
           <button onClick={handleRefresh}>刷新</button>
           <div style={{ flexBasis: '100%' }}></div>
           <button onClick={handlePost}>发文章</button>
           <button onClick={handlePostImage}>发图文</button>
           <button onClick={handleCopy}>复制</button>
-          <ThemeList />
+          <ThemeList disabled={!!metadataTheme} />
           { isMember ? 
             (<button onClick={handleExport}>导出</button>) :
             (<button onClick={onHelpClick}>帮助</button>)

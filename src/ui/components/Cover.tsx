@@ -23,14 +23,26 @@
 import * as React from "react";
 import { useConfigContext } from "src/store/ConfigStore";
 import styles from "./Cover.module.css";
+import AssetsManager from "src/assets";
+import { trimEmbedTag } from "src/utils";
 
-export function Cover() {
-	const cover = useConfigContext(s=>s.cover);
+function getCoverURL(cover: string): string | null {
+	if (cover.startsWith('http')) return cover;
+	const res = AssetsManager.getInstance().getResourcePath(trimEmbedTag(cover));
+	if (res) return res.resUrl;
+	return null
+}
+
+export function Cover({ readOnly = false, initialCover = '' }: { readOnly?: boolean; initialCover?: string }) {
+	const localCover = useConfigContext(s=>s.cover);
 	const setCover = useConfigContext(s=>s.setCover);
+
+	const displayedCover = readOnly && initialCover ? getCoverURL(initialCover) : (localCover ? URL.createObjectURL(localCover) : null);
 
 	const fileInputRef = React.useRef<HTMLInputElement>(null);
 
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		if (readOnly) return;
 		if (event.target.files && event.target.files.length > 0) {
 			setCover(event.target.files[0]);
 		} else {
@@ -39,11 +51,13 @@ export function Cover() {
 	};
 
 	const handleImageClick = () => {
+		if (readOnly) return;
 		// Trigger the hidden file input when the image is clicked
 		fileInputRef.current?.click();
 	};
 
 	const handleCloseClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+		if (readOnly) return;
 		// Prevent the default label behavior (triggering the input) first
 		event.preventDefault();
 		// Stop event propagation to prevent the parent label's onClick from firing
@@ -53,24 +67,25 @@ export function Cover() {
 
 	return (
 		<div className={styles.CoverContainer}>
-			<label className={styles.CoverLabel} onClick={cover ? handleImageClick : undefined}>
+			<label className={styles.CoverLabel} onClick={(!readOnly && displayedCover) ? handleImageClick : undefined}>
 				<input
 					type="file"
 					accept=".jpeg, .jpg, .png"
 					className={styles.CoverInput}
 					onChange={handleFileChange}
 					ref={fileInputRef} // Attach ref to the input
+					disabled={readOnly}
 				/>
-				{cover ? (
+				{displayedCover ? (
 					<>
 						<img
-							src={URL.createObjectURL(cover)}
+							src={displayedCover}
 							alt="Cover Preview"
 							className={styles.CoverPreview}
 						/>
-						<button className={styles.CloseButton} onClick={handleCloseClick}>
+						{!readOnly && <button className={styles.CloseButton} onClick={handleCloseClick}>
 							&times; {/* HTML entity for multiplication sign / close icon */}
-						</button>
+						</button>}
 					</>
 				) : (
 					<div className={styles.CoverTip}>

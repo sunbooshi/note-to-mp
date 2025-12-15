@@ -26,13 +26,11 @@ import { usePluginStore } from 'src/store/PluginStore';
 import { useRenderStore } from 'src/store/RenderStore';
 import { uevent } from 'src/utils';
 import { Loading } from './Loading';
-import { BaseRender } from 'src/base-render';
+import { RedBookRender } from 'src/redbook-render';
 
 import styles from './Wechat.module.css';
-import { NMPSettings } from 'src/settings';
-import AssetsManager from 'src/assets';
 
-export function NoteRender({platform}:{platform:string}) {
+export function RedBook() {
   const { notify } = useNotification();
   const app = usePluginStore((s) => s.app);
   const activeNote = useRenderStore.use.note();
@@ -40,10 +38,9 @@ export function NoteRender({platform}:{platform:string}) {
 
   const contentRef = useRef<HTMLDivElement>(null);
   
-  const renderRef = useRef<BaseRender>(new BaseRender(app));
+  const renderRef = useRef<RedBookRender>(new RedBookRender(app));
 
   const [loading, setLoading] = useState(false);
-  const cssContent = AssetsManager.getInstance().getTheme('obsidian-light')?.css.replace(/\.note-to-mp/g, '.note-to-mp-base');
 
   const showMsg = (msg: string) => {
     notify({type: 'success', title: msg});
@@ -81,20 +78,11 @@ export function NoteRender({platform}:{platform:string}) {
     uevent('open-help');
   };
 
-  const gotoPlatform = () => {
+  const gotoRedBook = () => {
     const { shell } = require('electron');
-    let url = '';
-    if (platform == 'zhihu') {
-      url = 'https://zhuanlan.zhihu.com/write';
-    }
-    else if (platform == 'toutiao') {
-      url = 'https://mp.toutiao.com/profile_v4/graphic/publish';
-    }
-    else if (platform == 'redbook') {
-      url = 'https://creator.xiaohongshu.com/';
-    }
+    const url = 'https://creator.xiaohongshu.com/';
     shell.openExternal(url);
-    uevent('open-' + platform);
+    uevent('open-redbook');
   }
 
   const handleCopy = async () => {
@@ -106,42 +94,25 @@ export function NoteRender({platform}:{platform:string}) {
       setLoading(true);
       await renderRef.current.copyWithoutCSS(contentRef.current!);
       setLoading(false);
-      if (NMPSettings.getInstance().isAuthKeyVaild()) {
-        showMsg('复制成功，快去粘贴吧！');
-      }
-      else {
-        showMsg('复制成功，快去粘贴吧！如需复制本地图片请购买会员，感谢支持！');
-      }
+      showMsg('复制成功，快去小红书粘贴吧！');
     } catch (error) {
       setLoading(false);
       showErr('错误：' + error.message);
     }
   };
 
-  let btnTitle = '';
-    if (platform == 'zhihu') {
-    btnTitle = '去知乎';
-  }
-  else if (platform == 'toutiao') {
-    btnTitle = '去头条';
-  }
-  else if (platform == 'redbook') {
-    btnTitle = '去小红书';
-  }
-
   return (
     <div className={styles.Root}>
       <div className={styles.Panel}>
         <div className={styles.PanelRight}>
           <button onClick={handleCopy}>复制</button>
-          <button onClick={gotoPlatform}>{btnTitle}</button>
+          <button onClick={gotoRedBook}>去小红书</button>
           <button onClick={handleRefresh}>刷新</button>
           <button onClick={onHelpClick}>帮助</button>
         </div>
       </div>
       <div className={styles.RenderWrapper}>
         <div className={styles.RenderRoot}>
-          <style>{cssContent}</style>
           <div ref={contentRef}></div>
         </div>
       </div>

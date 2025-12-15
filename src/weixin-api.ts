@@ -281,6 +281,10 @@ export async function putImageToOSS(authKey:string, uploadURL: string, data: Blo
 }
 
 export async function uploadImageToOSS(authkey: string, data: Blob, filename: string) {
+    if (data.size > 1048576) { // 1MB = 1024 * 1024 bytes
+        throw new Error(`图片 "${filename}" 大小超过1MB限制`);
+    }
+    
     const ext = filename.split('.').pop() || 'jpg';
     const {uploadURL, downloadURL} = await getUploadImageURL(authkey, ext);
     await putImageToOSS(authkey, uploadURL, data, ext);

@@ -91,7 +91,7 @@ export class BaseRender implements MDRendererCallback {
       }
       this.note = af;
 
-      this.articleHTML = await this.markedParser.parse(md);
+      this.articleHTML = await this.markedParser.parse(md, af);
       this.setArticle(contianer, this.articleHTML);
       await this.processCachedElements(contianer);
     }

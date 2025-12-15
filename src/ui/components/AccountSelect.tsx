@@ -19,6 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 import * as React from "react";
 import { Select } from "radix-ui";
 import classnames from "classnames";
@@ -31,7 +32,7 @@ import { NMPSettings } from "src/settings";
 import { useConfigContext } from "src/store/ConfigStore";
 import styles from "./AccountSelect.module.css";
 
-function AccountSelect() {
+function AccountSelect({ disabled = false }: { disabled?: boolean }) {
   const setAppId = useConfigContext((s)=>s.setAppId);
   const defaultAccount = useConfigContext((s)=>s.appid) || '';
   const settings = NMPSettings.getInstance();
@@ -42,8 +43,8 @@ function AccountSelect() {
   });
 
   return (
-    <Select.Root defaultValue={defaultAccount} onValueChange={setAppId}>
-      <Select.Trigger className={styles.Trigger} aria-label="Food">
+    <Select.Root defaultValue={defaultAccount} onValueChange={setAppId} disabled={disabled}>
+      <Select.Trigger className={styles.Trigger} disabled={disabled}>
         <Select.Value placeholder="请在设置添加公众号" />
         <Select.Icon className={styles.Icon}>
           <ChevronDownIcon />

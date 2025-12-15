@@ -29,15 +29,15 @@ import AssetsManager from "src/assets";
 import { useConfigContext } from "src/store/ConfigStore";
 import styles from "./ThemeList.module.css";
 
-export default function ThemeList() {
-  const mananger = AssetsManager.getInstance();
+export default function ThemeList({ disabled = false }: { disabled?: boolean }) {
+  const manager = AssetsManager.getInstance();
 
   const theme = useConfigContext((s) => s.theme);
   const highlight = useConfigContext((s) => s.highlight);
   const setTheme = useConfigContext((s) => s.setTheme);
   const setHighlight = useConfigContext((s) => s.setHighlight);
 
-  const themes = mananger.themes === undefined ? [] : mananger.themes.map(t => {
+  const themes = manager.themes === undefined ? [] : manager.themes.map(t => {
     return (
       <DropdownMenu.RadioItem className={styles.RadioItem} value={t.className} key={t.className}>
         <DropdownMenu.ItemIndicator className={styles.ItemIndicator}>
@@ -48,7 +48,7 @@ export default function ThemeList() {
     );
   });
 
-  const highlights = mananger.highlights === undefined ? [] : mananger.highlights.map(h => {
+  const highlights = manager.highlights === undefined ? [] : manager.highlights.map(h => {
     return (
       <DropdownMenu.RadioItem className={styles.RadioItem} value={h.name} key={h.name}>
         <DropdownMenu.ItemIndicator className={styles.ItemIndicator}>
@@ -62,7 +62,7 @@ export default function ThemeList() {
 
 	return (
 		<DropdownMenu.Root>
-			<DropdownMenu.Trigger asChild>
+			<DropdownMenu.Trigger asChild disabled={disabled}>
 				<button>主题</button>
 			</DropdownMenu.Trigger>
 
