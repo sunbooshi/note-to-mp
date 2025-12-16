@@ -21,7 +21,7 @@
  */
 
 import * as React from "react";
-import { Select } from "radix-ui";
+import * as Select from "@radix-ui/react-select";
 import classnames from "classnames";
 import {
   CheckIcon,
@@ -42,31 +42,41 @@ function AccountSelect({ disabled = false }: { disabled?: boolean }) {
     );
   });
 
+  // 使用 useRef 获取父容器的引用
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
   return (
-    <Select.Root defaultValue={defaultAccount} onValueChange={setAppId} disabled={disabled}>
-      <Select.Trigger className={styles.Trigger} disabled={disabled}>
-        <Select.Value placeholder="请在设置添加公众号" />
-        <Select.Icon className={styles.Icon}>
-          <ChevronDownIcon />
-        </Select.Icon>
-      </Select.Trigger>
-      <Select.Portal>
-        <Select.Content className={styles.Content}>
-          <Select.ScrollUpButton className={styles.ScrollButton}>
-            <ChevronUpIcon />
-          </Select.ScrollUpButton>
-          <Select.Viewport className={styles.Viewport}>
-            <Select.Group>
-              <Select.Label className={styles.Label}>公众号</Select.Label>
-              {accounts}
-            </Select.Group>
-          </Select.Viewport>
-          <Select.ScrollDownButton className={styles.ScrollButton}>
+    <div ref={containerRef} style={{ position: 'relative' }}>
+      <Select.Root defaultValue={defaultAccount} onValueChange={setAppId} disabled={disabled}>
+        <Select.Trigger className={styles.Trigger} disabled={disabled}>
+          <Select.Value placeholder="请在设置添加公众号" />
+          <Select.Icon className={styles.Icon}>
             <ChevronDownIcon />
-          </Select.ScrollDownButton>
-        </Select.Content>
-      </Select.Portal>
-    </Select.Root>
+          </Select.Icon>
+        </Select.Trigger>
+        {/* 直接使用父容器作为 portal 的挂载点 */}
+        <Select.Portal container={containerRef.current || undefined}>
+          <Select.Content 
+            className={styles.Content} 
+            position="popper" 
+            sideOffset={5}
+          >
+            <Select.ScrollUpButton className={styles.ScrollButton}>
+              <ChevronUpIcon />
+            </Select.ScrollUpButton>
+            <Select.Viewport className={styles.Viewport}>
+              <Select.Group>
+                <Select.Label className={styles.Label}>公众号</Select.Label>
+                {accounts}
+              </Select.Group>
+            </Select.Viewport>
+            <Select.ScrollDownButton className={styles.ScrollButton}>
+              <ChevronDownIcon />
+            </Select.ScrollDownButton>
+          </Select.Content>
+        </Select.Portal>
+      </Select.Root>
+    </div>
   );
 }
 

@@ -11,6 +11,10 @@
 	animation-duration: 400ms;
 	animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 	will-change: transform, opacity;
+	/* 确保在父容器中有足够的 z-index */
+	z-index: 999999;
+	position: relative;
+	
 	&[data-side="top"] {
 		animation-name: slideDownAndFade;
 	}

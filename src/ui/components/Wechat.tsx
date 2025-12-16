@@ -21,6 +21,7 @@
  */
 
 import { useRef, useEffect, useState } from 'react';
+import { Platform } from 'obsidian';
 import { Cover } from './Cover';
 import AccountSelect from "./AccountSelect";
 import ThemeList from './ThemeList';
@@ -117,7 +118,7 @@ const WechatInternal: React.FC = () => {
   
   const onHelpClick = () => {
     const { shell } = require('electron');
-    shell.openExternal('https://sunboshi.tech/doc')
+    shell.openExternal('https://docs.dualhue.cn/doc')
     uevent('open-help');
   };
 
@@ -174,6 +175,11 @@ const WechatInternal: React.FC = () => {
   };
 
   const handleCopy = async () => {
+    if (Platform.isMobile) {
+      showErr('由于Obsidian API的限制，移动设备不支持复制！');
+      return;
+    }
+
     if (contentRef.current == null) {
       showErr('未初始化！');
       return;

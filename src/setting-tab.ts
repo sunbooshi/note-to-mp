@@ -180,7 +180,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 		const helpEl = containerEl.createEl('div');
 		helpEl.style.cssText = 'display: flex;flex-direction: row;align-items: center;';
 		helpEl.createEl('h2', {text: '帮助文档'}).style.cssText = 'margin-right: 10px;';
-		helpEl.createEl('a', {text: 'https://sunboshi.tech/doc', attr: {href: 'https://sunboshi.tech/doc'}});
+		helpEl.createEl('a', {text: 'https://docs.dualhue.cn/doc', attr: {href: 'https://docs.dualhue.cn/doc'}});
 
 		containerEl.createEl('h2', {text: '插件设置'});
 
@@ -352,7 +352,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 					})
 				    .inputEl.setAttr('style', 'width: 520px; height: 60px;');
 		})
-		const customCSSDoc = '使用指南：<a href="https://sunboshi.tech/customcss">https://sunboshi.tech/customcss</a>';
+		const customCSSDoc = '使用指南：<a href="https://docs.dualhue.cn/customcss">https://docs.dualhue.cn/customcss</a>';
 		new Setting(containerEl)
 			.setName('自定义CSS笔记')
 			.setDesc(sanitizeHTMLToDom(customCSSDoc))
@@ -367,7 +367,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 				.inputEl.setAttr('style', 'width: 320px;')
 		});
 
-		const expertDoc = '使用指南：<a href="https://sunboshi.tech/expert">https://sunboshi.tech/expert</a>';
+		const expertDoc = '使用指南：<a href="https://docs.dualhue.cn/expert">https://docs.dualhue.cn/expert</a>';
 		new Setting(containerEl)
 			.setName('专家设置笔记')
 			.setDesc(sanitizeHTMLToDom(expertDoc))
@@ -382,7 +382,7 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 				.inputEl.setAttr('style', 'width: 320px;')
 		});
 		
-		let descHtml = '详情说明：<a href="https://sunboshi.tech/subscribe">https://sunboshi.tech/subscribe</a>';
+		let descHtml = '详情说明：<a href="https://docs.dualhue.cn/subscribe">https://docs.dualhue.cn/subscribe</a>';
 		if (this.settings.isVip) {
 			descHtml = '<span style="color:rgb(245, 70, 85);font-weight: bold;">👑永久会员</span><br/>' + descHtml;
 		}

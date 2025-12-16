@@ -25,7 +25,7 @@ import { imageExtToMime } from "./utils";
 import AssetsManager from "./assets";
 import { NMPSettings } from "./settings";
 
-const PluginHost = 'https://obplugin.sunboshi.tech';
+const PluginHost = 'https://obplugin.dualhue.cn';
 
 // 获取token
 export async function wxGetToken(authkey:string, appid:string, secret:string) {
@@ -73,7 +73,7 @@ export async function wxKeyInfo(authkey:string) {
 }
 
 export async function wxWidget(authkey: string, params: string) {
-    const host = 'https://obplugin.sunboshi.tech';
+    const host = 'https://obplugin.dualhue.cn';
     const path = '/math/widget';
     const url = `${host}${path}`;
     try {

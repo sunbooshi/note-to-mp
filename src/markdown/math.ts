@@ -35,7 +35,7 @@ export function cleanMathCache() {
 }
 
 export class MathRendererQueue {
-    private host = 'https://obplugin.sunboshi.tech';
+    private host = 'https://obplugin.dualhue.cn';
     private static instance: MathRendererQueue;
     private mathIndex: number = 0;
 

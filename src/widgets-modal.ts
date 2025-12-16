@@ -25,7 +25,7 @@ import { uevent } from "./utils";
 
 export class WidgetsModal extends Modal {
   listener: any = null;
-  url: string = 'https://widgets.sunboshi.tech';
+  url: string = 'https://widgets.dualhue.cn';
   constructor(app: App) {
     super(app);
   }

@@ -632,7 +632,7 @@ export class LocalFile extends Extension{
     }
 
     static async getExcalidrawUrl(data: string) {
-        const url = 'https://obplugin.sunboshi.tech/math/excalidraw';
+        const url = 'https://obplugin.dualhue.cn/math/excalidraw';
         const req = await requestUrl({
             url,
             method: 'POST',

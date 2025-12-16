@@ -74,7 +74,7 @@ export function RedBook() {
   
   const onHelpClick = () => {
     const { shell } = require('electron');
-    shell.openExternal('https://sunboshi.tech/doc')
+    shell.openExternal('https://docs.dualhue.cn/doc')
     uevent('open-help');
   };
 

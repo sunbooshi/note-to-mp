@@ -28,6 +28,7 @@ import {
 import AssetsManager from "src/assets";
 import { useConfigContext } from "src/store/ConfigStore";
 import styles from "./ThemeList.module.css";
+import * as React from "react";
 
 export default function ThemeList({ disabled = false }: { disabled?: boolean }) {
   const manager = AssetsManager.getInstance();
@@ -59,55 +60,60 @@ export default function ThemeList({ disabled = false }: { disabled?: boolean }) 
     );
   });
 
+  // 使用 useRef 获取父容器的引用
+  const containerRef = React.useRef<HTMLDivElement>(null);
 
-	return (
-		<DropdownMenu.Root>
-			<DropdownMenu.Trigger asChild disabled={disabled}>
-				<button>主题</button>
-			</DropdownMenu.Trigger>
+  return (
+    <div ref={containerRef} style={{ position: 'relative', display: 'inline-block' }}>
+      <DropdownMenu.Root>
+        <DropdownMenu.Trigger asChild disabled={disabled}>
+          <button>主题</button>
+        </DropdownMenu.Trigger>
 
-			<DropdownMenu.Portal>
-				<DropdownMenu.Content className={styles.Content} sideOffset={5}>
-					<DropdownMenu.Sub>
-						<DropdownMenu.SubTrigger className={styles.SubTrigger}>
-							主题
-							<div className={styles.RightSlot}>
-								<ChevronRightIcon />
-							</div>
-						</DropdownMenu.SubTrigger>
-						<DropdownMenu.Portal>
-							<DropdownMenu.SubContent
-								className={styles.SubContent}
-								sideOffset={2}
-								alignOffset={-5}
-							>
-                <DropdownMenu.RadioGroup value={theme} onValueChange={setTheme}>
-                  {themes}
-                </DropdownMenu.RadioGroup>
-							</DropdownMenu.SubContent>
-						</DropdownMenu.Portal>
-					</DropdownMenu.Sub>
-          <DropdownMenu.Sub>
-						<DropdownMenu.SubTrigger className={styles.SubTrigger}>
-							代码高亮
-							<div className={styles.RightSlot}>
-								<ChevronRightIcon />
-							</div>
-						</DropdownMenu.SubTrigger>
-						<DropdownMenu.Portal>
-							<DropdownMenu.SubContent
-								className={styles.SubContent}
-								sideOffset={2}
-								alignOffset={-5}
-							>
-                <DropdownMenu.RadioGroup value={highlight} onValueChange={setHighlight}>
-                  {highlights}
-                </DropdownMenu.RadioGroup>
-							</DropdownMenu.SubContent>
-						</DropdownMenu.Portal>
-					</DropdownMenu.Sub>
-				</DropdownMenu.Content>
-			</DropdownMenu.Portal>
-		</DropdownMenu.Root>
-	);
+        {/* 直接使用父容器作为 portal 的挂载点 */}
+        <DropdownMenu.Portal container={containerRef.current || undefined}>
+          <DropdownMenu.Content className={styles.Content} sideOffset={5}>
+            <DropdownMenu.Sub>
+              <DropdownMenu.SubTrigger className={styles.SubTrigger}>
+                主题
+                <div className={styles.RightSlot}>
+                  <ChevronRightIcon />
+                </div>
+              </DropdownMenu.SubTrigger>
+              <DropdownMenu.Portal container={containerRef.current || undefined}>
+                <DropdownMenu.SubContent
+                  className={styles.SubContent}
+                  sideOffset={2}
+                  alignOffset={-5}
+                >
+                  <DropdownMenu.RadioGroup value={theme} onValueChange={setTheme}>
+                    {themes}
+                  </DropdownMenu.RadioGroup>
+                </DropdownMenu.SubContent>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Sub>
+            <DropdownMenu.Sub>
+              <DropdownMenu.SubTrigger className={styles.SubTrigger}>
+                代码高亮
+                <div className={styles.RightSlot}>
+                  <ChevronRightIcon />
+                </div>
+              </DropdownMenu.SubTrigger>
+              <DropdownMenu.Portal container={containerRef.current || undefined}>
+                <DropdownMenu.SubContent
+                  className={styles.SubContent}
+                  sideOffset={2}
+                  alignOffset={-5}
+                >
+                  <DropdownMenu.RadioGroup value={highlight} onValueChange={setHighlight}>
+                    {highlights}
+                  </DropdownMenu.RadioGroup>
+                </DropdownMenu.SubContent>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Sub>
+          </DropdownMenu.Content>
+        </DropdownMenu.Portal>
+      </DropdownMenu.Root>
+    </div>
+  );
 };

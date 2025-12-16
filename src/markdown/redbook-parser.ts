@@ -80,8 +80,6 @@ const customRenderer = {
     },
 
     blockquote(text: string): string {
-        console.log('quote')
-        console.log(text);
         const lines = text.split('<br>');
         return `\n\n${lines.map(line => '    ' + line.trim()).join('\n')}\n\n`;
     },

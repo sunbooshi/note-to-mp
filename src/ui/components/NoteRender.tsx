@@ -21,6 +21,7 @@
  */
 
 import { useRef, useEffect, useState } from 'react';
+import { Platform } from 'obsidian';
 import { useNotification } from './Notification';
 import { usePluginStore } from 'src/store/PluginStore';
 import { useRenderStore } from 'src/store/RenderStore';
@@ -77,7 +78,7 @@ export function NoteRender({platform}:{platform:string}) {
   
   const onHelpClick = () => {
     const { shell } = require('electron');
-    shell.openExternal('https://sunboshi.tech/doc')
+    shell.openExternal('https://docs.dualhue.cn/doc')
     uevent('open-help');
   };
 
@@ -98,10 +99,16 @@ export function NoteRender({platform}:{platform:string}) {
   }
 
   const handleCopy = async () => {
+    if (Platform.isMobile) {
+      showErr('由于Obsidian API的限制，移动设备不支持复制功能！');
+      return;
+    }
+
     if (contentRef.current == null) {
       showErr('未初始化！');
       return;
     }
+
     try {
       setLoading(true);
       await renderRef.current.copyWithoutCSS(contentRef.current!);
