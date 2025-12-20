@@ -30,13 +30,10 @@ import { DraftArticle, wxAddDrafts } from "src/weixin-api";
 import { PageLoading, LoadingOrb } from "./components/Loading";
 import NoteList, { NoteItem, NoteItemStatus } from './components/NoteList';
 import { BellIcon } from "@radix-ui/react-icons"
+import { ConfigStore, createConfigStore, ConfigContext, useConfigContext } from 'src/store/ConfigStore'
+import AccountSelect from "src/ui/components/AccountSelect";
 
 import styles from "./pubview.module.css";
-
-function defaultAppId() {
-  const settings = NMPSettings.getInstance();
-  return settings.wxInfo.length > 0 ? settings.wxInfo[0].appid : null;
-}
 
 function defaultTheme() {
   return NMPSettings.getInstance().defaultStyle;
@@ -49,6 +46,7 @@ function defaultHighlight() {
 export function Pubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
   const app = usePluginStore(s => s.app);
   const isReourceLoaded = usePluginStore(s => s.isReourceLoaded);
+  const appid = useConfigContext(s=>s.appid);
 
   const styleRef = useRef<HTMLStyleElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -58,6 +56,7 @@ export function Pubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
   const [message, setMessage] = useState('');
   const [cssContent, setCSSContent] = useState('');
   const [canceled, setCanceled] = useState(false);
+  const [disableSelect, setDisableSelect] = useState(false);
 
   const onCancel = () => {
     setCanceled(true);
@@ -83,7 +82,7 @@ export function Pubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
     if (!contentRef.current) return;
     const note = notes[index];
     setMessage('发布中：' + note.basename);
-    await renderRef.current.postArticle(defaultAppId()!, undefined, contentRef.current!, css);
+    await renderRef.current.postArticle(appid!, undefined, contentRef.current!, css);
     prepare(index + 1);
   };
 
@@ -121,7 +120,6 @@ export function Pubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
     if (!styleRef.current) return;
     if (!contentRef.current) return;
 
-    const appid = defaultAppId();
     if (!appid) {
       setMessage('请先设置公众号');
       return;
@@ -130,7 +128,26 @@ export function Pubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
       setMessage('没有需要发布的笔记');
       return;
     }
-    prepare(0);
+    
+    // 实现10秒倒计时
+    let countdown = 10;
+    setMessage(`发布准备中！${countdown}s`);
+    
+    const countdownInterval = setInterval(() => {
+      countdown--;
+      if (countdown > 0) {
+        setMessage(`发布准备中！${countdown}s`);
+      } else {
+        clearInterval(countdownInterval);
+        setDisableSelect(true);
+        prepare(0);
+      }
+    }, 1000);
+
+    // 清理函数，组件卸载时清除定时器
+    return () => {
+      clearInterval(countdownInterval);
+    };
   }, [notes, isReourceLoaded, styleRef, contentRef]);
 
 
@@ -149,6 +166,7 @@ export function Pubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
         <div ref={contentRef}></div>
       </div>
       <div className={styles.Footer}>
+        <AccountSelect disabled={disableSelect} />
         <button onClick={onCancel}>取消发布</button>
       </div>
     </div>
@@ -159,6 +177,7 @@ function MergePubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
   const app = usePluginStore(s => s.app);
   const isReourceLoaded = usePluginStore(s => s.isReourceLoaded);
 
+  const appid = useConfigContext(s=>s.appid);
   const styleRef = useRef<HTMLStyleElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -169,6 +188,7 @@ function MergePubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
   const [cssContent, setCSSContent] = useState('');
   const [canceled, setCanceled] = useState(false);
   const [disableDrag, setDisabeDrag] = useState(false);
+  const [disableSelect, setDisableSelect] = useState(false);
 
   const [noteItems, setNoteItems] = useState<NoteItem[]>(
     notes.map(n => {
@@ -192,7 +212,6 @@ function MergePubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
       return;
     }
 
-    const appid = defaultAppId();
     if (!appid) {
       setMessage('请先设置公众号');
       return;
@@ -203,6 +222,7 @@ function MergePubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
     }
 
     setDisabeDrag(true);
+    setDisableSelect(true);
     articlesRef.current = [];
     prepare(0);
   }
@@ -232,7 +252,7 @@ function MergePubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
       return;
     }
     if (!contentRef.current) return;
-    const { token, metadata } = await renderRef.current.prepareArticle(defaultAppId()!, undefined, contentRef.current!, css);
+    const { token, metadata } = await renderRef.current.prepareArticle(appid!, undefined, contentRef.current!, css);
     articlesRef.current.push(metadata);
     if (index + 1 == notes.length) {
       await publish(token)
@@ -304,25 +324,50 @@ function MergePubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
         <div ref={contentRef}></div>
       </div>
       <div className={styles.Footer}>
-        <div className={styles.Tips}><BellIcon style={{ marginRight: 10 }} /><span>最多能够包含8篇笔记</span></div>
+        <div className={styles.Tips}><BellIcon style={{ marginRight: 5 }} /><span>最多8篇笔记</span></div>
+        <AccountSelect disabled={disableSelect} />
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <button onClick={onCancel} style={{ width: 80 }}>取消</button>
-          <div style={{ width: 20 }}></div>
           <button onClick={onPublish} style={{ width: 80 }}>发布</button>
+          <div style={{ width: 20 }}></div>
+          <button onClick={onCancel} style={{ width: 80 }}>取消</button>
         </div>
       </div>
     </div>
   );
 }
 
+function PubContent({ modal, notes }: { modal: Modal, notes: TFile[] }) {
+  const storeRef = useRef<ConfigStore>(null);
+  if (!storeRef.current) {
+    storeRef.current = createConfigStore();
+  }
+  return (
+    <ConfigContext.Provider value={storeRef.current}>
+      <Pubview modal={modal} notes={notes} />
+    </ConfigContext.Provider>
+  );
+}
+
+function MergeContent({ modal, notes }: { modal: Modal, notes: TFile[] }) {
+  const storeRef = useRef<ConfigStore>(null);
+  if (!storeRef.current) {
+    storeRef.current = createConfigStore();
+  }
+  return (
+    <ConfigContext.Provider value={storeRef.current}>
+      <MergePubview modal={modal} notes={notes} />
+    </ConfigContext.Provider>
+  );
+}
+
 export function createPubview(conatainer: HTMLElement, modal: Modal, notes: TFile[]) {
   const root = ReactDOM.createRoot(conatainer);
-  root.render(<Pubview modal={modal} notes={notes} />);
+  root.render(<PubContent modal={modal} notes={notes} />);
   return root;
 }
 
 export function createMergePubview(conatainer: HTMLElement, modal: Modal, notes: TFile[]) {
   const root = ReactDOM.createRoot(conatainer);
-  root.render(<MergePubview modal={modal} notes={notes} />);
+  root.render(<MergeContent modal={modal} notes={notes} />);
   return root;
 }

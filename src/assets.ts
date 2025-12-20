@@ -421,6 +421,10 @@ export default class AssetsManager {
         if (relativePath.startsWith('/')) {
             return relativePath;
         }
+
+        if (!relativePath.includes('/')) {
+            return relativePath;
+        }
         
         // 如果relativePath不包含任何路径分隔符或相对路径符号，则认为它是同一目录下的文件名
         const isSimpleFilename = !relativePath.includes('/') && !relativePath.includes('./') && !relativePath.includes('../');

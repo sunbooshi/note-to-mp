@@ -62,7 +62,7 @@ export class ArticleRender implements MDRendererCallback {
   setArticle(container:HTMLElement, article: string) {
     container.empty();
     let className = 'note-to-mp';
-    const html = `<section class="${className}" id="article-section">${article}</section>`;
+    const html = `<section class="${className}" id="article-section" data-plugin="note-to-mp">${article}</section>`;
     const doc = sanitizeHTMLToDom(html);
     if (doc.firstChild) {
       container.appendChild(doc.firstChild);

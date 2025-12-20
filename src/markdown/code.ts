@@ -126,9 +126,9 @@ export class CodeRenderer extends Extension {
 				result += char;
 			} else {
 				if (char === ' ') {
-					result += '&nbsp;';
+					result += '<span leaf="true">&nbsp;</span>';
 				} else if (char === '\t') {
-					result += '&nbsp;&nbsp;&nbsp;&nbsp;';
+					result += '<span leaf="true">&nbsp;&nbsp;&nbsp;&nbsp;</span>';
 				} else {
 					result += char;
 				}
