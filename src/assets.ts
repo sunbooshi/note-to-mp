@@ -361,17 +361,15 @@ export default class AssetsManager {
 	}
 
     searchFile(nameOrPath: string, base: TFile|null = null): TAbstractFile | null {
-        const resolvedPath = this.resolvePath(nameOrPath, base);
+        // 先按相对路径或者当前目录下找
+        let file = this.app.metadataCache.getFirstLinkpathDest(nameOrPath, base ? base.path : '');
+        if (file) {
+            return file;
+        }
+
         const vault= this.app.vault;
         const attachmentFolderPath = vault.config.attachmentFolderPath || '';
-        let localPath = resolvedPath;
-        let file = null;
-
-        // 先按路径查找
-        file = vault.getFileByPath(resolvedPath);
-        if (file) {
-            return file; 
-        }
+        let localPath = nameOrPath;
 
         // 在根目录查找
         file = vault.getFileByPath(nameOrPath);
@@ -382,12 +380,6 @@ export default class AssetsManager {
         // 从附件文件夹查找
         if (attachmentFolderPath != '') {
             localPath = attachmentFolderPath + '/' + nameOrPath;
-            file = vault.getFileByPath(localPath)
-            if (file) {
-                return file;
-            }
-
-            localPath = attachmentFolderPath + '/' + resolvedPath;
             file = vault.getFileByPath(localPath)
             if (file) {
                 return file;
