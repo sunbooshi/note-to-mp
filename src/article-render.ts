@@ -78,7 +78,7 @@ export class ArticleRender implements MDRendererCallback {
     }
   }
 
-  async getArticleContent(container: HTMLElement, css: string) {
+  getArticleContent(container: HTMLElement, css: string) {
     const content = container.innerHTML;
     let html = applyCSS(content, css);
     // 处理话题多余内容
@@ -246,34 +246,10 @@ export class ArticleRender implements MDRendererCallback {
     if (appid) {
       await this.uploadImages(appid, container);
     }
-    const content = await this.getArticleContent(container, css);
+    const content = this.getArticleContent(container, css);
     await navigator.clipboard.write([new ClipboardItem({
       'text/html': new Blob([content], { type: 'text/html' })
     })])
-  }
-
-  async copyWithoutCSS(container: HTMLElement) {
-    await this.cachedElementsToImages(container);
-    const clonedArticleDiv = container.cloneNode(true) as HTMLDivElement;
-    // 移除公众号名片
-    clonedArticleDiv.querySelectorAll('.note-mpcard-wrapper').forEach(node => node.remove());
-    // TODO：小部件处理
-    if (!this.settings.isAuthKeyVaild()) {
-      const content = clonedArticleDiv.innerHTML;
-      await navigator.clipboard.write([new ClipboardItem({
-        'text/html': new Blob([content], { type: 'text/html' })
-      })]);
-      new Notice('复制成功，快去粘贴吧！如需复制本地图片，请购买会员，感谢支持！');
-      return;
-    }
-
-    await LocalImageManager.getInstance().uploadToOSS(clonedArticleDiv, this.settings.authKey, this.app.vault);
-
-    const content = clonedArticleDiv.innerHTML;
-    await navigator.clipboard.write([new ClipboardItem({
-      'text/html': new Blob([content], { type: 'text/html' })
-    })]);
-    new Notice('复制成功，快去粘贴吧！');
   }
 
   getSecret(appid: string) {
@@ -343,7 +319,7 @@ export class ArticleRender implements MDRendererCallback {
     }
 
     metadata.title = metadata.title || this.title;
-    metadata.content = await this.getArticleContent(container, css);
+    metadata.content = this.getArticleContent(container, css);
     metadata.thumb_media_id = mediaId;
 
     return {token, metadata};
