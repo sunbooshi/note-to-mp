@@ -68,6 +68,6 @@ export const ConfigContext = createContext<ConfigStore | null>(null)
 
 export function useConfigContext<T>(selector: (state: IConfigState) => T): T {
   const store = useContext(ConfigContext)
-  if (!store) throw new Error('Missing BearContext.Provider in the tree')
+  if (!store) throw new Error('Missing ConfigContext.Provider in the tree')
   return useStore(store, selector)
 }

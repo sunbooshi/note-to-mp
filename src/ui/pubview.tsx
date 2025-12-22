@@ -47,6 +47,7 @@ export function Pubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
   const app = usePluginStore(s => s.app);
   const isReourceLoaded = usePluginStore(s => s.isReourceLoaded);
   const appid = useConfigContext(s=>s.appid);
+  const appidRef = useRef<string | undefined>(appid);
 
   const styleRef = useRef<HTMLStyleElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -56,7 +57,11 @@ export function Pubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
   const [message, setMessage] = useState('');
   const [cssContent, setCSSContent] = useState('');
   const [canceled, setCanceled] = useState(false);
-  const [disableSelect, setDisableSelect] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+
+  useEffect(() => {
+    appidRef.current = appid;
+  }, [appid]);
 
   const onCancel = () => {
     setCanceled(true);
@@ -80,10 +85,15 @@ export function Pubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
         }, 2000);
         return;
       }
-      if (!contentRef.current) return;
+      if (!contentRef.current) return '';
       const note = notes[index];
       setMessage('发布中：' + note.basename);
-      await renderRef.current.postArticle(appid!, undefined, contentRef.current!, css);
+      const currentAppid = appidRef.current;
+      if (!currentAppid) {
+        setMessage('请先设置公众号');
+        return;
+      }
+      await renderRef.current.postArticle(currentAppid, undefined, contentRef.current!, css);
       prepare(index + 1);
     }
     catch (error) {
@@ -146,7 +156,7 @@ export function Pubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
         setMessage(`发布准备中！${countdown}s`);
       } else {
         clearInterval(countdownInterval);
-        setDisableSelect(true);
+        setPublishing(true);
         prepare(0);
       }
     }, 1000);
@@ -173,7 +183,7 @@ export function Pubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
         <div ref={contentRef}></div>
       </div>
       <div className={styles.Footer}>
-        <AccountSelect disabled={disableSelect} />
+        <AccountSelect disabled={publishing} />
         <button onClick={onCancel}>取消发布</button>
       </div>
     </div>
@@ -183,8 +193,9 @@ export function Pubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
 function MergePubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
   const app = usePluginStore(s => s.app);
   const isReourceLoaded = usePluginStore(s => s.isReourceLoaded);
-
   const appid = useConfigContext(s=>s.appid);
+  const appidRef = useRef<string | undefined>(appid);
+
   const styleRef = useRef<HTMLStyleElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -194,8 +205,11 @@ function MergePubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
   const [message, setMessage] = useState('拖动笔记可以调整顺序');
   const [cssContent, setCSSContent] = useState('');
   const [canceled, setCanceled] = useState(false);
-  const [disableDrag, setDisabeDrag] = useState(false);
-  const [disableSelect, setDisableSelect] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+
+  useEffect(() => {
+    appidRef.current = appid;
+  }, [appid]);
 
   const [noteItems, setNoteItems] = useState<NoteItem[]>(
     notes.map(n => {
@@ -228,8 +242,7 @@ function MergePubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
       return;
     }
 
-    setDisabeDrag(true);
-    setDisableSelect(true);
+    setPublishing(true);
     articlesRef.current = [];
     prepare(0);
   }
@@ -260,7 +273,12 @@ function MergePubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
         return;
       }
       if (!contentRef.current) return;
-      const { token, metadata } = await renderRef.current.prepareArticle(appid!, undefined, contentRef.current!, css);
+      const currentAppid = appidRef.current;
+      if (!currentAppid) {
+        setMessage('请先设置公众号');
+        return;
+      }
+      const { token, metadata } = await renderRef.current.prepareArticle(currentAppid, undefined, contentRef.current!, css);
       articlesRef.current.push(metadata);
       if (index + 1 == notes.length) {
         await publish(token)
@@ -284,7 +302,7 @@ function MergePubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
       console.error(res.text);
       setMessage(`创建草稿失败, https状态码: ${res.status} 可能是文章包含异常内容，请尝试手动复制到公众号编辑器！`);
     }
-    setDisabeDrag(false);
+    setPublishing(false);
     setMessage('发布成功！');
     setTimeout(() => {
       modal.close();
@@ -330,7 +348,7 @@ function MergePubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
         <div className={styles.Message}>{message}</div>
       </div>
       <div className={styles.List}>
-        <NoteList items={noteItems} setItems={setNoteItems} disable={disableDrag} />
+        <NoteList items={noteItems} setItems={setNoteItems} disable={publishing} />
       </div>
       <div className={styles.Content}>
         <style ref={styleRef}>{cssContent}</style>
@@ -338,9 +356,9 @@ function MergePubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
       </div>
       <div className={styles.Footer}>
         <div className={styles.Tips}><BellIcon style={{ marginRight: 5 }} /><span>最多8篇笔记</span></div>
-        <AccountSelect disabled={disableSelect} />
+        <AccountSelect disabled={publishing} />
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <button onClick={onPublish} style={{ width: 80 }}>发布</button>
+          <button disabled={publishing} onClick={onPublish} style={{ width: 80 }}>发布</button>
           <div style={{ width: 20 }}></div>
           <button onClick={onCancel} style={{ width: 80 }}>取消</button>
         </div>
