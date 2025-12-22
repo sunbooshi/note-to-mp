@@ -72,18 +72,24 @@ export function Pubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
   };
 
   const pubNote = async (index: number, css: string) => {
-    if (canceled) {
-      setMessage('发布已取消!');
-      setTimeout(() => {
-        modal.close();
-      }, 2000);
-      return;
+    try {
+      if (canceled) {
+        setMessage('发布已取消!');
+        setTimeout(() => {
+          modal.close();
+        }, 2000);
+        return;
+      }
+      if (!contentRef.current) return;
+      const note = notes[index];
+      setMessage('发布中：' + note.basename);
+      await renderRef.current.postArticle(appid!, undefined, contentRef.current!, css);
+      prepare(index + 1);
     }
-    if (!contentRef.current) return;
-    const note = notes[index];
-    setMessage('发布中：' + note.basename);
-    await renderRef.current.postArticle(appid!, undefined, contentRef.current!, css);
-    prepare(index + 1);
+    catch (error) {
+      setCanceled(true);
+      setMessage(' 发布失败：' + error.message);
+    }
   };
 
   const prepare = async (index: number) => {
@@ -111,6 +117,7 @@ export function Pubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
       }, 5000);
     }
     catch (error) {
+      setCanceled(true);
       setMessage(note.basename + ' 渲染失败：' + error.message);
     }
   }
@@ -244,24 +251,30 @@ function MergePubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
   };
 
   const prepareNote = async (index: number, css: string) => {
-    if (canceled) {
-      setMessage('发布已取消!');
-      setTimeout(() => {
-        modal.close();
-      }, 2000);
-      return;
+    try {
+      if (canceled) {
+        setMessage('发布已取消!');
+        setTimeout(() => {
+          modal.close();
+        }, 2000);
+        return;
+      }
+      if (!contentRef.current) return;
+      const { token, metadata } = await renderRef.current.prepareArticle(appid!, undefined, contentRef.current!, css);
+      articlesRef.current.push(metadata);
+      if (index + 1 == notes.length) {
+        await publish(token)
+        updateItemStatus(index, NoteItemStatus.Done)
+      }
+      else {
+        updateItemStatus(index, NoteItemStatus.Done)
+      }
+      prepare(index + 1);
     }
-    if (!contentRef.current) return;
-    const { token, metadata } = await renderRef.current.prepareArticle(appid!, undefined, contentRef.current!, css);
-    articlesRef.current.push(metadata);
-    if (index + 1 == notes.length) {
-      await publish(token)
-      updateItemStatus(index, NoteItemStatus.Done)
+    catch (error) {
+      setCanceled(true);
+      setMessage('发布失败：' + error.message);
     }
-    else {
-      updateItemStatus(index, NoteItemStatus.Done)
-    }
-    prepare(index + 1);
   };
 
   const publish = async (token: string) => {

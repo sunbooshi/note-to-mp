@@ -99,6 +99,7 @@ export function RedBook() {
       setLoading(false);
       showErr('错误：' + error.message);
     }
+    uevent('copy-redbook');
   };
 
   return (

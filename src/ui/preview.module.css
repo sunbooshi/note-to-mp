@@ -101,9 +101,6 @@
 	color: var(--violet-11);
 	box-shadow: 0 0 0 1px var(--violet-7);
 	height: 35px;
-	&:focus {
-		box-shadow: 0 0 0 2px var(--violet-8);
-	}
 }
 
 .Button {
@@ -122,9 +119,6 @@
 		color: var(--green-11);
 		&:hover {
 			background-color: var(--green-5);
-		}
-		&:focus {
-			box-shadow: 0 0 0 2px var(--green-7);
 		}
 	}
 }

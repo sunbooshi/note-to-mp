@@ -123,6 +123,8 @@ export function NoteRender({platform}:{platform:string}) {
       setLoading(false);
       showErr('错误：' + error.message);
     }
+
+    uevent('copy-' + platform);
   };
 
   let btnTitle = '';
