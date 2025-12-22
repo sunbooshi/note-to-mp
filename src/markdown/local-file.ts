@@ -397,29 +397,24 @@ export class LocalImageManager {
         for (const img of images) {
             const src = img.getAttribute('src');
             if (!src) continue;
-            try {
-                let newUrl: string | null = null;
+            let newUrl: string | null = null;
 
-                if (src.startsWith('data:image')) {
-                    const blob = await (await fetch(src)).blob();
-                    const filename = `image_${Date.now()}.${blob.type.split('/')[1] || 'png'}`;
-                    newUrl = await uploadImageToOSS(authkey, blob, filename);
-                } else if (src.startsWith('app://')) {
-                    const info = this.images.get(src);
-                    if (!info) continue;
-                    newUrl = await uploadLocal(info);
-                } else if (src.includes('mmbiz.qpic.cn')) {
-                    const info = localImages.find(info => info.url == src);
-                    if (!info) continue;
-                    newUrl = await uploadLocal(info);
-                }
+            if (src.startsWith('data:image')) {
+                const blob = await (await fetch(src)).blob();
+                const filename = `image_${Date.now()}.${blob.type.split('/')[1] || 'png'}`;
+                newUrl = await uploadImageToOSS(authkey, blob, filename);
+            } else if (src.startsWith('app://')) {
+                const info = this.images.get(src);
+                if (!info) continue;
+                newUrl = await uploadLocal(info);
+            } else if (src.includes('mmbiz.qpic.cn')) {
+                const info = localImages.find(info => info.url == src);
+                if (!info) continue;
+                newUrl = await uploadLocal(info);
+            }
 
-                if (newUrl) {
-                    img.src = newUrl;
-                }
-            } catch (error) {
-                console.error('Failed to upload image and replace src:', error);
-                new Notice(`上传到OSS失败: ${src.substring(0, 50)}...`);
+            if (newUrl) {
+                img.src = newUrl;
             }
         }
     }
