@@ -20,9 +20,6 @@
 	&:hover {
 		background-color: var(--mauve-3);
 	}
-	&:focus {
-		box-shadow: 0 0 0 2px black;
-	}
 	&[data-placeholder] {
 		color: var(--violet-9);
 	}

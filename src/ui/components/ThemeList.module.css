@@ -102,9 +102,6 @@
 	&:hover {
 		background-color: var(--violet-3);
 	}
-	&:focus {
-		box-shadow: 0 0 0 2px black;
-	}
 }
 
 .RightSlot {
