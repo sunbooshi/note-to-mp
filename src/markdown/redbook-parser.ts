@@ -59,7 +59,7 @@ function getEmojiNum(index: number) {
 const customRenderer = {
     heading(text: string, level: number): string {
         const emoji = defaultRedBookOptions.heading[level - 1] || '';
-        return `${emoji} ${text}\n`;
+        return `${emoji} ${text}\n\n`;
     },
 
     strong(text: string): string {
@@ -77,6 +77,10 @@ const customRenderer = {
     code(code: string, infostring: string | undefined): string {
         const lang = infostring || '';
         return `\n\`\`\`${lang}\n${code}\n\`\`\`\n`;
+    },
+
+    paragraph(text: string): string {
+        return `${text}\n\n`;
     },
 
     blockquote(text: string): string {
