@@ -252,7 +252,6 @@ export async function wxBatchGetMaterial(token: string, type: string, offset: nu
 
 export async function getUploadImageURL(authkey: string, ext: string) {
     const url = PluginHost + '/v1/oss/url/' + ext + '/' + authkey;
-    console.log(url);
     const res = await requestUrl({
         url,
         method: 'GET',
