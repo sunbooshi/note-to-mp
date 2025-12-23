@@ -257,9 +257,12 @@ export class CalloutRenderer extends Extension {
         }
         else {
             if (title.toLowerCase() === callout.toLowerCase()) {
-                return `<blockquote>${body}</blockquote>`
+                return `<blockquote>${body.replace(/[\r\n]+$/, "")}</blockquote>`
             }
-            return `<blockquote><strong>${title}</strong><br>${body}</blockquote>`;
+            if (body.trim() === '') {
+                return `<blockquote><strong>${title}</strong></blockquote>`;
+            }
+            return `<blockquote><strong>${title}</strong><br>${body.replace(/[\r\n]+$/, "")}</blockquote>`;
         }
      }
 

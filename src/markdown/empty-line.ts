@@ -32,7 +32,6 @@ export class EmptyLineRenderer extends Extension {
         tokenizer(src: string) {
           const match = /^\n\n+/.exec(src);
           if (match) {
-            console.log('mathced src: ', src)
             return {
               type: "emptyline",
               raw: match[0],
@@ -40,7 +39,7 @@ export class EmptyLineRenderer extends Extension {
           }
         },
         renderer: (token: Tokens.Generic) => {
-          return '<p><br></p>'.repeat(token.raw.length - 1);
+          return '<p class="note-empty-line">' + '<span class="note-line-break"></span>'.repeat(token.raw.length - 1) + '</p>';
         },
       }]
     }
