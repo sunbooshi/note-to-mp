@@ -1,0 +1,22 @@
+.Header {
+  display: flex;
+  height: 44px;
+}
+
+.Message {
+  font-size: 22px;
+  line-height: 44px;
+}
+
+.Content {
+  height: 240px;
+  overflow-y: auto;
+  margin: 20px 0;
+  background-color: white;
+}
+
+.Footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

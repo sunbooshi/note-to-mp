@@ -135,9 +135,20 @@
   color: rgba(0, 0, 0, 0.3);
 }
 
+.note-light-bg {
+  padding: 1em;
+  background-color: #F7F7F7;
+  border: rgb(240, 240, 240) 1px solid;
+}
+
+.note-light-bg code {
+  font-family: Consolas,Courier,monospace;
+}
+
 .loading-wrapper {
   display: flex;
   width: 100%;
+  min-height: 50vh;
   height: 100%;
   align-items: center;
   justify-content: center;

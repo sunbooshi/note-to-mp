@@ -10,7 +10,9 @@
     "moduleResolution": "node",
     "importHelpers": true,
     "isolatedModules": true,
-	"strictNullChecks": true,
+    "jsx": "react-jsx",
+	  "strictNullChecks": true,
+    "allowSyntheticDefaultImports": true,
     "lib": [
       "DOM",
       "DOM.Iterable",
@@ -20,6 +22,7 @@
     ]
   },
   "include": [
-    "**/*.ts"
+    "**/*.ts",
+    "**/*.tsx"
   ]
 }

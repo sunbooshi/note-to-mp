@@ -20,58 +20,37 @@
  * THE SOFTWARE.
  */
 
-import { App, Modal, MarkdownView } from "obsidian";
-import { uevent } from "./utils";
+import { App, Modal, TFolder, TFile } from "obsidian";
+import { createPubview, createMergePubview } from "./ui/pubview";
+import * as ReactDOM from 'react-dom/client';
 
-export class WidgetsModal extends Modal {
-  listener: any = null;
-  url: string = 'https://widgets.dualhue.cn';
-  constructor(app: App) {
+export class NotePubModal extends Modal {
+  pubview: ReactDOM.Root | null = null;
+  notes: TFile[];
+  merge: boolean = false;
+
+  constructor(app: App, notes: TFile[], merge?:boolean) {
     super(app);
-  }
-
-  insertMarkdown(markdown: string) {
-    const editor = this.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
-    if (!editor) return;
-    editor.replaceSelection(markdown);
-    editor.exec("goRight");
-    uevent('insert-widgets');
+    this.notes = notes;
+    if (merge !== undefined) {
+      this.merge = merge;
+    }
   }
 
   onOpen() {
-    let { contentEl, modalEl } = this;
-    modalEl.style.width = '640px';
-    modalEl.style.height = '500px';
-    const iframe = contentEl.createEl('iframe', {
-      attr: {
-        src: this.url,
-        width: '100%',
-        height: '100%',
-        allow: 'clipboard-read; clipboard-write',
-      },
-    });
-
-    iframe.style.border = 'none';
-
-    this.listener = this.handleMessage.bind(this);
-    window.addEventListener('message', this.listener);
-    uevent('open-widgets');
-  }
-
-  handleMessage(event: MessageEvent) {
-    if (event.origin === this.url) {
-      const { type, data } = event.data;
-      if (type === 'cmd') {
-        this.insertMarkdown(data);
-      }
+    let { contentEl } = this;
+    if (this.merge) {
+      this.pubview = createMergePubview(contentEl, this, this.notes);
+    }
+    else {
+      this.pubview = createPubview(contentEl, this, this.notes);
     }
   }
 
   onClose() {
-    if (this.listener) {
-      window.removeEventListener('message', this.listener);
-    }
     let { contentEl } = this;
+    this.pubview?.unmount();
+    this.pubview = null;
     contentEl.empty();
   }
 }

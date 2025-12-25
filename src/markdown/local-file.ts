@@ -25,6 +25,8 @@ import { Notice, TAbstractFile, TFile, Vault, MarkdownView, requestUrl, Platform
 import { Extension } from "./extension";
 import { NMPSettings } from "../settings";
 import { IsImageLibReady, PrepareImageLib, WebpToJPG, UploadImageToWx } from "../imagelib";
+import { mimeToImageExt, imageExtToMime } from "../utils";
+import { uploadImageToOSS } from "../weixin-api";
 
 declare module 'obsidian' {
     interface Vault {
@@ -43,28 +45,26 @@ interface ImageInfo {
     filePath: string;
     url: string | null;
     media_id: string | null;
+    id: number | null;
 }
 
 export class LocalImageManager {
     private images: Map<string, ImageInfo>;
-    private static instance: LocalImageManager;
+    private _imageId: number = 1;
 
-    private constructor() {
+    constructor() {
         this.images = new Map<string, ImageInfo>();
     }
 
-    // 静态方法，用于获取实例
-    public static getInstance(): LocalImageManager {
-        if (!LocalImageManager.instance) {
-            LocalImageManager.instance = new LocalImageManager();
+    public setImage(path: string, info: ImageInfo): void {
+        if (this.images.has(path)) {
+            info.id = this.images.get(path)!.id || info.id;
         }
-        return LocalImageManager.instance;
+        this.images.set(path, info);
     }
 
-    public setImage(path: string, info: ImageInfo): void {
-        if (!this.images.has(path)) {
-            this.images.set(path, info);
-        }
+    public getImageId(): number {
+        return this._imageId++;
     }
 
     isWebp(file: TFile | string): boolean {
@@ -75,6 +75,23 @@ export class LocalImageManager {
         return name.endsWith('.webp');
     }
 
+    async readImageData(vault: Vault, path: string) {
+        const file = vault.getFileByPath(path);
+        if (file == null) return null;
+        let fileData = await vault.readBinary(file);
+        let fileName = file.name;
+        if (this.isWebp(file)) {
+            if (IsImageLibReady()) {
+                fileData = WebpToJPG(fileData);
+                fileName = fileName.toLowerCase().replace('.webp', '.jpg');
+            }
+            else {
+                console.error('wasm not ready for webp');
+            }
+        }
+        return {fileName, fileData};
+    }
+
     async uploadLocalImage(token: string, vault: Vault, type: string = '') {
         const keys = this.images.keys();
         await PrepareImageLib();
@@ -82,22 +99,16 @@ export class LocalImageManager {
         for (let key of keys) {
             const value = this.images.get(key);
             if (value == null) continue;
-            if (value.url != null) continue;
-            const file = vault.getFileByPath(value.filePath);
-            if (file == null) continue;
-            let fileData = await vault.readBinary(file);
-            let name = file.name;
-            if (this.isWebp(file)) {
-                if (IsImageLibReady()) {
-                    fileData = WebpToJPG(fileData);
-                    name = name.toLowerCase().replace('.webp', '.jpg');
-                }
-                else {
-                    console.error('wasm not ready for webp');
-                }
+            if (value.url != null && value.url.length > 0) {
+                if (type != 'image') continue;
+                if (value.media_id != null && value.media_id.length > 0) continue;
             }
 
-            const res = await UploadImageToWx(new Blob([fileData]), name, token, type);
+            const data = await this.readImageData(vault, value.filePath);
+            if (data == null) continue;
+            const {fileName, fileData} = data;
+
+            const res = await UploadImageToWx(new Blob([fileData]), fileName, token, type);
             if (res.errcode != 0) {
                 const msg = `上传图片失败: ${res.errcode} ${res.errmsg}`;
                 new Notice(msg);
@@ -137,7 +148,7 @@ export class LocalImageManager {
             let filename = pathname.split('/').pop() || '';
             filename = decodeURIComponent(filename);
             if (!this.checkImageExt(filename)) {
-                filename = filename + this.getImageExt(type);
+                filename = filename + mimeToImageExt(type);
             }
             return filename;
         } catch (e) {
@@ -151,23 +162,10 @@ export class LocalImageManager {
     }
 
     getImageExtFromBlob(blob: Blob): string {
-        // MIME类型到文件扩展名的映射
-        const mimeToExt: { [key: string]: string } = {
-            'image/jpeg': '.jpg',
-            'image/jpg': '.jpg',
-            'image/png': '.png',
-            'image/gif': '.gif',
-            'image/bmp': '.bmp',
-            'image/webp': '.webp',
-            'image/svg+xml': '.svg',
-            'image/tiff': '.tiff'
-        };
-    
         // 获取MIME类型
         const mimeType = blob.type.toLowerCase();
-        
         // 返回对应的扩展名，如果找不到则返回空字符串
-        return mimeToExt[mimeType] || '';
+        return mimeToImageExt(mimeType);
     }
 
     base64ToBlob(src: string) {
@@ -184,7 +182,7 @@ export class LocalImageManager {
 			byteNumbers[i] = byteCharacters.charCodeAt(i);
 		}
 		const byteArray = new Uint8Array(byteNumbers);
-		return {blob: new Blob([byteArray], { type: mineType }), ext: this.getImageExt(mineType)};
+		return {blob: new Blob([byteArray], { type: mineType }), ext: mimeToImageExt(mineType)};
 	}
 
     async uploadImageFromUrl(url: string, token: string, type: string = '') {
@@ -218,40 +216,30 @@ export class LocalImageManager {
         }
     }
 
-    getImageExt(type: string): string {
-        const mimeToExt: { [key: string]: string } = {
-            'image/jpeg': '.jpg',
-            'image/jpg': '.jpg',
-            'image/png': '.png',
-            'image/gif': '.gif',
-            'image/bmp': '.bmp',
-            'image/webp': '.webp',
-            'image/svg+xml': '.svg',
-            'image/tiff': '.tiff'
-        };
-        return mimeToExt[type] || '.jpg';
+    findImageInfo(src: string, id: number | null) {
+        const byKey = this.images.get(src);
+        if (byKey) return byKey;
+
+        for (const value of this.images.values()) {
+            if (id !== null && value.id === id) {
+                return value;
+            }
+            if (value.url === src || value.resUrl === src) {
+                return value;
+            }
+        }
+
+        return undefined;
     }
 
-    getMimeType(ext: string): string {
-        const extToMime: { [key: string]: string } = {
-            '.jpg': 'image/jpeg',
-            '.jpeg': 'image/jpeg',
-            '.png': 'image/png',
-            '.gif': 'image/gif',
-            '.bmp': 'image/bmp',
-            '.webp': 'image/webp',
-            '.svg': 'image/svg+xml',
-            '.tiff': 'image/tiff'
-        };
-        return extToMime[ext.toLowerCase()] || 'image/jpeg';
-    }
 
     getImageInfos(root: HTMLElement) {
         const images = root.getElementsByTagName('img');
         const result = [];
         for (let i = 0; i < images.length; i++) {
             const img = images[i];
-            const res = this.images.get(img.src);
+            const id = img.getAttribute('data-img-id');
+            const res = this.findImageInfo(img.src, id ? parseInt(id) : null) ;
             if (res) {
                 result.push(res);
             }
@@ -282,8 +270,9 @@ export class LocalImageManager {
                     filePath: "",
                     url: res.url,
                     media_id: res.media_id,
+                    id: this.getImageId(),
                 };
-                this.images.set(img.src, info);
+                this.setImage(img.src, info);
                 result.push(res);
             }
             else if (img.src.startsWith('data:image/')) {
@@ -304,8 +293,9 @@ export class LocalImageManager {
                     filePath: "",
                     url: res.url,
                     media_id: res.media_id,
+                    id: this.getImageId(),
                 };
-                this.images.set('#' + img.id, info);
+                this.setImage('#' + img.id, info);
                 result.push(res);
             }
         }
@@ -319,7 +309,7 @@ export class LocalImageManager {
             let value = this.images.get(img.src);
             if (value == null) {
                 if (!img.id) {
-                    console.error('miss image id, ' + img.src);
+                    console.warn('miss image id, ' + img.src);
                     continue;
                 }
                 value = this.images.get('#' + img.id);
@@ -327,6 +317,9 @@ export class LocalImageManager {
             if (value == null) continue;
             if (value.url == null) continue;
             img.setAttribute('src', value.url);
+            if (value.id) {
+                img.setAttribute('data-img-id', value.id.toString());
+            }
         }
     }
 
@@ -350,7 +343,7 @@ export class LocalImageManager {
             if (file == null) continue;
             let fileData = await vault.readBinary(file);
             const base64 = this.arrayBufferToBase64(fileData);
-            const mimeType = this.getMimeType(file.extension);
+            const mimeType = imageExtToMime(file.extension);
             const data = `data:${mimeType};base64,${base64}`;
             result.set(value.resUrl, data);
         }
@@ -370,7 +363,7 @@ export class LocalImageManager {
             }
 
             const base64 = this.arrayBufferToBase64(data);
-            const mimeType = this.getMimeType(ext);
+            const mimeType = imageExtToMime(ext);
             return `data:${mimeType};base64,${base64}`;
         }
         catch (e) {
@@ -415,6 +408,49 @@ export class LocalImageManager {
         return result.innerHTML;
     }
 
+    async uploadToOSS(root: HTMLElement, authkey: string, vault: Vault) {
+        const images = Array.from(root.querySelectorAll('img'));
+        const localImages = Array.from(this.images.values());
+
+        const uploadLocal = async(info: ImageInfo) => {
+            const data = await this.readImageData(vault, info.filePath);
+            if (!data) return;
+            const {fileName, fileData} = data;
+            return await uploadImageToOSS(authkey, new Blob([fileData]), fileName);
+        };
+
+        for (const img of images) {
+            const src = img.getAttribute('src');
+            if (!src) continue;
+            let newUrl: string | null = null;
+
+            if (src.startsWith('data:image')) {
+                const blob = await (await fetch(src)).blob();
+                const filename = `image_${Date.now()}.${blob.type.split('/')[1] || 'png'}`;
+                newUrl = await uploadImageToOSS(authkey, blob, filename);
+            } else if (src.startsWith('app://')) {
+                const info = this.images.get(src);
+                if (!info) continue;
+                newUrl = await uploadLocal(info);
+            } else if (src.includes('mmbiz.qpic.cn')) {
+                const info = localImages.find(info => info.url == src);
+                if (!info) continue;
+                newUrl = await uploadLocal(info);
+            }
+
+            if (newUrl) {
+                img.src = newUrl;
+            }
+        }
+    }
+
+    async accountChanged() {
+        this.images.forEach((value, key) => {
+            value.media_id = null;
+            value.url = null;
+        });
+    }
+
     async cleanup() {
         this.images.clear(); 
     }
@@ -436,13 +472,7 @@ export class LocalFile extends Extension{
             console.error('找不到文件：' + path);
             return '';
         }
-        const info = {
-            resUrl: res.resUrl,
-            filePath: res.filePath,
-            media_id: null,
-            url: null
-        };
-        LocalImageManager.getInstance().setImage(res.resUrl, info);
+        this.callback.cacheImage(res.resUrl, res.filePath);
         return res.resUrl;
     }
 
@@ -595,13 +625,13 @@ export class LocalFile extends Extension{
         let { path, head: header, block} = this.parseFileLink(link);
         let file = null;
         if (path === '') {
-            file = this.app.workspace.getActiveFile();
+            file = this.callback.note;
         }
         else {
             if (!path.endsWith('.md')) {
                 path = path + '.md';
             }
-            file = this.assetsManager.searchFile(path);
+            file = this.assetsManager.searchFile(path, this.callback.note);
         }
 
         if (file == null) {
@@ -623,7 +653,7 @@ export class LocalFile extends Extension{
     }
 
     static async getExcalidrawUrl(data: string) {
-        const url = 'https://obplugin.sunboshi.tech/math/excalidraw';
+        const url = 'https://obplugin.dualhue.cn/math/excalidraw';
         const req = await requestUrl({
             url,
             method: 'POST',
@@ -709,7 +739,7 @@ export class LocalFile extends Extension{
             let svg = '';
             if (src === '') {
                 svg = '渲染失败';
-                console.log('Failed to get Excalidraw URL');
+                console.error('Failed to get Excalidraw URL');
             }
             else {
                 const blob = await this.readBlob(src);
@@ -800,7 +830,7 @@ export class LocalFile extends Extension{
 
                 const id = this.generateId();
                 const content = await this.renderFile(token.href, id);
-                const tag = this.callback.settings.embedStyle === 'quote' ? 'blockquote' : 'section';
+                const tag = this.settings.embedStyle === 'quote' ? 'blockquote' : 'section';
                 token.html = `<${tag} class="note-embed-file" id="${id}">${content}</${tag}>`
             },
 

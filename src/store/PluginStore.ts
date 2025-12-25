@@ -20,37 +20,20 @@
  * THE SOFTWARE.
  */
 
-import { NMPSettings } from "src/settings";
-import { Marked, MarkedExtension } from "marked";
-import { App, TFile, Vault } from "obsidian";
-import AssetsManager from "../assets";
+import { App } from 'obsidian';
+import { create } from 'zustand';
+import { createSelectors } from './createSelectors';
 
-export interface MDRendererCallback {
-    isWechat(): boolean;
-    note: TFile | null;
-    cacheElement(category: string, id: string, data: string): void;
-    cacheImage(resUrl: string, filePath: string): void;
+interface IPluginState {
+  app: App;
+  setApp: (app: App) => void;
+  isReourceLoaded: boolean;
+  setResourceLoaded: (loaded: boolean) => void;
 }
 
-export abstract class Extension {
-    app: App;
-    vault: Vault;
-    assetsManager: AssetsManager
-    settings: NMPSettings;
-    callback: MDRendererCallback;
-    marked: Marked;
-
-    constructor(app: App, settings: NMPSettings, assetsManager: AssetsManager, callback: MDRendererCallback) {
-        this.app = app;
-        this.vault = app.vault;
-        this.settings = settings;
-        this.assetsManager = assetsManager;
-        this.callback = callback;
-    }
-
-    async prepare() { return; }
-    async postprocess(html:string) { return html; }
-    async beforePublish() { }
-    async cleanup() { return; }
-    abstract markedExtension(): MarkedExtension
-}
+export const usePluginStore = createSelectors(create<IPluginState>((set) => ({
+  app: null as unknown as App,
+  setApp: (app) => set({ app }),
+  isReourceLoaded: false,
+  setResourceLoaded: (loaded) => set({isReourceLoaded:loaded}),
+})));

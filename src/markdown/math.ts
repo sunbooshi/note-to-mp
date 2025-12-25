@@ -35,7 +35,7 @@ export function cleanMathCache() {
 }
 
 export class MathRendererQueue {
-    private host = 'https://obplugin.sunboshi.tech';
+    private host = 'https://obplugin.dualhue.cn';
     private static instance: MathRendererQueue;
     private mathIndex: number = 0;
 
@@ -128,7 +128,12 @@ export class MathRenderer extends Extension {
         if (type === '') {
             type = this.settings.math;
         }
-        return await MathRendererQueue.getInstance().render(token, inline, type);
+
+        const html = await MathRendererQueue.getInstance().render(token, inline, type);
+        if (this.callback.isWechat()) {
+            return html;
+        }
+        return `<span class="FormulaCSR ztext-math isEditable" data-tex="${token.text}">${html}</span>`;
     }
 
     markedExtension(): MarkedExtension {

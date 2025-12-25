@@ -152,6 +152,13 @@ export class WidgetBox extends Extension {
 
     this.processColor(style);
 
+    if (!this.callback.isWechat()) {
+      if (title.length > 0) {
+        return `<blockquote><strong>${title}</strong>${content}</blockquote>`;
+      }
+      return `<blockquote>${content}</blockquote>`;
+    }
+
     const cached = this.getWidget(boxId, title, style, content);
     if (cached) {
       uevent('render-widgets-cached');

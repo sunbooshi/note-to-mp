@@ -126,9 +126,9 @@ export class CodeRenderer extends Extension {
 				result += char;
 			} else {
 				if (char === ' ') {
-					result += '&nbsp;';
+					result += '<span leaf="true">&nbsp;</span>';
 				} else if (char === '\t') {
-					result += '&nbsp;&nbsp;&nbsp;&nbsp;';
+					result += '<span leaf="true">&nbsp;&nbsp;&nbsp;&nbsp;</span>';
 				} else {
 					result += char;
 				}
@@ -153,6 +153,10 @@ export class CodeRenderer extends Extension {
 		}
 
 		code = this.replaceSpaces(code);
+
+		if (!this.callback.isWechat()) {
+			return `<pre class="note-light-bg"><code class="language-${lang}">${code}</code></pre>`;
+		}
 		const lines = code.split('\n');
 		let body = '';
 		let liItems = '';
@@ -253,6 +257,7 @@ export class CodeRenderer extends Extension {
 	}
 
 	markedExtension(): MarkedExtension {
+		const isWechat = this.callback.isWechat();
 		return {
 			async: true,
 			walkTokens: async (token: Tokens.Generic) => {
@@ -269,7 +274,7 @@ export class CodeRenderer extends Extension {
 					}
 				}
 				if (token.lang && token.lang.trim().toLocaleLowerCase() == 'mpcard') {
-					token.html = this.renderCard(token as Tokens.Code);
+					token.html = isWechat ? this.renderCard(token as Tokens.Code) : "";
 					return;
 				}
 				token.html = await this.codeRenderer(token.text, token.lang);

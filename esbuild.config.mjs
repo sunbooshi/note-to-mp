@@ -1,6 +1,7 @@
 import esbuild from "esbuild";
 import process from "process";
 import builtins from "builtin-modules";
+import fs from "fs";
 
 const banner =
 `/*
@@ -10,6 +11,28 @@ if you want to view the source, please visit the github repository of this plugi
 `;
 
 const prod = (process.argv[2] === "production");
+
+function syncCSSPlugin() {
+    return {
+        name: "sync-css",
+        setup(build) {
+            build.onEnd(() => {
+                const out = "main.css";
+                const target = "styles.css";
+
+                try {
+                    if (fs.existsSync(out)) {
+                        // 在生产和开发模式下统一使用 copyFileSync
+                        fs.copyFileSync(out, target);
+                        console.log(`Copied ${out} → ${target}`);
+                    }
+                } catch (e) {
+                    console.error(`Failed to sync ${out} to ${target}:`, e.message);
+                }
+            });
+        }
+    };
+}
 
 const context = await esbuild.context({
 	banner: {
@@ -38,10 +61,17 @@ const context = await esbuild.context({
 	sourcemap: prod ? false : "inline",
 	treeShaking: true,
 	outfile: "main.js",
+	loader: {
+		'.module.css': 'local-css',
+	},
+	plugins: [syncCSSPlugin()],
 });
 
 if (prod) {
 	await context.rebuild();
+	if (fs.existsSync("main.css")) {
+    fs.renameSync("main.css", "styles.css");
+  }
 	process.exit(0);
 } else {
 	await context.watch();

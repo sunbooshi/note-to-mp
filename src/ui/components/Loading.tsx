@@ -20,37 +20,28 @@
  * THE SOFTWARE.
  */
 
-import { NMPSettings } from "src/settings";
-import { Marked, MarkedExtension } from "marked";
-import { App, TFile, Vault } from "obsidian";
-import AssetsManager from "../assets";
+import styles from "./Loading.module.css";
 
-export interface MDRendererCallback {
-    isWechat(): boolean;
-    note: TFile | null;
-    cacheElement(category: string, id: string, data: string): void;
-    cacheImage(resUrl: string, filePath: string): void;
+export function Loading() {
+  return (
+    <div className={styles.LoadingSpinner}></div>
+  );
 }
 
-export abstract class Extension {
-    app: App;
-    vault: Vault;
-    assetsManager: AssetsManager
-    settings: NMPSettings;
-    callback: MDRendererCallback;
-    marked: Marked;
+export function PageLoading() {
+  return (
+    <div className={styles.PageLoading}>
+      <Loading />
+    </div>
+  );
+}
 
-    constructor(app: App, settings: NMPSettings, assetsManager: AssetsManager, callback: MDRendererCallback) {
-        this.app = app;
-        this.vault = app.vault;
-        this.settings = settings;
-        this.assetsManager = assetsManager;
-        this.callback = callback;
-    }
-
-    async prepare() { return; }
-    async postprocess(html:string) { return html; }
-    async beforePublish() { }
-    async cleanup() { return; }
-    abstract markedExtension(): MarkedExtension
+export function LoadingOrb({fontSize, width, height, color}:{fontSize?:number, width?:number, height?:number, color?:string}) {
+  fontSize = fontSize || 32;
+  width = width || 44;
+  height = height || 44;
+  color = color || 'rgb(169, 84, 248)';
+  return (
+    <div className={styles.LoadingOrb} style={{fontSize, width, height, color}}></div>
+  );
 }

@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-import { App, sanitizeHTMLToDom, requestUrl, Platform } from "obsidian";
+import { App, sanitizeHTMLToDom, requestUrl, Platform, TFile } from "obsidian";
 import * as postcss from "./postcss/postcss";
 
 let PluginVersion = "0.0.0";
@@ -202,7 +202,7 @@ export function applyCSS(html: string, css: string) {
 }
 
 export function uevent(name: string) {
-	const url = `https://u.sunboshi.tech/event?name=${name}&platform=${PlugPlatform}&v=${PluginVersion}`;
+	const url = `https://u.dualhue.cn/event?name=${name}&platform=${PlugPlatform}&v=${PluginVersion}`;
 	requestUrl(url).then().catch(error => {
 		console.error("Failed to send event: " + url, error);
 	});
@@ -248,4 +248,49 @@ export async function waitForLayoutReady(app: App): Promise<void> {
   return new Promise((resolve) => {
     app.workspace.onLayoutReady(() => resolve());
   });
+}
+
+
+export function mimeToImageExt(type: string): string {
+	const mimeToExt: { [key: string]: string } = {
+		'image/jpeg': '.jpg',
+		'image/jpg': '.jpg',
+		'image/png': '.png',
+		'image/gif': '.gif',
+		'image/bmp': '.bmp',
+		'image/webp': '.webp',
+		'image/svg+xml': '.svg',
+		'image/tiff': '.tiff'
+	};
+	return mimeToExt[type] || '.jpg';
+}
+
+export function imageExtToMime(ext: string): string {
+	const extToMime: { [key: string]: string } = {
+		'.jpg': 'image/jpeg',
+		'.jpeg': 'image/jpeg',
+		'.png': 'image/png',
+		'.gif': 'image/gif',
+		'.bmp': 'image/bmp',
+		'.webp': 'image/webp',
+		'.svg': 'image/svg+xml',
+		'.tiff': 'image/tiff'
+	};
+	return extToMime[ext.toLowerCase()] || 'image/jpeg';
+}
+
+export function trimEmbedTag(name: string) {
+	return name.trim().replace(/^!\[\[/, '').replace(/^\[\[/, '').replace(/]]$/, '');
+}
+
+const escapeMap: Record<string, string> = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#39;"
+};
+
+export function escapeHTML(str: string) {
+  return str.replace(/[&<>"']/g, (ch) => escapeMap[ch]);
 }
