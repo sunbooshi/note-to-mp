@@ -30,7 +30,7 @@ import { CodeRenderer } from "./code";
 import { EmbedBlockMark } from "./embed-block-mark";
 import { SVGIcon } from "./icons";
 import { LinkRenderer } from "./link";
-import { LocalFile, LocalImageManager } from "./local-file";
+import { LocalFile } from "./local-file";
 import { MathRenderer } from "./math";
 import { TextHighlight } from "./text-highlight";
 import { Comment } from "./commnet";
@@ -52,10 +52,12 @@ export class MarkedParser {
 	app: App;
 	vault: Vault;
 	currentNote: TFile | null = null;
+	callback: MDRendererCallback;
 
 	constructor(app: App, callback: MDRendererCallback) {
 		this.app = app;
 		this.vault = app.vault;
+		this.callback = callback;
 
 		const settings = NMPSettings.getInstance();
 		const assetsManager = AssetsManager.getInstance();
@@ -107,13 +109,7 @@ export class MarkedParser {
 					const res = AssetsManager.getInstance().getResourcePath(decodeURI(href), self.currentNote);
 					if (res) {
 						href = res.resUrl;
-						const info = {
-							resUrl: res.resUrl,
-							filePath: res.filePath,
-							media_id: null,
-							url: null
-						};
-						LocalImageManager.getInstance().setImage(res.resUrl, info);	
+						self.callback.cacheImage(res.resUrl, res.filePath);
 					}
 				}
 				let out = '';

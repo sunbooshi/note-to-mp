@@ -9,19 +9,29 @@
 	line-height: 1;
 	height: 30px;
 	gap: 5px;
-	width: 160px;
-	background-color: white;
-	color: var(--violet-11);
-	box-shadow: 0 2px 10px var(--black-a7);
+	width: 120px;
+	color: var(--color-base-100);
+	box-shadow: 0 2px 10px var(--color-base-50);
 	/* 添加触摸友好的样式 */
 	touch-action: manipulation;
 	-webkit-tap-highlight-color: transparent;
 	
 	&:hover {
-		background-color: var(--mauve-3);
+		background-color: var(--color-base-10);
 	}
 	&[data-placeholder] {
-		color: var(--violet-9);
+		color: var(--color-base-50);
+	}
+	&[data-state="closed"] {
+		height: 30px;
+	}
+	&[data-state="open"] {
+		height: 30px;
+	}
+	span {
+		white-space: nowrap; /* 不换行 */
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 }
 
@@ -31,7 +41,7 @@
 
 .Content {
 	overflow: hidden;
-	background-color: white;
+	background-color: var(--color-base-00);
 	border-radius: 6px;
 	box-shadow:
 		0px 10px 38px -10px rgba(22, 23, 24, 0.35),
@@ -48,7 +58,7 @@
 .Item {
 	font-size: 13px;
 	line-height: 1;
-	color: var(--violet-11);
+	color: var(--color-purple);
 	border-radius: 3px;
 	display: flex;
 	align-items: center;
@@ -60,13 +70,13 @@
 	touch-action: manipulation;
 	
 	&[data-disabled] {
-		color: var(--mauve-8);
+		color: var(--color-base-10);
 		pointer-events: none;
 	}
 	&[data-highlighted] {
 		outline: none;
-		background-color: var(--violet-9);
-		color: var(--violet-1);
+		background-color: var(--text-selection);
+		color: var(--text-accent);
 	}
 }
 
@@ -74,12 +84,12 @@
 	padding: 0 25px;
 	font-size: 12px;
 	line-height: 25px;
-	color: var(--mauve-11);
+	color: var(--text-muted);
 }
 
 .Separator {
 	height: 1px;
-	background-color: var(--violet-6);
+	background-color: var(--color-base-20);
 	margin: 5px;
 }
 
@@ -97,7 +107,7 @@
 	align-items: center;
 	justify-content: center;
 	height: 25px;
-	background-color: white;
-	color: var(--violet-11);
+	background-color: var(--color-base-00);
+	color: var(--color-base-70);
 	cursor: default;
 }

@@ -47,6 +47,8 @@ export class ArticleRender implements MDRendererCallback {
   title: string;
   markedParser: MarkedParser;
   cachedElements: Map<string, string> = new Map();
+  imagesReplaced: boolean;
+  imageManager: LocalImageManager;
   debouncedRenderMarkdown: (...args: any[]) => void;
 
   constructor(app: App) {
@@ -55,6 +57,8 @@ export class ArticleRender implements MDRendererCallback {
     this.assetsManager = AssetsManager.getInstance();
     this.articleHTML = '';
     this.title = '';
+    this.imagesReplaced = false;
+    this.imageManager = new LocalImageManager();
     this.markedParser = new MarkedParser(app, this);
     this.debouncedRenderMarkdown = debounce(this.renderMarkdown.bind(this), 1000);
   }
@@ -115,10 +119,17 @@ export class ArticleRender implements MDRendererCallback {
       if (md.startsWith('---')) {
         md = md.replace(FRONT_MATTER_REGEX, '');
       }
+
+
+      if (this.note && this.note.path !== af.path) {
+        this.imageManager.cleanup();
+      }
+
       this.note = af;
 
       this.articleHTML = await this.markedParser.parse(md, af);
       this.setArticle(contianer, this.articleHTML); 
+      this.imagesReplaced = false;
       await this.processCachedElements(contianer);
     }
     catch (e) {
@@ -233,13 +244,14 @@ export class ArticleRender implements MDRendererCallback {
 
     await this.cachedElementsToImages(container);
 
-    const lm = LocalImageManager.getInstance();
+    const lm = this.imageManager;
     // 上传图片
     await lm.uploadLocalImage(token, this.app.vault);
     // 上传图床图片
     await lm.uploadRemoteImage(container, token);
     // 替换图片链接
     lm.replaceImages(container);
+    this.imagesReplaced = true;
   }
 
   async copyArticle(container: HTMLElement, css: string, appid: string | null) {
@@ -281,20 +293,21 @@ export class ArticleRender implements MDRendererCallback {
     }
 
     await this.cachedElementsToImages(container);
-    const lm = LocalImageManager.getInstance();
+    const lm = this.imageManager;
     // 上传图片
     await lm.uploadLocalImage(token, this.app.vault);
     // 上传图床图片
     await lm.uploadRemoteImage(container, token);
     // 替换图片链接
     lm.replaceImages(container);
+    this.imagesReplaced = true;
     // 上传封面
     let mediaId = metadata.thumb_media_id;
     if (!mediaId) {
       if (metadata.cover) {
         // 上传仓库里的图片
         if (metadata.cover.startsWith('http')) {
-          const res = await LocalImageManager.getInstance().uploadImageFromUrl(metadata.cover, token, 'image');
+          const res = await lm.uploadImageFromUrl(metadata.cover, token, 'image');
           if (res.media_id) {
             mediaId = res.media_id;
           }
@@ -367,7 +380,8 @@ export class ArticleRender implements MDRendererCallback {
     }
 
     const imageList: DraftImageMediaId[] = [];
-    const lm = LocalImageManager.getInstance();
+    console.log('post images')
+    const lm = this.imageManager;
     // 上传图片
     await lm.uploadLocalImage(token, this.app.vault, 'image');
     // 上传图床图片
@@ -420,7 +434,7 @@ export class ArticleRender implements MDRendererCallback {
 
   async exportHTML(container: HTMLElement, css: string) {
     await this.cachedElementsToImages(container);
-    const lm = LocalImageManager.getInstance();
+    const lm = this.imageManager;
     const content = await lm.embleImages(container, this.app.vault);
     const globalStyle = await this.assetsManager.getStyle();
     const html = applyCSS(content, css + globalStyle);
@@ -531,9 +545,25 @@ export class ArticleRender implements MDRendererCallback {
     }
   }
 
+  accountChanged(): void {
+    this.imageManager.accountChanged();
+    CardDataManager.getInstance().cleanup();
+  }
+
   cacheElement(category: string, id: string, data: string): void {
     const key = category + ':' + id;
     this.cachedElements.set(key, data);
+  }
+
+  cacheImage(resUrl: string, filePath: string): void {
+    const info = {
+      resUrl: resUrl,
+      filePath: filePath,
+      media_id: null,
+      url: null,
+      id: this.imageManager.getImageId(),
+    };
+    this.imageManager.setImage(resUrl, info);
   }
 
   isWechat(): boolean {

@@ -33,11 +33,10 @@ import { useRenderStore } from 'src/store/RenderStore';
 import { ConfigStore, createConfigStore, ConfigContext, useConfigContext } from 'src/store/ConfigStore'
 import { uevent } from 'src/utils';
 import { Loading } from './Loading';
-import { LocalImageManager } from 'src/markdown/local-file';
-import { CardDataManager } from 'src/markdown/code';
 
 import styles from './Wechat.module.css';
 import { NMPSettings } from 'src/settings';
+import AssetsManager from 'src/assets';
 
 const WechatInternal: React.FC = () => {
   const { notify } = useNotification();
@@ -82,8 +81,10 @@ const WechatInternal: React.FC = () => {
   };
 
   useEffect(()=> {
-    LocalImageManager.getInstance().cleanup();
-    CardDataManager.getInstance().cleanup();
+    renderRef.current.accountChanged();
+    if (renderRef.current.imagesReplaced) {
+      useRenderStore.getState().setRenderVersion();
+    }
   }, [appid]);
 
   useEffect(()=>{
@@ -105,6 +106,7 @@ const WechatInternal: React.FC = () => {
     if (!activeNote) return;
     setLoading(true);
     try {
+      await AssetsManager.getInstance().loadExpertSettings();
       useRenderStore.getState().setRenderVersion();
       const res = await renderRef.current.getCSS(activeNote, theme, highlight);
       setCSSContent(res);

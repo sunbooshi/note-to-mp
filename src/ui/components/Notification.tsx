@@ -27,7 +27,7 @@ import styles from "./Notification.module.css"; // Assuming the CSS file will be
 const SUCCESS_DURATION = 3000; // 3 seconds
 const ERROR_DURATION = Infinity; // Stays until manually closed
 
-type NotificationType = "success" | "error";
+type NotificationType = "success" | "error" | "info";
 
 interface NotificationData {
 	id: string;
@@ -65,20 +65,18 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 						key={id}
 						className={styles.Root}
 						data-type={type}
-						duration={type === "success" ? SUCCESS_DURATION : ERROR_DURATION}
+						duration={type === "error" ? ERROR_DURATION : SUCCESS_DURATION}
 						onOpenChange={(open) => onOpenChange(open, id)}
 					>
-						<RadixToast.Title className={styles.Title}>{title}</RadixToast.Title>
+						<RadixToast.Title className={styles.Title} data-type={type}>{title}</RadixToast.Title>
 						{description && (
 							<RadixToast.Description className={styles.Description}>
 								{description}
 							</RadixToast.Description>
 						)}
-						{type === "error" && (
-							<RadixToast.Close asChild className={styles.Action}>
-								<button className={styles.CloseButton}>&times;</button>
-							</RadixToast.Close>
-						)}
+						<RadixToast.Close asChild className={styles.Action}>
+							<button className={styles.CloseButton}>&times;</button>
+						</RadixToast.Close>
 					</RadixToast.Root>
 				))}
 				<RadixToast.Viewport className={styles.Viewport} label={""} />

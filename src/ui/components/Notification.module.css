@@ -18,7 +18,7 @@
 }
 
 .Root {
-	background-color: white;
+	background-color: var(--interactive-normal);
 	border-radius: 6px;
 	box-shadow:
 		hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
@@ -34,11 +34,15 @@
 
 /* Add variants for success and error */
 .Root[data-type="success"] {
-	border-left-color: var(--green-7);
+	border-left-color: var(--color-green);
 }
 
 .Root[data-type="error"] {
-	border-left-color: var(--red-7);
+	border-left-color: var(--color-red);
+}
+
+.Root[data-type="info"] {
+	border-left-color: var(--color-yellow);
 }
 
 .Root[data-state="open"] {
@@ -87,16 +91,23 @@
 
 .Title {
 	grid-area: title;
-	margin-bottom: 5px;
 	font-weight: 500;
-	color: var(--slate-12);
+	color: var(--text-success);
 	font-size: 15px;
+}
+
+.Title[data-type="error"] {
+	color: var(--text-error);
+}
+
+.Title[data-type="info"] {
+	color: var(--text-warning);
 }
 
 .Description {
 	grid-area: description;
-	margin: 0;
-	color: var(--slate-11);
+	margin: 10px 0;
+	color: var(--text-normal);
 	font-size: 13px;
 	line-height: 1.3;
 }
@@ -109,17 +120,19 @@
 /* Styles for the manual close button */
 .CloseButton {
 	all: unset;
-	width: 20px;
-	height: 20px;
+	width: 24px;
+	height: 24px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	line-height: 20px;
+	font-size: 18px;
 	border-radius: 50%;
-	color: var(--slate-11);
+	color: var(--color-base-100);
 	cursor: pointer;
 }
 
 .CloseButton:hover {
-	background-color: var(--mauve-3);
+	background-color: var(--interactive-hover);
 }
 

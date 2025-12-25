@@ -42,6 +42,7 @@ export class BaseRender implements MDRendererCallback {
   title: string;
   markedParser: MarkedParser;
   cachedElements: Map<string, string> = new Map();
+  imageManager: LocalImageManager;
   debouncedRenderMarkdown: (...args: any[]) => void;
 
   constructor(app: App) {
@@ -50,6 +51,7 @@ export class BaseRender implements MDRendererCallback {
     this.assetsManager = AssetsManager.getInstance();
     this.articleHTML = '';
     this.title = '';
+    this.imageManager = new LocalImageManager();
     this.markedParser = new MarkedParser(app, this);
     this.debouncedRenderMarkdown = debounce(this.renderMarkdown.bind(this), 1000);
   }
@@ -89,6 +91,11 @@ export class BaseRender implements MDRendererCallback {
       if (md.startsWith('---')) {
         md = md.replace(FRONT_MATTER_REGEX, '');
       }
+
+      if (this.note && this.note.path !== af.path) {
+        this.imageManager.cleanup();
+      }
+
       this.note = af;
 
       this.articleHTML = await this.markedParser.parse(md, af);
@@ -111,7 +118,7 @@ export class BaseRender implements MDRendererCallback {
       return;
     }
 
-    await LocalImageManager.getInstance().uploadToOSS(container, this.settings.authKey, this.app.vault);
+    await this.imageManager.uploadToOSS(container, this.settings.authKey, this.app.vault);
 
     const content = container.innerHTML;
     await navigator.clipboard.write([new ClipboardItem({
@@ -121,7 +128,7 @@ export class BaseRender implements MDRendererCallback {
 
   async exportHTML(container: HTMLElement, css: string) {
     await this.cachedElementsToImages(container);
-    const lm = LocalImageManager.getInstance();
+    const lm = this.imageManager;
     const content = await lm.embleImages(container, this.app.vault);
     const globalStyle = await this.assetsManager.getStyle();
     const html = applyCSS(content, css + globalStyle);
@@ -235,6 +242,17 @@ export class BaseRender implements MDRendererCallback {
   cacheElement(category: string, id: string, data: string): void {
     const key = category + ':' + id;
     this.cachedElements.set(key, data);
+  }
+
+  cacheImage(resUrl: string, filePath: string): void {
+    const info = {
+      resUrl: resUrl,
+      filePath: filePath,
+      media_id: null,
+      url: null,
+      id: this.imageManager.getImageId(),
+    };
+    this.imageManager.setImage(resUrl, info);
   }
 
   isWechat(): boolean {

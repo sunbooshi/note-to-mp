@@ -2,7 +2,7 @@
 .SubContent {
 	max-height: 60vh; /* Set max-height to 60% of viewport height */
 	overflow-y: auto; /* Enable vertical scrolling */
-	background-color: white;
+	background-color: var(--color-base-00);
 	border-radius: 6px;
 	padding: 5px;
 	box-shadow:
@@ -35,7 +35,7 @@
 .SubTrigger {
 	font-size: 13px;
 	line-height: 1;
-	color: var(--violet-11);
+	color: var(--text-normal);
 	border-radius: 3px;
 	display: flex;
 	align-items: center;
@@ -46,30 +46,30 @@
 	user-select: none;
 	outline: none;
 	&[data-disabled] {
-		color: var(--mauve-8);
+		color: var(--color-base-10);
 		pointer-events: none;
 	}
 	&[data-highlighted] {
-		background-color: var(--violet-9);
-		color: var(--violet-1);
+		background-color: var(--text-selection);
+		color: var(--text-accent);
 	}
 }
 
 .SubTrigger[data-state="open"]:not([data-highlighted], [data-disabled]) {
-	background-color: var(--violet-4);
-	color: var(--violet-11);
+	background-color: var(--text-selection);
+	color: var(--text-accent);
 }
 
 .Label {
 	padding-left: 25px;
 	font-size: 12px;
 	line-height: 25px;
-	color: var(--mauve-11);
+	color: var(--text-muted);
 }
 
 .Separator {
 	height: 1px;
-	background-color: var(--violet-6);
+	background-color: var(--color-base-20);
 	margin: 5px;
 }
 
@@ -96,23 +96,23 @@
 	align-items: center;
 	justify-content: center;
 	color: var(--violet-11);
-	background-color: white;
-	box-shadow: 0 2px 10px var(--black-a7);
+	background-color: var(--color-base-00);
+	box-shadow: 0 2px 10px var(--color-base-50);
 	user-select: none;
 	&:hover {
-		background-color: var(--violet-3);
+		background-color: var(--color-base-10);
 	}
 }
 
 .RightSlot {
 	margin-left: auto;
 	padding-left: 20px;
-	color: var(--mauve-11);
+	color: var(--color-base-70);
 	[data-highlighted] > & {
 		color: white;
 	}
 	[data-disabled] & {
-		color: var(--mauve-8);
+		color: var(--color-base-10);
 	}
 }
 

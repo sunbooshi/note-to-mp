@@ -45,28 +45,26 @@ interface ImageInfo {
     filePath: string;
     url: string | null;
     media_id: string | null;
+    id: number | null;
 }
 
 export class LocalImageManager {
     private images: Map<string, ImageInfo>;
-    private static instance: LocalImageManager;
+    private _imageId: number = 1;
 
-    private constructor() {
+    constructor() {
         this.images = new Map<string, ImageInfo>();
     }
 
-    // 静态方法，用于获取实例
-    public static getInstance(): LocalImageManager {
-        if (!LocalImageManager.instance) {
-            LocalImageManager.instance = new LocalImageManager();
+    public setImage(path: string, info: ImageInfo): void {
+        if (this.images.has(path)) {
+            info.id = this.images.get(path)!.id || info.id;
         }
-        return LocalImageManager.instance;
+        this.images.set(path, info);
     }
 
-    public setImage(path: string, info: ImageInfo): void {
-        if (!this.images.has(path)) {
-            this.images.set(path, info);
-        }
+    public getImageId(): number {
+        return this._imageId++;
     }
 
     isWebp(file: TFile | string): boolean {
@@ -101,7 +99,11 @@ export class LocalImageManager {
         for (let key of keys) {
             const value = this.images.get(key);
             if (value == null) continue;
-            if (value.url != null) continue;
+            if (value.url != null && value.url.length > 0) {
+                if (type != 'image') continue;
+                if (value.media_id != null && value.media_id.length > 0) continue;
+            }
+
             const data = await this.readImageData(vault, value.filePath);
             if (data == null) continue;
             const {fileName, fileData} = data;
@@ -214,12 +216,30 @@ export class LocalImageManager {
         }
     }
 
+    findImageInfo(src: string, id: number | null) {
+        const byKey = this.images.get(src);
+        if (byKey) return byKey;
+
+        for (const value of this.images.values()) {
+            if (id !== null && value.id === id) {
+                return value;
+            }
+            if (value.url === src || value.resUrl === src) {
+                return value;
+            }
+        }
+
+        return undefined;
+    }
+
+
     getImageInfos(root: HTMLElement) {
         const images = root.getElementsByTagName('img');
         const result = [];
         for (let i = 0; i < images.length; i++) {
             const img = images[i];
-            const res = this.images.get(img.src);
+            const id = img.getAttribute('data-img-id');
+            const res = this.findImageInfo(img.src, id ? parseInt(id) : null) ;
             if (res) {
                 result.push(res);
             }
@@ -250,8 +270,9 @@ export class LocalImageManager {
                     filePath: "",
                     url: res.url,
                     media_id: res.media_id,
+                    id: this.getImageId(),
                 };
-                this.images.set(img.src, info);
+                this.setImage(img.src, info);
                 result.push(res);
             }
             else if (img.src.startsWith('data:image/')) {
@@ -272,8 +293,9 @@ export class LocalImageManager {
                     filePath: "",
                     url: res.url,
                     media_id: res.media_id,
+                    id: this.getImageId(),
                 };
-                this.images.set('#' + img.id, info);
+                this.setImage('#' + img.id, info);
                 result.push(res);
             }
         }
@@ -295,6 +317,9 @@ export class LocalImageManager {
             if (value == null) continue;
             if (value.url == null) continue;
             img.setAttribute('src', value.url);
+            if (value.id) {
+                img.setAttribute('data-img-id', value.id.toString());
+            }
         }
     }
 
@@ -419,6 +444,13 @@ export class LocalImageManager {
         }
     }
 
+    async accountChanged() {
+        this.images.forEach((value, key) => {
+            value.media_id = null;
+            value.url = null;
+        });
+    }
+
     async cleanup() {
         this.images.clear(); 
     }
@@ -440,13 +472,7 @@ export class LocalFile extends Extension{
             console.error('找不到文件：' + path);
             return '';
         }
-        const info = {
-            resUrl: res.resUrl,
-            filePath: res.filePath,
-            media_id: null,
-            url: null
-        };
-        LocalImageManager.getInstance().setImage(res.resUrl, info);
+        this.callback.cacheImage(res.resUrl, res.filePath);
         return res.resUrl;
     }
 
@@ -713,7 +739,7 @@ export class LocalFile extends Extension{
             let svg = '';
             if (src === '') {
                 svg = '渲染失败';
-                console.log('Failed to get Excalidraw URL');
+                console.error('Failed to get Excalidraw URL');
             }
             else {
                 const blob = await this.readBlob(src);

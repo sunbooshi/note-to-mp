@@ -29,6 +29,7 @@ export interface MDRendererCallback {
     isWechat(): boolean;
     note: TFile | null;
     cacheElement(category: string, id: string, data: string): void;
+    cacheImage(resUrl: string, filePath: string): void;
 }
 
 export abstract class Extension {
