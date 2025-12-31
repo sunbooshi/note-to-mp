@@ -1,3 +1,29 @@
+## 2.0.0
+- 新增支持知乎、飞书、小红书等平台
+- 新增多篇笔记合并发布为一篇
+- 新增自选笔记批量发布、合并发布
+- 新增文档属性支持单独设置自定义CSS
+- 修复偶发会员功能失效的bug
+- 修复部分携带路径插入的图片无法渲染的bug
+- 优化空行渲染
+- 废弃custom.css，请使用笔记自定义CSS
+
+空行渲染高度自定义CSS，可以尝试修改`margin-top`、`margin-bottom`、`height`的值来调整高度。
+==注意`margin-top`、`margin-bottom`的值应该是负值。==
+
+```
+.note-to-mp p.note-empty-line {
+  line-height: 0;
+  margin-top: -0.75em;
+  margin-bottom: -0.45em;
+}
+
+.note-line-break {
+  display: block;
+  height: 1.2em;
+}
+```
+
 ## 1.3.2
 Bug fix.
 

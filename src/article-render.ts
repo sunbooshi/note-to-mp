@@ -31,12 +31,10 @@ import { MDRendererCallback } from './markdown/extension';
 import { MarkedParser } from './markdown/parser';
 import { LocalImageManager, LocalFile } from './markdown/local-file';
 import { CardDataManager } from './markdown/code';
-import { debounce } from './utils';
+import { debounce, removeFrontMatter } from './utils';
 import { PrepareImageLib, IsImageLibReady, WebpToJPG } from './imagelib';
 import { toPng } from 'html-to-image';
 
-
-const FRONT_MATTER_REGEX = /^(---)$.+?^(---)$.+?/ims;
 
 export class ArticleRender implements MDRendererCallback {
   app: App;
@@ -116,10 +114,8 @@ export class ArticleRender implements MDRendererCallback {
       else {
         md = '没有可渲染的笔记或文件不支持渲染';
       }
-      if (md.startsWith('---')) {
-        md = md.replace(FRONT_MATTER_REGEX, '');
-      }
 
+      md = removeFrontMatter(md);
 
       if (this.note && this.note.path !== af.path) {
         this.imageManager.cleanup();
@@ -143,8 +139,8 @@ export class ArticleRender implements MDRendererCallback {
       let customCSS = this.settings.customCSSNote.length > 0 ? this.assetsManager.customCSS : '';
       const metadata = getMetadata(this.app, note);
       if (metadata.css) {
-        const note = metadata.css.replace('[[', '').replace(']]', '');
-        const css = await this.assetsManager.loadCSSFromNote(note);
+        const name = metadata.css.replace('[[', '').replace(']]', '');
+        const css = await this.assetsManager.loadCSSFromNote(name);
         if (css) {
           customCSS = css;
         }
@@ -380,7 +376,6 @@ export class ArticleRender implements MDRendererCallback {
     }
 
     const imageList: DraftImageMediaId[] = [];
-    console.log('post images')
     const lm = this.imageManager;
     // 上传图片
     await lm.uploadLocalImage(token, this.app.vault, 'image');

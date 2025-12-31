@@ -234,16 +234,20 @@ export class LocalImageManager {
 
 
     getImageInfos(root: HTMLElement) {
+        console.log('------------------')
         const images = root.getElementsByTagName('img');
         const result = [];
+        console.log('local images: ', JSON.stringify(Object.fromEntries(this.images)));
         for (let i = 0; i < images.length; i++) {
             const img = images[i];
             const id = img.getAttribute('data-img-id');
+            console.log('img.src:', img.src, 'id:', id)
             const res = this.findImageInfo(img.src, id ? parseInt(id) : null) ;
             if (res) {
                 result.push(res);
             }
         }
+        console.log('------------------')
         return result;
     }
 

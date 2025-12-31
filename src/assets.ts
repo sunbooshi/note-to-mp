@@ -25,6 +25,7 @@ import * as zip from "@zip.js/zip.js";
 import DefaultTheme from "./default-theme";
 import DefaultHighlight from "./default-highlight";
 import { NMPSettings } from "./settings";
+import { removeFrontMatter } from "./utils";
 import { ExpertSettings, defaultExpertSettings, expertSettingsFromString } from "./expert-settings";
 
 
@@ -151,10 +152,11 @@ export default class AssetsManager {
     }
 
     async loadCSSFromNote(note: string) {
-        const file = this.searchFile(note);
+        const file = this.searchFile(note) as TFile;
         if (file) {
-            const cssContent = await this.app.vault.adapter.read(file.path);
+            let cssContent = await this.app.vault.cachedRead(file);
             if (cssContent) {
+                cssContent = removeFrontMatter(cssContent);
                 return cssContent.replace(/```css/gi, '').replace(/```/g, '');
             }
         }
@@ -165,9 +167,9 @@ export default class AssetsManager {
         try {
             const note = NMPSettings.getInstance().expertSettingsNote;
             if (note != '') {
-                const file = this.searchFile(note);
+                const file = this.searchFile(note) as TFile;
                 if (file) {
-                    let content = await this.app.vault.adapter.read(file.path);
+                    let content = await this.app.vault.cachedRead(file);
                     if (content) {
                         this.expertSettings = expertSettingsFromString(content);
                     }

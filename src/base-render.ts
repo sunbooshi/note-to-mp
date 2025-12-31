@@ -27,11 +27,9 @@ import AssetsManager from './assets';
 import { MDRendererCallback } from './markdown/extension';
 import { MarkedParser } from './markdown/parser';
 import { LocalImageManager, LocalFile } from './markdown/local-file';
-import { debounce } from './utils';
+import { debounce, removeFrontMatter } from './utils';
 import { toPng } from 'html-to-image';
 
-
-const FRONT_MATTER_REGEX = /^(---)$.+?^(---)$.+?/ims;
 
 export class BaseRender implements MDRendererCallback {
   app: App;
@@ -88,9 +86,7 @@ export class BaseRender implements MDRendererCallback {
       else {
         md = '没有可渲染的笔记或文件不支持渲染';
       }
-      if (md.startsWith('---')) {
-        md = md.replace(FRONT_MATTER_REGEX, '');
-      }
+      md = removeFrontMatter(md);
 
       if (this.note && this.note.path !== af.path) {
         this.imageManager.cleanup();

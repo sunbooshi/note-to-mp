@@ -294,3 +294,11 @@ const escapeMap: Record<string, string> = {
 export function escapeHTML(str: string) {
   return str.replace(/[&<>"']/g, (ch) => escapeMap[ch]);
 }
+
+const FRONT_MATTER_REGEX = /^(---)$.+?^(---)$.+?/ims;
+export function removeFrontMatter(md: string) {
+	if (md.startsWith('---')) {
+    return md.replace(FRONT_MATTER_REGEX, '');
+  }
+	return md;
+}

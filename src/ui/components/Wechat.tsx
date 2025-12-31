@@ -106,6 +106,7 @@ const WechatInternal: React.FC = () => {
     if (!activeNote) return;
     setLoading(true);
     try {
+      await AssetsManager.getInstance().loadCustomCSS();
       await AssetsManager.getInstance().loadExpertSettings();
       useRenderStore.getState().setRenderVersion();
       const res = await renderRef.current.getCSS(activeNote, theme, highlight);
