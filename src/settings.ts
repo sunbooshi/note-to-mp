@@ -43,6 +43,7 @@ export class NMPSettings {
     excalidrawToPNG: boolean;
     isLoaded: boolean = false;
     enableEmptyLine: boolean = false;
+    dismissedAnnouncements: string[] = [];
 
     private static instance: NMPSettings;
 
@@ -72,6 +73,7 @@ export class NMPSettings {
         this.excalidrawToPNG = false;
         this.expertSettingsNote = '';
         this.enableEmptyLine = false;
+        this.dismissedAnnouncements = [];
     }
 
     resetStyelAndHighlight() {
@@ -103,6 +105,7 @@ export class NMPSettings {
             ignoreEmptyLine,
             isVip,
             expireat,
+            dismissedAnnouncements,
         } = data;
 
         const settings = NMPSettings.getInstance();
@@ -163,6 +166,9 @@ export class NMPSettings {
         if (expireat) {
             settings.expireat = new Date(expireat);
         }
+        if (dismissedAnnouncements) {
+             settings.dismissedAnnouncements = dismissedAnnouncements;
+        }
         settings.isLoaded = true;
     }
 
@@ -188,6 +194,7 @@ export class NMPSettings {
             'ignoreEmptyLine': settings.enableEmptyLine,
             'isVip': settings.isVip,
             'expireat': settings.expireat,
+            'dismissedAnnouncements': settings.dismissedAnnouncements,
         }
     }
 

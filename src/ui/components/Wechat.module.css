@@ -5,6 +5,7 @@
   box-sizing: border-box;
   overflow-y: auto;
   position: relative;
+  container-type: inline-size;
 }
 
 .Panel {
@@ -15,10 +16,15 @@
   flex-shrink: 0; /* Keep the panel fixed at its content height */
 }
 
+.Root[data-collapsed="true"] .Panel {
+  display: none;
+}
+
 .PanelRight {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  column-gap: 10px;
+  row-gap: 5px;
   padding: 0 10px;
   align-items: center;
 }
@@ -36,6 +42,18 @@
   padding: 10px;
   background-color: #FFFFFF;
   box-sizing: border-box;
+}
+
+.LineBreak {
+  flex-basis: 100%;
+  display: block;
+}
+
+@container (max-width: 490px) {
+  .LineBreak {
+    flex-basis: unset;
+    display: none;
+  }
 }
 
 .Loading {

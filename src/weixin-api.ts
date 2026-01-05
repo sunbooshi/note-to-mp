@@ -346,3 +346,51 @@ export function getMetadata(app: App, file: TFile) {
     }
     return res;
 }
+
+export interface Announcement {
+    id: string,
+	type: string,
+	title: string,
+	message: string,
+	target_version: string,
+	min_obsidian_version: string,
+	action_url: string,
+	platform: string,
+}
+
+export async function requestAnnouncement() {
+    const url = PluginHost + '/v1/wx/ann';
+    const res = await requestUrl({
+        method: 'GET',
+        url: url,
+        throw: false,
+    });
+    if (res.status !== 200) {
+        console.error(`获取公告失败：${res.status} ${res.text}`);
+        return;
+    }
+    return await res.json as Announcement[];
+}
+
+export interface VersionInfo {
+    version: string;
+    summary: string;
+    url: string;
+}
+
+export async function requestLatestVersion() {
+    const url = PluginHost + '/v1/wx/latest';
+
+    const res = await requestUrl({
+        method: 'GET',
+        url: url,
+        throw: false,
+    });
+
+    if (res.status !== 200) {
+        console.error(`获取最新版本失败：${res.status} ${res.text}`);
+        return;
+    }
+
+    return await res.json as VersionInfo;
+}

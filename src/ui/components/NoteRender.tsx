@@ -138,8 +138,10 @@ export function NoteRender({platform}:{platform:string}) {
     btnTitle = '去小红书';
   }
 
+  const isCollapsed = usePluginStore.use.isCollapsed();
+
   return (
-    <div className={styles.Root}>
+    <div className={styles.Root} data-collapsed={isCollapsed}>
       <div className={styles.Panel}>
         <div className={styles.PanelRight}>
           <button onClick={handleCopy}>复制</button>

@@ -10,11 +10,45 @@
 	flex-direction: column;
 	background-color: var(--background-primary);
 	box-shadow: 0 2px 10px var(--black-a4);
+	position: relative;
 }
 
 .List {
 	flex-shrink: 0;
 	display: flex;
+}
+
+.List[data-collapsed="true"] {
+	height: 0;
+}
+
+.List[data-collapsed="true"] > *:not(.CollapseBtn) {
+	display: none;
+}
+
+.CollapseBtn {
+	all: unset;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	color: var(--color-base-60);
+	padding: 8px;
+	transition: color 0.2s;
+}
+
+.CollapseBtn:hover {
+	color: var(--color-purple);
+}
+
+.CollapseBtn[data-floating="true"] {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	z-index: 1000;
+	background-color: var(--background-secondary);
+	border-radius: 50%;
+	box-shadow: 0 2px 8px var(--black-a4);
 }
 
 .Trigger {

@@ -20,20 +20,28 @@
  * THE SOFTWARE.
  */
 
-import { App } from 'obsidian';
+import { App, Plugin } from 'obsidian';
 import { create } from 'zustand';
 import { createSelectors } from './createSelectors';
 
 interface IPluginState {
   app: App;
   setApp: (app: App) => void;
+  plugin: Plugin;
+  setPlugin: (plugin: Plugin) => void;
   isReourceLoaded: boolean;
   setResourceLoaded: (loaded: boolean) => void;
+  isCollapsed: boolean;
+  setIsCollapsed: (collapsed: boolean) => void;
 }
 
 export const usePluginStore = createSelectors(create<IPluginState>((set) => ({
   app: null as unknown as App,
   setApp: (app) => set({ app }),
+  plugin: null as unknown as Plugin,
+  setPlugin: (plugin) => set({ plugin }),
   isReourceLoaded: false,
   setResourceLoaded: (loaded) => set({isReourceLoaded:loaded}),
+  isCollapsed: false,
+  setIsCollapsed: (collapsed) => set({isCollapsed: collapsed}),
 })));

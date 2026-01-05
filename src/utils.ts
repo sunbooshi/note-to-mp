@@ -302,3 +302,63 @@ export function removeFrontMatter(md: string) {
   }
 	return md;
 }
+
+/**
+ * 版本比较函数
+ * 比较两个版本号的大小
+ * @param v1 版本号1
+ * @param v2 版本号2
+ * @returns 1 if v1 > v2, -1 if v1 < v2, 0 if v1 === v2
+ */
+export function compareVersions(v1: string, v2: string): number {
+	const parts1 = v1.split('.').map(Number);
+	const parts2 = v2.split('.').map(Number);
+	
+	const maxLength = Math.max(parts1.length, parts2.length);
+	
+	for (let i = 0; i < maxLength; i++) {
+		const num1 = parts1[i] || 0;
+		const num2 = parts2[i] || 0;
+		
+		if (num1 > num2) return 1;
+		if (num1 < num2) return -1;
+	}
+	
+	return 0;
+}
+
+/**
+ * 检查版本是否符合目标版本要求
+ * @param currentVersion 当前版本
+ * @param targetVersion 目标版本表达式，如 ">2.0.0", "=2.0.0", "<2.0.0", ">=2.0.0", "<=2.0.0"
+ * @returns 是否符合要求
+ */
+export function matchesVersionRequirement(currentVersion: string, targetVersion: string): boolean {
+	if (!targetVersion || targetVersion.trim() === '') {
+		return true; // 如果没有版本要求，则显示
+	}
+
+	const match = targetVersion.match(/^(>=|<=|>|<|=)(.+)$/);
+	if (!match) {
+		return true; // 如果格式不正确，默认显示
+	}
+
+	const operator = match[1];
+	const requiredVersion = match[2].trim();
+	const comparison = compareVersions(currentVersion, requiredVersion);
+
+	switch (operator) {
+		case '>':
+			return comparison > 0;
+		case '>=':
+			return comparison >= 0;
+		case '<':
+			return comparison < 0;
+		case '<=':
+			return comparison <= 0;
+		case '=':
+			return comparison === 0;
+		default:
+			return true;
+	}
+}

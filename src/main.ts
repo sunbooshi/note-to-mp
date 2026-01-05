@@ -50,6 +50,7 @@ export default class NoteToMpPlugin extends Plugin {
 	async onload() {
 		console.log('Loading NoteToMP');
 		usePluginStore.getState().setApp(this.app);
+		usePluginStore.getState().setPlugin(this);
 		setVersion(this.manifest.version);
 		this.app.workspace.onLayoutReady(()=>{
 			this.loadResource();
@@ -86,14 +87,17 @@ export default class NoteToMpPlugin extends Plugin {
 		this.addCommand({
 			id: 'note-to-mp-pub',
 			name: '发布公众号文章',
-			callback: async () => {
-				const file = this.app.workspace.getActiveFile;
-				if (file instanceof TFile) {
-					if (file.extension.toLocaleLowerCase() === 'md') {
-						new NotePubModal(this.app, [file]).open();
-					}
+			callback: () => {
+				const file = this.app.workspace.getActiveFile();
+				if (!(file instanceof TFile)) {
+					new Notice('请先打开要发布的笔记再执行发布');
+					return;
 				}
-				new Notice('请先打开要发布的笔记再执行发布');
+				if (file.extension.toLocaleLowerCase() !== 'md') {
+					new Notice('只能发布 Markdown 文件');
+					return;
+				}
+				new NotePubModal(this.app, [file]).open();
 			}
 		});
 

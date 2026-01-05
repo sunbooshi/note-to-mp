@@ -221,15 +221,17 @@ const WechatInternal: React.FC = () => {
     }
   };
 
+  const isCollapsed = usePluginStore.use.isCollapsed();
+
   return (
-    <div className={styles.Root}>
+    <div className={styles.Root} data-collapsed={isCollapsed}>
       <div className={styles.Panel}>
         <Cover readOnly={!!metadataCover} initialCover={metadataCover} />
         <div className={styles.PanelRight}>
           <AccountSelect disabled={!!metadataAppid} />
           <button onClick={gotoMP}>去公众号后台</button>
           <button onClick={handleRefresh}>刷新</button>
-          <div style={{ flexBasis: '100%' }}></div>
+          <div className={styles.LineBreak}></div>
           <button onClick={handlePost}>发文章</button>
           <button onClick={handlePostImage}>发图文</button>
           <button onClick={handleCopy}>复制</button>

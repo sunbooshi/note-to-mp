@@ -22,16 +22,18 @@
 
 import { App, TextAreaComponent, PluginSettingTab, Setting, Notice, sanitizeHTMLToDom } from 'obsidian';
 import NoteToMpPlugin from './main';
-import { wxGetToken,wxEncrypt } from './weixin-api';
+import { wxGetToken,wxEncrypt, requestLatestVersion } from './weixin-api';
 import { cleanMathCache } from './markdown/math';
 import { NMPSettings } from './settings';
 import { DocModal } from './doc-modal';
+import { compareVersions } from './utils';
 
 export class NoteToMpSettingTab extends PluginSettingTab {
 	plugin: NoteToMpPlugin;
 	wxInfo: string;
 	wxTextArea: TextAreaComponent|null;
 	settings: NMPSettings;
+	headerEl: HTMLElement|null;
 
 	constructor(app: App, plugin: NoteToMpPlugin) {
 		super(app, plugin);
@@ -177,10 +179,16 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 
 		this.wxInfo = this.parseWXInfo();
 
-		const helpEl = containerEl.createEl('div');
-		helpEl.style.cssText = 'display: flex;flex-direction: row;align-items: center;';
-		helpEl.createEl('h2', {text: '帮助文档'}).style.cssText = 'margin-right: 10px;';
-		helpEl.createEl('a', {text: 'https://docs.dualhue.cn/doc', attr: {href: 'https://docs.dualhue.cn/doc'}});
+		this.headerEl = containerEl.createEl('div');
+		this.headerEl.style.cssText = 'display: flex;flex-direction: row;align-items: center;';
+		this.headerEl.createEl('h2', {text: 'NoteToMP'}).style.cssText = 'margin-right: 10px;';
+		this.headerEl.createEl('a', {text: '帮助文档', attr: {href: 'https://docs.dualhue.cn/doc'}});
+		this.headerEl.createEl('div', {text: ' '}).style.cssText = 'width: 10px;';
+		this.headerEl.createEl('a', {text: '会员购买', attr: {href: 'https://docs.dualhue.cn/subscribe'}});
+		this.headerEl.createEl('div', {text: ' '}).style.cssText = 'width: 10px;';
+		const version = this.plugin.manifest.version;
+		this.headerEl.createEl('div', {text: `当前版本: v${version}`});
+		this.headerEl.createEl('div', {text: ' '}).style.cssText = 'width: 10px;';
 
 		containerEl.createEl('h2', {text: '插件设置'});
 
@@ -210,17 +218,6 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 					this.settings.defaultHighlight = value;
 					await this.plugin.saveSettings();
                 });
-			});
-
-		new Setting(containerEl)
-			.setName('在工具栏展示样式选择')
-			.setDesc('建议在移动端关闭，可以增大文章预览区域')
-			.addToggle(toggle => {
-			    toggle.setValue(this.settings.showStyleUI);
-				toggle.onChange(async (value) => {
-				    this.settings.showStyleUI = value;
-					await this.plugin.saveSettings();
-				});
 			});
 
 		new Setting(containerEl)
@@ -455,5 +452,16 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 				button.setButtonText('测试公众号');
 			})
 		})
+		this.checkUpdate();
+	}
+
+	checkUpdate() {
+		requestLatestVersion().then((versionInfo) => {
+			if (!versionInfo) return;
+			if (!this.headerEl) return;
+			if (compareVersions(versionInfo.version, this.plugin.manifest.version) > 0) {
+				this.headerEl.createEl('a', {text: '有新版本: v' + versionInfo.version, attr: {href: versionInfo.url}});
+			}
+		});	
 	}
 }
