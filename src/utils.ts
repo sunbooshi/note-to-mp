@@ -153,7 +153,15 @@ function applyStyle(root: HTMLElement, cssRoot: postcss.Root) {
 						content = decl.value || '';
 					})
 					item = createSpan();
-					item.textContent = content.replace(/(^")|("$)/g, '');
+					if (content.startsWith('"') && content.length >= 2) {
+						item.textContent = content.replace(/(^")|("$)/g, '');
+					}
+					else if (content.startsWith("'") && content.length >= 2) {
+						item.textContent = content.replace(/(^')|('$)/g, '');
+					}
+					else {
+						item.textContent = content;
+					}
 
 					if (pseudoType === 'before') {
 						root.prepend(item);
