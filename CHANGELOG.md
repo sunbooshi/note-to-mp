@@ -8,19 +8,14 @@
 - 优化空行渲染
 - 废弃custom.css，请使用仓库中的笔记保存CSS
 
-空行渲染高度自定义CSS，可以尝试修改`margin-top`、`margin-bottom`、`height`的值来调整高度。
-==注意`margin-top`、`margin-bottom`的值应该是负值。==
+空行的最终显示高度会受到当前主题的影响。如果你对高度不太满意，可以通过自定义 CSS 进行微调，修改`line-height`、`margin-top`、`margin-bottom`的值来调整高度。
+**注意`margin-top`、`margin-bottom`的值应该是负值。**
 
 ```
 .note-to-mp p.note-empty-line {
-  line-height: 0;
+  line-height: 1.2em;
   margin-top: -0.75em;
   margin-bottom: -0.45em;
-}
-
-.note-line-break {
-  display: block;
-  height: 1.2em;
 }
 ```
 

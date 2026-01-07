@@ -39,7 +39,7 @@ export class EmptyLineRenderer extends Extension {
           }
         },
         renderer: (token: Tokens.Generic) => {
-          return '<p class="note-empty-line">' + '<span class="note-line-break"></span>'.repeat(token.raw.length - 1) + '</p>';
+          return '<p class="note-empty-line">' + '<br>'.repeat(token.raw.length - 1) + '</p>';
         },
       }]
     }

@@ -213,13 +213,8 @@ ul {
 }
 
 .note-to-mp p.note-empty-line {
-  line-height: 0;
+  line-height: 1.2em;
   margin-top: -0.75em;
   margin-bottom: -0.45em;
-}
-
-.note-line-break {
-  display: block;
-  height: 1.2em;
 }
 `;
