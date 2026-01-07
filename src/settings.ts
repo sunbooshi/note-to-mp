@@ -43,6 +43,7 @@ export class NMPSettings {
     excalidrawToPNG: boolean;
     isLoaded: boolean = false;
     enableEmptyLine: boolean = false;
+    dismissedAnnouncements: string[] = [];
 
     private static instance: NMPSettings;
 
@@ -72,6 +73,7 @@ export class NMPSettings {
         this.excalidrawToPNG = false;
         this.expertSettingsNote = '';
         this.enableEmptyLine = false;
+        this.dismissedAnnouncements = [];
     }
 
     resetStyelAndHighlight() {
@@ -101,6 +103,9 @@ export class NMPSettings {
             excalidrawToPNG,
             expertSettingsNote,
             ignoreEmptyLine,
+            isVip,
+            expireat,
+            dismissedAnnouncements,
         } = data;
 
         const settings = NMPSettings.getInstance();
@@ -155,7 +160,15 @@ export class NMPSettings {
         if (ignoreEmptyLine !== undefined) {
             settings.enableEmptyLine = ignoreEmptyLine;
         }
-        settings.getExpiredDate();
+        if (isVip !== undefined) {
+            settings.isVip = isVip;
+        }
+        if (expireat) {
+            settings.expireat = new Date(expireat);
+        }
+        if (dismissedAnnouncements) {
+             settings.dismissedAnnouncements = dismissedAnnouncements;
+        }
         settings.isLoaded = true;
     }
 
@@ -179,19 +192,28 @@ export class NMPSettings {
             'excalidrawToPNG': settings.excalidrawToPNG,
             'expertSettingsNote': settings.expertSettingsNote,
             'ignoreEmptyLine': settings.enableEmptyLine,
+            'isVip': settings.isVip,
+            'expireat': settings.expireat,
+            'dismissedAnnouncements': settings.dismissedAnnouncements,
         }
     }
 
-    getExpiredDate() {
-        if (this.authKey.length == 0) return;
-        wxKeyInfo(this.authKey).then((res) => {
-            if (res.status == 200) {
-                if (res.json.vip) {
-                    this.isVip = true;
-                }
-                this.expireat = new Date(res.json.expireat);
+    async updateKeyInfo() {
+        if (this.authKey.length == 0) return false;
+        const res = await wxKeyInfo(this.authKey);
+        let updated = false;
+        if (res.status == 200) {
+            if (res.json.vip !== this.isVip) {
+                this.isVip = res.json.vip;
+                updated = true;
             }
-        })
+            const expireat = new Date(res.json.expireat);
+            if (expireat != this.expireat) {
+                this.expireat = expireat;
+                updated = true;
+            }
+        }
+        return updated;
     }
 
     isAuthKeyVaild() {

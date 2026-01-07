@@ -1,0 +1,80 @@
+.Root {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Replace height: 100% with flex-grow */
+  box-sizing: border-box;
+  overflow-y: auto;
+  position: relative;
+  container-type: inline-size;
+}
+
+.Panel {
+  display: flex;
+  flex-direction: row;
+  padding: 10px; /* Consistent padding */
+  border-bottom: 1px solid var(--color-base-40);
+  flex-shrink: 0; /* Keep the panel fixed at its content height */
+}
+
+.Root[data-collapsed="true"] .Panel {
+  display: none;
+}
+
+.PanelRight {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 10px;
+  row-gap: 5px;
+  padding: 0 10px;
+  align-items: center;
+}
+
+.RenderWrapper {
+  flex-grow: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.RenderRoot {
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  padding: 10px;
+  background-color: #FFFFFF;
+  box-sizing: border-box;
+}
+
+.LineBreak {
+  flex-basis: 100%;
+  display: block;
+}
+
+@container (max-width: 490px) {
+  .LineBreak {
+    flex-basis: unset;
+    display: none;
+  }
+}
+
+.Loading {
+  position: absolute;
+  z-index: 99999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.LoadingWrapper {
+  width: 120px;
+  height: 120px;
+  background-color: #FFFFFF;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

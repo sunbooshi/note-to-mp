@@ -93,6 +93,7 @@ export class HeadingRenderer extends Extension {
   }
 
   markedExtension(): MarkedExtension {
+    const isWechat = this.callback.isWechat();
     return {
       async: true,
       walkTokens: async (token: Tokens.Generic) => {
@@ -102,7 +103,7 @@ export class HeadingRenderer extends Extension {
 
         const setting = this.headingSettings[token.depth];
         this.index[token.depth] += 1;
-        if (setting) {
+        if (setting && isWechat) {
           if (typeof setting === 'string') {
             token.html = await this.renderWithTemplate(token as Tokens.Heading, setting);
           }

@@ -1,0 +1,51 @@
+.CoverLabel {
+  width: 120px;
+  height: 80px;
+  display: block;
+  border: 1px dashed #E0E0E0;
+  position: relative; /* Add positioning context for absolute children */
+  overflow: hidden; /* Hide overflowing image parts */
+}
+
+.CoverInput {
+  display: none;
+}
+
+.CoverTip {
+  font-size: 12px;
+  display: flex;
+  padding: 10px 0;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  height: 100%;
+}
+
+.CoverPreview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensure image covers the area without distortion */
+}
+
+.CloseButton {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  color: white;
+  border: none;
+  border-radius: 50%; /* Circular button */
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+  z-index: 10; /* Ensure it's above the image */
+}
+
+.CloseButton:hover {
+  background: rgba(0, 0, 0, 0.2);
+}

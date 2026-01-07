@@ -22,13 +22,14 @@
 
 import { NMPSettings } from "src/settings";
 import { Marked, MarkedExtension } from "marked";
-import { App, Vault } from "obsidian";
+import { App, TFile, Vault } from "obsidian";
 import AssetsManager from "../assets";
 
 export interface MDRendererCallback {
-   settings: NMPSettings;
-   updateElementByID(id:string, html:string):void; // 改为异步渲染后已废弃
-   cacheElement(category: string, id: string, data: string): void;
+    isWechat(): boolean;
+    note: TFile | null;
+    cacheElement(category: string, id: string, data: string): void;
+    cacheImage(resUrl: string, filePath: string): void;
 }
 
 export abstract class Extension {

@@ -20,9 +20,12 @@
  * THE SOFTWARE.
  */
 
-import { requestUrl, RequestUrlParam, getBlobArrayBuffer } from "obsidian";
+import { requestUrl, RequestUrlParam, getBlobArrayBuffer, App, FrontMatterCache, TFile } from "obsidian";
+import { imageExtToMime } from "./utils";
+import AssetsManager from "./assets";
+import { NMPSettings } from "./settings";
 
-const PluginHost = 'https://obplugin.sunboshi.tech';
+const PluginHost = 'https://obplugin.dualhue.cn';
 
 // 获取token
 export async function wxGetToken(authkey:string, appid:string, secret:string) {
@@ -70,7 +73,7 @@ export async function wxKeyInfo(authkey:string) {
 }
 
 export async function wxWidget(authkey: string, params: string) {
-    const host = 'https://obplugin.sunboshi.tech';
+    const host = 'https://obplugin.dualhue.cn';
     const path = '/math/widget';
     const url = `${host}${path}`;
     try {
@@ -151,11 +154,11 @@ export interface DraftArticle {
     appid?: string;
     theme?: string;
     highlight?: string;
+    css?: string;
 }
 
-export async function wxAddDraft(token: string, data: DraftArticle) {
-    const url = 'https://api.weixin.qq.com/cgi-bin/draft/add?access_token=' + token;
-    const body = {articles:[{
+function convertArticle(data: DraftArticle) {
+    return {
         title: data.title,
         content: data.content,
         digest: data.digest,
@@ -166,7 +169,27 @@ export async function wxAddDraft(token: string, data: DraftArticle) {
         ... data.need_open_comment !== undefined && {need_open_comment: data.need_open_comment},
         ... data.only_fans_can_comment !== undefined && {only_fans_can_comment: data.only_fans_can_comment},
         ... data.author && {author: data.author},
-    }]};
+    };
+}
+
+export async function wxAddDraft(token: string, data: DraftArticle) {
+    const url = 'https://api.weixin.qq.com/cgi-bin/draft/add?access_token=' + token;
+    const body = {articles:[convertArticle(data)]};
+
+    const res = await requestUrl({
+        method: 'POST',
+        url: url,
+        throw: false,
+        body: JSON.stringify(body)
+    });
+
+    return res;
+}
+
+export async function wxAddDrafts(token: string, data: DraftArticle[]) {
+    const url = 'https://api.weixin.qq.com/cgi-bin/draft/add?access_token=' + token;
+    const articles = data.map(d=>convertArticle(d));
+    const body = {articles};
 
     const res = await requestUrl({
         method: 'POST',
@@ -225,4 +248,149 @@ export async function wxBatchGetMaterial(token: string, type: string, offset: nu
     });
 
     return await res.json;
+}
+
+export async function getUploadImageURL(authkey: string, ext: string) {
+    const url = PluginHost + '/v1/oss/url/' + ext + '/' + authkey;
+    const res = await requestUrl({
+        url,
+        method: 'GET',
+        throw: false,
+    });
+
+    if (res.status !== 200) {
+        throw new Error(`获取上传地址失败：${res.status} ${res.text}`);
+    }
+    return await res.json;
+}
+
+export async function putImageToOSS(authKey:string, uploadURL: string, data: Blob, ext: string) {
+    const contentType = imageExtToMime('.'+ext);
+    const res = await requestUrl({
+        url: uploadURL,
+        method: 'PUT',
+        throw: false,
+        headers: {
+            'x-oss-meta-authkey': authKey,
+            'Content-Type': contentType,
+        },
+        body: await getBlobArrayBuffer(data),
+    });
+    return res;
+}
+
+export async function uploadImageToOSS(authkey: string, data: Blob, filename: string) {
+    if (data.size > 1048576) { // 1MB = 1024 * 1024 bytes
+        throw new Error(`图片 "${filename}" 大小超过1MB限制`);
+    }
+    
+    const ext = filename.split('.').pop() || 'jpg';
+    const {uploadURL, downloadURL} = await getUploadImageURL(authkey, ext);
+    await putImageToOSS(authkey, uploadURL, data, ext);
+    return downloadURL;
+}
+
+function getFrontmatterValue(frontmatter: FrontMatterCache, key: string) {
+    const value = frontmatter[key];
+
+    if (value instanceof Array) {
+        return value[0];
+    }
+
+    return value;
+}
+
+export function getMetadata(app: App, file: TFile) {
+    const assetsManager = AssetsManager.getInstance();
+    const settings = NMPSettings.getInstance();
+    let res: DraftArticle = {
+        title: '',
+        author: undefined,
+        digest: undefined,
+        content: '',
+        content_source_url: undefined,
+        cover: undefined,
+        thumb_media_id: '',
+        need_open_comment: undefined,
+        only_fans_can_comment: undefined,
+        pic_crop_235_1: undefined,
+        pic_crop_1_1: undefined,
+        appid: undefined,
+        theme: undefined,
+        highlight: undefined,
+        css: undefined,
+    }
+    const metadata = app.metadataCache.getFileCache(file);
+    if (metadata?.frontmatter) {
+        const keys = assetsManager.expertSettings.frontmatter;
+        const frontmatter = metadata.frontmatter;
+        res.title = getFrontmatterValue(frontmatter, keys.title);
+        res.author = getFrontmatterValue(frontmatter, keys.author);
+        res.digest = getFrontmatterValue(frontmatter, keys.digest);
+        res.content_source_url = getFrontmatterValue(frontmatter, keys.content_source_url);
+        res.cover = getFrontmatterValue(frontmatter, keys.cover);
+        res.thumb_media_id = getFrontmatterValue(frontmatter, keys.thumb_media_id);
+        res.need_open_comment = frontmatter[keys.need_open_comment] ? 1 : undefined;
+        res.only_fans_can_comment = frontmatter[keys.only_fans_can_comment] ? 1 : undefined;
+        res.appid = getFrontmatterValue(frontmatter, keys.appid);
+        if (res.appid && !res.appid.startsWith('wx')) {
+            res.appid = settings.wxInfo.find(wx => wx.name === res.appid)?.appid;
+        }
+        res.theme = getFrontmatterValue(frontmatter, keys.theme);
+        res.highlight = getFrontmatterValue(frontmatter, keys.highlight);
+        if (frontmatter[keys.crop]) {
+            res.pic_crop_235_1 = '0_0_1_0.5';
+            res.pic_crop_1_1 = '0_0.525_0.404_1';
+        }
+        res.css = getFrontmatterValue(frontmatter, keys.css);
+    }
+    return res;
+}
+
+export interface Announcement {
+    id: string,
+	type: string,
+	title: string,
+	message: string,
+	target_version: string,
+	min_obsidian_version: string,
+	action_url: string,
+	platform: string,
+}
+
+export async function requestAnnouncement() {
+    const url = PluginHost + '/v1/wx/ann';
+    const res = await requestUrl({
+        method: 'GET',
+        url: url,
+        throw: false,
+    });
+    if (res.status !== 200) {
+        console.error(`获取公告失败：${res.status} ${res.text}`);
+        return;
+    }
+    return await res.json as Announcement[];
+}
+
+export interface VersionInfo {
+    version: string;
+    summary: string;
+    url: string;
+}
+
+export async function requestLatestVersion() {
+    const url = PluginHost + '/v1/wx/latest';
+
+    const res = await requestUrl({
+        method: 'GET',
+        url: url,
+        throw: false,
+    });
+
+    if (res.status !== 200) {
+        console.error(`获取最新版本失败：${res.status} ${res.text}`);
+        return;
+    }
+
+    return await res.json as VersionInfo;
 }

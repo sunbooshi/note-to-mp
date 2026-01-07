@@ -25,6 +25,7 @@ import * as zip from "@zip.js/zip.js";
 import DefaultTheme from "./default-theme";
 import DefaultHighlight from "./default-highlight";
 import { NMPSettings } from "./settings";
+import { removeFrontMatter } from "./utils";
 import { ExpertSettings, defaultExpertSettings, expertSettingsFromString } from "./expert-settings";
 
 
@@ -54,7 +55,6 @@ export default class AssetsManager {
     customCSS: string = '';
     themeCfg: string;
     hilightCfg: string;
-    customCSSPath: string;
     iconsPath: string;
     wasmPath: string;
     expertSettings: ExpertSettings;
@@ -82,7 +82,6 @@ export default class AssetsManager {
         this.hilightPath = this.assetsPath + 'highlights/';
         this.themeCfg = this.assetsPath + 'themes.json';
         this.hilightCfg = this.assetsPath + 'highlights.json';
-        this.customCSSPath = this.assetsPath + 'custom.css';
         this.iconsPath = this.assetsPath + 'icons/';
         this.wasmPath = this.assetsPath + 'lib.wasm';
     }
@@ -137,26 +136,14 @@ export default class AssetsManager {
         try {
             const customCSSNote = NMPSettings.getInstance().customCSSNote;
             if (customCSSNote != '') {
-                const file = this.searchFile(customCSSNote);
-                if (file) {
-                    const cssContent = await this.app.vault.adapter.read(file.path);
-                    if (cssContent) {
-                        this.customCSS = cssContent.replace(/```css/gi, '').replace(/```/g, '');
-                    }
+                const css = await this.loadCSSFromNote(customCSSNote);
+                if (css != null) {
+                    this.customCSS = css;
                 }
                 else {
                     new Notice(customCSSNote + '自定义CSS文件不存在！');
                 }
                 return;
-            }
-
-            if (!await this.app.vault.adapter.exists(this.customCSSPath)) {
-                return;
-            }
-
-            const cssContent = await this.app.vault.adapter.read(this.customCSSPath);
-            if (cssContent) {
-                this.customCSS = cssContent;
             }
         } catch (error) {
             console.error(error);
@@ -164,13 +151,25 @@ export default class AssetsManager {
         }
     }
 
+    async loadCSSFromNote(note: string) {
+        const file = this.searchFile(note) as TFile;
+        if (file) {
+            let cssContent = await this.app.vault.cachedRead(file);
+            if (cssContent) {
+                cssContent = removeFrontMatter(cssContent);
+                return cssContent.replace(/```css/gi, '').replace(/```/g, '');
+            }
+        }
+        return null;
+    }
+
     async loadExpertSettings() {
         try {
             const note = NMPSettings.getInstance().expertSettingsNote;
             if (note != '') {
-                const file = this.searchFile(note);
+                const file = this.searchFile(note) as TFile;
                 if (file) {
-                    let content = await this.app.vault.adapter.read(file.path);
+                    let content = await this.app.vault.cachedRead(file);
                     if (content) {
                         this.expertSettings = expertSettingsFromString(content);
                     }
@@ -363,18 +362,16 @@ export default class AssetsManager {
 		shell.openPath(dst);
 	}
 
-    searchFile(nameOrPath: string): TAbstractFile | null {
-        const resolvedPath = this.resolvePath(nameOrPath);
+    searchFile(nameOrPath: string, base: TFile|null = null): TAbstractFile | null {
+        // 先按相对路径或者当前目录下找
+        let file = this.app.metadataCache.getFirstLinkpathDest(nameOrPath, base ? base.path : '');
+        if (file) {
+            return file;
+        }
+
         const vault= this.app.vault;
         const attachmentFolderPath = vault.config.attachmentFolderPath || '';
-        let localPath = resolvedPath;
-        let file = null;
-
-        // 先按路径查找
-        file = vault.getFileByPath(resolvedPath);
-        if (file) {
-            return file; 
-        }
+        let localPath = nameOrPath;
 
         // 在根目录查找
         file = vault.getFileByPath(nameOrPath);
@@ -385,12 +382,6 @@ export default class AssetsManager {
         // 从附件文件夹查找
         if (attachmentFolderPath != '') {
             localPath = attachmentFolderPath + '/' + nameOrPath;
-            file = vault.getFileByPath(localPath)
-            if (file) {
-                return file;
-            }
-
-            localPath = attachmentFolderPath + '/' + resolvedPath;
             file = vault.getFileByPath(localPath)
             if (file) {
                 return file;
@@ -410,8 +401,8 @@ export default class AssetsManager {
         return null;
     }
 
-    getResourcePath(path: string): {resUrl:string, filePath:string}|null {
-        const file = this.searchFile(path) as TFile;
+    getResourcePath(path: string, base: TFile|null = null): {resUrl:string, filePath:string}|null {
+        const file = this.searchFile(path, base) as TFile;
         if (file == null) {
             return null;
         }
@@ -419,26 +410,57 @@ export default class AssetsManager {
         return {resUrl, filePath: file.path};
     }
 
-    resolvePath(relativePath: string): string {
-        const basePath = this.getActiveFileDir();
+    resolvePath(relativePath: string, af: TFile|null = null): string {
+        // 如果relativePath是绝对路径（以/开头），直接返回
+        if (relativePath.startsWith('/')) {
+            return relativePath;
+        }
+
         if (!relativePath.includes('/')) {
             return relativePath;
         }
-        const stack = basePath.split("/");
-        const parts = relativePath.split("/");
-      
-        stack.pop(); // Remove the current file name (or empty string)
-    
+        
+        // 如果relativePath不包含任何路径分隔符或相对路径符号，则认为它是同一目录下的文件名
+        const isSimpleFilename = !relativePath.includes('/') && !relativePath.includes('./') && !relativePath.includes('../');
+        if (isSimpleFilename) {
+            const basePath = this.getActiveFileDir(af);
+            // 如果没有基础路径，直接返回relativePath
+            if (!basePath) {
+                return relativePath;
+            }
+            // 将文件名附加到基础路径
+            return basePath + "/" + relativePath;
+        }
+        
+        const basePath = this.getActiveFileDir(af);
+        // 如果没有基础路径，无法解析相对路径
+        if (!basePath) {
+            return relativePath;
+        }
+        
+        // 将基础路径和相对路径组合
+        const fullPath = basePath + "/" + relativePath;
+        const stack: string[] = [];
+        const parts = fullPath.split("/");
+
         for (const part of parts) {
-            if (part === ".") continue;
-            if (part === "..") stack.pop();
-            else stack.push(part);
+            if (part === "." || part === "") continue;
+            if (part === "..") {
+                if (stack.length > 0) {
+                    stack.pop();
+                }
+            } else {
+                stack.push(part);
+            }
         }
         return stack.join("/");
     }
 
-    getActiveFileDir() {
-        const af = this.app.workspace.getActiveFile();
+    getActiveFileDir(af: TFile|null = null) {
+        if (!af) {
+            console.warn('getActiveFileDir: active file is null');
+        }
+        af = af || this.app.workspace.getActiveFile();
         if (af == null) {
             return '';
         }
