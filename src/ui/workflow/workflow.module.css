@@ -1,0 +1,611 @@
+.Container {
+  position: relative;
+}
+
+.Root {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.Header {
+  margin-bottom: 20px;
+}
+
+/* Floating Notification System */
+.NotificationContainer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 400px;
+  pointer-events: none;
+  padding: 10px;
+}
+
+.Notification {
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: auto;
+  animation: slideIn 0.3s ease-out;
+  min-width: 300px;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.Notification[data-type="success"] {
+  border-left: 4px solid var(--interactive-accent);
+}
+
+.Notification[data-type="error"] {
+  border-left: 4px solid var(--text-error);
+}
+
+.NotificationContent {
+  flex: 1;
+}
+
+.NotificationTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-normal);
+}
+
+.NotificationDescription {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.NotificationClose {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 20px;
+  line-height: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+
+.NotificationClose:hover {
+  color: var(--text-normal);
+}
+
+.List {
+  display: flex;
+  border-bottom: 1px solid var(--background-modifier-border);
+  margin-bottom: 4px;
+}
+
+.Trigger {
+  all: unset;
+	position: relative;
+	font-family: inherit;
+	height: 36px;
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 15px;
+	line-height: 1;
+	color: var(--color-base-50);
+	user-select: none;
+	&:not(:last-child)::after {
+		content: "";
+		position: absolute;
+		right: 0;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 1px; /* 分割线宽度 */
+		height: 50%; /* 分割线高度，例如60% */
+		background-color: var(--color-base-30); /* 分割线颜色 */
+	}
+	&:hover {
+		color: var(--color-purple);
+	}
+	&[data-state="active"] {
+		color: var(--color-purple);
+		height: 36px;
+		box-shadow:
+			inset 0 -1px 0 0 var(--color-purple),
+			0 1px 0 0 var(--color-purple);
+	}
+	&[data-state="inactive"] {
+		height: 36px;
+		box-shadow: none;
+	}
+}
+
+.Trigger:hover {
+  color: var(--text-normal);
+}
+
+.Trigger[data-state="active"] {
+  color: var(--text-accent);
+  border-bottom-color: var(--text-accent);
+}
+
+.Content {
+  padding: 10px 0;
+}
+
+.Content[data-state="inactive"] {
+  display: none;
+}
+
+.Form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 340px;
+}
+
+.FormGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.Label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-normal);
+}
+
+.Select,
+.Input {
+  padding: 0 12px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 14px;
+}
+
+.SelectWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.SelectTrigger {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  height: 35px;
+  gap: 8px;
+  background-color: var(--background-primary);
+  color: var(--text-normal);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  font-size: 14px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.SelectTrigger:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+.SelectTrigger:focus {
+  border-color: var(--interactive-accent);
+}
+
+.SelectIcon {
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.SelectContent {
+  overflow: hidden;
+  background-color: var(--background-primary);
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  box-shadow: 0 10px 38px -10px rgba(0, 0, 0, 0.35), 0 10px 20px -15px rgba(0, 0, 0, 0.2);
+  z-index: 9997;
+  max-height: 300px;
+}
+
+.SelectViewport {
+  padding: 5px;
+}
+
+.SelectItem {
+  all: unset;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--text-normal);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 32px 0 12px;
+  position: relative;
+  user-select: none;
+  cursor: pointer;
+}
+
+.SelectItem[data-disabled] {
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.SelectItem[data-highlighted] {
+  outline: none;
+  background-color: var(--background-modifier-hover);
+}
+
+.SelectItemIndicator {
+  position: absolute;
+  right: 8px;
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.SelectScrollButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 25px;
+  background-color: var(--background-primary);
+  color: var(--text-normal);
+  cursor: default;
+}
+
+.Select:focus,
+.Input:focus {
+  outline: none;
+  border-color: var(--text-accent);
+}
+
+.CharCount {
+  font-size: 12px;
+  color: var(--text-muted);
+  align-self: flex-end;
+}
+
+.RadioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.RadioLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-normal);
+}
+
+.RadioLabel input[type="radio"] {
+  cursor: pointer;
+}
+
+.PresetOptions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-left: 24px;
+  margin-top: 8px;
+}
+
+.PresetOption {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-normal);
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: var(--background-secondary);
+}
+
+.PresetOption:hover {
+  background: var(--background-modifier-hover);
+}
+
+.PresetOption input[type="radio"] {
+  cursor: pointer;
+}
+
+.Error {
+  padding: 10px 12px;
+  background: var(--background-modifier-error);
+  color: var(--color-base-05);
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.GenerateButton {
+  padding: 10px 20px;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.GenerateButton:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.GenerateButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Manage Tab Styles */
+.ManageContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 340px;
+}
+
+.ManageFooter {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.DeleteButton {
+  padding: 8px 16px;
+  background: var(--text-error);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.DeleteButton:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.DeleteButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--background-modifier-border);
+}
+
+.TokenTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.TokenTable thead {
+  background: var(--background-secondary);
+}
+
+.TokenTable th,
+.TokenTable td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.TokenTable th {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.TokenTable tbody tr {
+  transition: background 0.2s;
+}
+
+.TokenTable tbody tr:hover {
+  background: var(--background-modifier-hover);
+}
+
+.CheckboxCell {
+  width: 40px;
+  text-align: center;
+}
+
+.CheckboxCell input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.LoadingMessage,
+.EmptyMessage {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* Result Overlay Styles */
+.ResultOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9998;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ResultModal {
+  background: var(--background-primary);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  width: 90%;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ResultHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.ResultWarning {
+  color: var(--text-warning);
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ResultCloseBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.ResultCloseBtn:hover {
+  color: var(--text-normal);
+}
+
+.ResultContent {
+  padding: 24px 20px;
+}
+
+.ResultLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-normal);
+  margin-bottom: 12px;
+}
+
+.ResultToken {
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  padding: 16px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: var(--text-normal);
+  word-break: break-all;
+  line-height: 1.6;
+  max-height: 200px;
+  overflow-y: auto;
+  user-select: text;
+}
+
+.ConfirmMessage {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.ResultActions {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--background-modifier-border);
+  justify-content: flex-end;
+}
+
+.CopyButton {
+  padding: 10px 20px;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.CopyButton:hover {
+  opacity: 0.9;
+}
+
+.CloseButton {
+  padding: 10px 20px;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.CloseButton:hover {
+  background: var(--background-modifier-hover);
+}

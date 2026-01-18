@@ -27,6 +27,7 @@ import { cleanMathCache } from './markdown/math';
 import { NMPSettings } from './settings';
 import { DocModal } from './doc-modal';
 import { compareVersions } from './utils';
+import { WorkflowModal } from './ui/workflow/workflow';
 
 export class NoteToMpSettingTab extends PluginSettingTab {
 	plugin: NoteToMpPlugin;
@@ -450,6 +451,12 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 				button.setButtonText('测试中...');
 				await this.testWXInfo();
 				button.setButtonText('测试公众号');
+			})
+		})
+		.addButton(button => {
+			button.setButtonText('AI工作流');
+			button.onClick(async () => {
+				new WorkflowModal(this.app).open();
 			})
 		})
 		this.checkUpdate();

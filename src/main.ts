@@ -30,6 +30,7 @@ import { WidgetsModal } from './widgets-modal';
 import { NotePubModal } from './note-pub';
 import { usePluginStore } from './store/PluginStore';
 import './styles.css';
+import { WorkflowModal } from './ui/workflow/workflow';
 
 
 export default class NoteToMpPlugin extends Plugin {
@@ -98,6 +99,14 @@ export default class NoteToMpPlugin extends Plugin {
 					return;
 				}
 				new NotePubModal(this.app, [file]).open();
+			}
+		});
+
+		this.addCommand({
+			id: 'note-to-mp-workflow',
+			name: 'AI工作流',
+			callback: () => {
+				new WorkflowModal(this.app).open();
 			}
 		});
 
