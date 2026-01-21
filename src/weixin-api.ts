@@ -213,7 +213,7 @@ export interface DraftImages {
     article_type: string;
     title: string;
     content: string;
-    need_open_commnet: number;
+    need_open_comment: number;
     only_fans_can_comment: number;
     image_info: DraftImageInfo;
 }

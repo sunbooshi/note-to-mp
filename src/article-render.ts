@@ -403,7 +403,7 @@ export class ArticleRender implements MDRendererCallback {
       article_type: 'newspic',
       title: metadata.title || this.title,
       content: content,
-      need_open_commnet: metadata.need_open_comment || 0,
+      need_open_comment: metadata.need_open_comment || 0,
       only_fans_can_comment: metadata.only_fans_can_comment || 0,
       image_info: {
         image_list: imageList,
