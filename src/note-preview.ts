@@ -22,7 +22,7 @@
 
 import { EventRef, ItemView, Workspace, WorkspaceLeaf, TFile, Plugin } from 'obsidian';
 import { uevent } from './utils';
-import { LocalFile } from './markdown/local-file';
+import { LocalFile } from './core/markdown/local-file';
 import { useRenderStore } from './store/RenderStore';
 import { createPreview } from './ui/preview';
 import * as ReactDOM from 'react-dom/client';

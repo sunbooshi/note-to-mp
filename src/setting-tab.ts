@@ -23,7 +23,7 @@
 import { App, TextAreaComponent, PluginSettingTab, Setting, Notice, sanitizeHTMLToDom } from 'obsidian';
 import NoteToMpPlugin from './main';
 import { wxGetToken,wxEncrypt, requestLatestVersion } from './weixin-api';
-import { cleanMathCache } from './markdown/math';
+import { cleanMathCache } from './core/markdown/math';
 import { NMPSettings } from './settings';
 import { DocModal } from './doc-modal';
 import { compareVersions } from './utils';

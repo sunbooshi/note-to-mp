@@ -22,8 +22,8 @@
 
 import { App, TFile } from 'obsidian';
 import { BaseRender } from './base-render';
-import { MDRendererCallback } from './markdown/extension';
-import { RedBookParser } from './markdown/redbook-parser';
+import { MDRendererCallback } from './core/markdown/extension';
+import { RedBookParser } from './core/markdown/redbook-parser';
 
 export class RedBookRender extends BaseRender implements MDRendererCallback {
   redBookParser: RedBookParser;

@@ -21,16 +21,16 @@
  */
 
 import { App, Notice, sanitizeHTMLToDom, apiVersion, TFile, MarkdownRenderer, Component } from 'obsidian';
-import { applyCSS } from './utils';
+import { applyCSS } from './core/csstools';
 import { UploadImageToWx } from './imagelib';
 import { NMPSettings } from './settings';
 import AssetsManager from './assets';
 import InlineCSS from './inline-css';
 import { wxGetToken, wxAddDraft, wxBatchGetMaterial, DraftImageMediaId, DraftImages, wxAddDraftImages, getMetadata, DraftArticle } from './weixin-api';
-import { MDRendererCallback } from './markdown/extension';
-import { MarkedParser } from './markdown/parser';
-import { LocalImageManager, LocalFile } from './markdown/local-file';
-import { CardDataManager } from './markdown/code';
+import { MDRendererCallback } from './core/markdown/extension';
+import { MarkedParser } from './core/markdown/parser';
+import { LocalImageManager, LocalFile } from './core/markdown/local-file';
+import { CardDataManager } from './core/markdown/code';
 import { debounce, removeFrontMatter } from './utils';
 import { PrepareImageLib, IsImageLibReady, WebpToJPG } from './imagelib';
 import { toPng } from 'html-to-image';

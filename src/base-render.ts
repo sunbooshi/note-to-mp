@@ -21,12 +21,12 @@
  */
 
 import { App, Notice, sanitizeHTMLToDom, apiVersion, TFile, MarkdownRenderer, Component } from 'obsidian';
-import { applyCSS } from './utils';
+import { applyCSS } from './core/csstools';
 import { NMPSettings } from './settings';
 import AssetsManager from './assets';
-import { MDRendererCallback } from './markdown/extension';
-import { MarkedParser } from './markdown/parser';
-import { LocalImageManager, LocalFile } from './markdown/local-file';
+import { MDRendererCallback } from './core/markdown/extension';
+import { MarkedParser } from './core/markdown/parser';
+import { LocalImageManager, LocalFile } from './core/markdown/local-file';
 import { debounce, removeFrontMatter } from './utils';
 import { toPng } from 'html-to-image';
 
