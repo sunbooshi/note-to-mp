@@ -27,7 +27,9 @@ import DefaultHighlight from "./default-highlight";
 import { NMPSettings } from "./settings";
 import { removeFrontMatter } from "./utils";
 import { ExpertSettings, defaultExpertSettings, expertSettingsFromString } from "./expert-settings";
+import { compileCSS } from "@/core/csstools";
 
+const customTheme = {name: '自定义', className: 'custom-theme', desc: '自定义主题', author: 'SunBooshi', css:''};
 
 export interface Theme {
     name: string
@@ -53,6 +55,8 @@ export default class AssetsManager {
     themesPath: string;
     hilightPath: string;
     customCSS: string = '';
+    customNotePath: string = '';
+    customNoteModified: number = 0;
     themeCfg: string;
     hilightCfg: string;
     iconsPath: string;
@@ -102,14 +106,14 @@ export default class AssetsManager {
         try {
             if (!await this.app.vault.adapter.exists(this.themeCfg)) {
                 new Notice('主题资源未下载，请前往设置下载！');
-                this.themes = [this.defaultTheme];
+                this.themes = [this.defaultTheme, customTheme];
                 return;
             }
             const data = await this.app.vault.adapter.read(this.themeCfg);
             if (data) {
                 const themes = JSON.parse(data);
                 await this.loadCSS(themes);
-                this.themes = [this.defaultTheme, ... themes];
+                this.themes = [this.defaultTheme, customTheme, ... themes];
             }
         } catch (error) {
             console.error(error);
@@ -153,14 +157,28 @@ export default class AssetsManager {
 
     async loadCSSFromNote(note: string) {
         const file = this.searchFile(note) as TFile;
-        if (file) {
-            let cssContent = await this.app.vault.cachedRead(file);
-            if (cssContent) {
-                cssContent = removeFrontMatter(cssContent);
-                return cssContent.replace(/```css/gi, '').replace(/```/g, '');
-            }
+        if (!file) {
+            return null;
         }
-        return null;
+
+        if (this.customNotePath === file.path && this.customNoteModified == file.stat.mtime) {
+            return this.customCSS;
+        }
+
+        this.customNotePath = file.path;
+        this.customNoteModified = file.stat.mtime;
+
+        let cssContent = await this.app.vault.cachedRead(file);
+        if (!cssContent) {
+            return null;
+        }
+        cssContent = removeFrontMatter(cssContent);
+        cssContent = cssContent.replace(/```[\s]*css[\s]*/gi, '')
+                               .replace(/```[\s]*less[\s]*/gi, '')
+                               .replace(/```/g, '');
+
+        this.customCSS = await compileCSS(cssContent);
+        return this.customCSS;
     }
 
     async loadExpertSettings() {
@@ -195,7 +213,8 @@ export default class AssetsManager {
     async loadHighlights() {
         try {
             const defaultHighlight = {name: '默认', url: '', css: DefaultHighlight};
-            this.highlights = [defaultHighlight];
+            const customHighlight = {name: '自定义', url: '', css: ''}; 
+            this.highlights = [defaultHighlight, customHighlight];
             if (!await this.app.vault.adapter.exists(this.hilightCfg)) {
                 new Notice('高亮资源未下载，请前往设置下载！');
                 return;

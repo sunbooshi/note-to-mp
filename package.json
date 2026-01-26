@@ -13,6 +13,7 @@
 	"author": "",
 	"license": "MIT",
 	"devDependencies": {
+		"@types/less": "^3.0.8",
 		"@types/node": "^16.11.6",
 		"@types/react": "^19.2.7",
 		"@types/react-dom": "^19.2.3",
@@ -35,6 +36,7 @@
 		"highlight.js": "^11.9.0",
 		"html-to-image": "^1.11.11",
 		"immer": "^11.0.1",
+		"less": "^4.5.1",
 		"marked": "^12.0.1",
 		"marked-highlight": "^2.1.3",
 		"radix-ui": "^1.4.3",

@@ -22,6 +22,54 @@
 
 // 需要渲染进inline style的css样式
 export default `
+.note-mpcard-wrapper {
+  margin: 20px 20px;
+  background-color: rgb(250, 250, 250);
+  padding: 10px 20px;
+  border-radius: 10px;
+}
+.note-mpcard-content {
+  display: flex;
+}
+.note-mpcard-headimg {
+  border: none !important;
+  border-radius: 27px !important;
+  box-shadow: none !important;
+  width: 54px !important;
+  height: 54px !important;
+  margin: 0 !important;
+}
+.note-mpcard-info { 
+  margin-left: 10px;
+}
+.note-mpcard-nickname {
+  font-size: 17px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.9);
+}
+
+.note-mpcard-signature {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.55);
+}
+.note-mpcard-foot {
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid #ececec;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.note-light-bg {
+  padding: 1em;
+  background-color: #F7F7F7;
+  border: rgb(240, 240, 240) 1px solid;
+}
+
+.note-light-bg code {
+  font-family: Consolas,Courier,monospace;
+}
+  
 /* --------------------------------------- */
 /* callout */
 /* --------------------------------------- */
@@ -216,5 +264,18 @@ ul {
   line-height: 1.2em;
   margin-top: -0.75em;
   margin-bottom: -0.45em;
+}
+
+.note-table {
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+}
+.note-table th {
+  min-width: 80px;
+  white-space: nowrap;
+}
+.note-table td {
+  min-width: 80px;
 }
 `;

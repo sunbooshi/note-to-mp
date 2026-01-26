@@ -324,7 +324,7 @@ Code
     padding: 0;
     line-height: 26px;
     list-style-type: none;
-    backgroud: transparent !important;
+    background: transparent !important;
 }
 
 .note-to-mp .code-section ul>li {

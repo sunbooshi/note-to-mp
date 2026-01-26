@@ -431,8 +431,7 @@ export class ArticleRender implements MDRendererCallback {
     await this.cachedElementsToImages(container);
     const lm = this.imageManager;
     const content = await lm.embleImages(container, this.app.vault);
-    const globalStyle = await this.assetsManager.getStyle();
-    const html = applyCSS(content, css + globalStyle);
+    const html = applyCSS(content, css);
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
