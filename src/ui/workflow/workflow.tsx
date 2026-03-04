@@ -30,6 +30,7 @@ import { WorkflowDataManager } from "@/core/WorkflowManager";
 import { usePluginStore } from "@/store/PluginStore";
 import { ArticleRender } from "src/article-render";
 import { LoadingOrb } from "../components/Loading";
+import { ResultViewer } from "./resultviewer";
 import * as Select from "@radix-ui/react-select";
 
 import styles from "./workflow.module.css";
@@ -623,6 +624,8 @@ export class WorkflowModal extends Modal {
 function WorkflowRun({note}: {note: TFile}) {
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
+  const [finished, setFinished] = useState(false);
+  const [result, setResult] = useState<any>(null);
   const [message, setMessage] = useState('数据解析中...');
   const app = usePluginStore(state => state.app);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -631,26 +634,32 @@ function WorkflowRun({note}: {note: TFile}) {
   const run = async() => {
     setRunning(true);
     setMessage('运行中...');
+    let startRes = null;
+    let endRes = null;
     try {
-      await WorkflowDataManager.getInstance().runWorkflow(app, note.path, 'start');
-      await WorkflowDataManager.getInstance().runWorkflow(app, note.path, 'end');
+      startRes = await WorkflowDataManager.getInstance().runWorkflow(app, note.path, 'start', true);
+      endRes = await WorkflowDataManager.getInstance().runWorkflow(app, note.path, 'end', true);
+      setMessage('✅运行完成');
+      setFinished(true);
+      if (startRes) {
+        setResult(startRes);
+      }
+      if (endRes) {
+        setResult(endRes);
+      }
     } catch (e) {
-      setMessage('Failed to run workflow: ' + e.message);
+      setMessage('工作流运行失败: ' + e.message);
     } finally {
       setRunning(false);
-      setMessage('✅运行完成');
     }
   }
 
   const renderNote = async (note: TFile) => {
-    console.log('renderNote: ', note);
     if (!contentRef.current) return '';
-    console.log('renderNote1: ', note);
     await renderRef.current.renderMarkdown(contentRef.current!, note);
   };
 
   useEffect(() => {
-    console.log('WorkflowRun: ', note);
     if (!contentRef.current) return;
     renderNote(note).then(() => {
       setLoading(false);
@@ -660,6 +669,15 @@ function WorkflowRun({note}: {note: TFile}) {
       setLoading(false);
     });
   }, [note, contentRef]);
+
+  if (finished) {
+    return (
+      <div className={styles.WorkflowRun}>
+        <h2>{message}</h2>
+        <ResultViewer data={result} />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.WorkflowRun}>
@@ -695,8 +713,7 @@ export class WorkflowRunModal extends Modal {
   
   onOpen() {
     let { contentEl, modalEl } = this;
-    modalEl.style.width = '360px';
-    modalEl.style.height = '200px';
+    modalEl.style.minHeight = '200px';
     this.view = ReactDOM.createRoot(contentEl);
     this.view.render(<WorkflowRun note={this.note} />);
   }
