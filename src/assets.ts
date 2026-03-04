@@ -45,6 +45,16 @@ export interface Highlight {
     css: string
 }
 
+interface LessError {
+    column: number;
+    extract: string[];
+    filename: string;
+    index: number;
+    line: number;
+    message: string;
+    type: string;
+}
+
 export default class AssetsManager {
     app: App;
     defaultTheme: Theme = DefaultTheme;
@@ -139,7 +149,10 @@ export default class AssetsManager {
     async loadCustomCSS() {
         try {
             const customCSSNote = NMPSettings.getInstance().customCSSNote;
-            if (customCSSNote != '') {
+            if (customCSSNote.length == 0) {
+                this.customCSS = '';
+            }
+            else {
                 const css = await this.loadCSSFromNote(customCSSNote);
                 if (css != null) {
                     this.customCSS = css;
@@ -151,8 +164,17 @@ export default class AssetsManager {
             }
         } catch (error) {
             console.error(error);
-            new Notice('读取CSS失败！');
+            new Notice(AssetsManager.formatError(error), 30000);
         }
+    }
+
+    static formatError(error: any) {
+        const { line, column, extract } = error;
+        if (line && column && extract) {
+            const e = error as LessError;
+            return `自定义CSS解析错误：第${e.line}行，\n错误信息：\n${e.message}`;
+        }
+        return '读取CSS失败！' + error.message;
     }
 
     async loadCSSFromNote(note: string) {

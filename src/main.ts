@@ -30,7 +30,7 @@ import { WidgetsModal } from './widgets-modal';
 import { NotePubModal } from './note-pub';
 import { usePluginStore } from './store/PluginStore';
 import './styles.css';
-import { WorkflowModal } from './ui/workflow/workflow';
+import { WorkflowModal, WorkflowRunModal } from './ui/workflow/workflow';
 
 
 export default class NoteToMpPlugin extends Plugin {
@@ -107,6 +107,23 @@ export default class NoteToMpPlugin extends Plugin {
 			name: 'AI工作流',
 			callback: () => {
 				new WorkflowModal(this.app).open();
+			}
+		});
+
+		this.addCommand({
+			id: 'note-to-mp-workflow-run',
+			name: '运行工作流',
+			callback: () => {
+				const file = this.app.workspace.getActiveFile();
+				if (!(file instanceof TFile)) {
+					new Notice('请先打开要发布的笔记再执行发布');
+					return;
+				}
+				if (file.extension.toLocaleLowerCase() !== 'md') {
+					new Notice('只能发布 Markdown 文件');
+					return;
+				}
+				new WorkflowRunModal(this.app, file).open();
 			}
 		});
 
