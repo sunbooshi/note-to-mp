@@ -31,9 +31,10 @@ import { MDRendererCallback } from './core/markdown/extension';
 import { MarkedParser } from './core/markdown/parser';
 import { LocalImageManager, LocalFile } from './core/markdown/local-file';
 import { CardDataManager } from './core/markdown/code';
-import { debounce, removeFrontMatter } from './utils';
+import { debounce, removeFrontMatter, trimEmbedTag } from './utils';
 import { PrepareImageLib, IsImageLibReady, WebpToJPG } from './imagelib';
 import { toPng } from 'html-to-image';
+import { WorkflowDataManager } from "./core/WorkflowManager";
 
 
 export class ArticleRender implements MDRendererCallback {
@@ -160,15 +161,7 @@ export class ArticleRender implements MDRendererCallback {
   }
 
   async uploadVaultCover(name: string, token: string) {
-    const LocalFileRegex = /^!\[\[(.*?)\]\]/;
-    const matches = name.match(LocalFileRegex);
-    let fileName = '';
-    if (matches && matches.length > 1) {
-      fileName = matches[1];
-    }
-    else {
-      fileName = name;
-    }
+    const fileName = trimEmbedTag(name);
     const vault = this.app.vault;
     const file = this.assetsManager.searchFile(fileName) as TFile;
     if (!file) {
@@ -335,6 +328,8 @@ export class ArticleRender implements MDRendererCallback {
   }
 
   async postArticle(appid:string, localCover: File | null = null, container: HTMLElement, css: string) {
+    await this.runStartWorkflow();
+
     const { token, metadata } = await this.prepareArticle(appid, localCover, container, css);
 
     // 创建草稿
@@ -346,6 +341,9 @@ export class ArticleRender implements MDRendererCallback {
     }
 
     const draft = res.json;
+
+    await this.runEndWorkflow();
+
     if (draft.media_id) {
       return draft.media_id;
     }
@@ -359,6 +357,8 @@ export class ArticleRender implements MDRendererCallback {
     if (!this.settings.authKey) {
       throw new Error('请先设置注册码（AuthKey）');
     }
+
+    await this.runStartWorkflow();
 
     let metadata = getMetadata(this.app, this.note!);
     if (metadata.appid) {
@@ -416,6 +416,8 @@ export class ArticleRender implements MDRendererCallback {
       console.error(res.text);
       throw new Error(`创建图片/文字失败, https状态码: ${res.status}  ${res.text}！`);
     }
+
+    await this.runEndWorkflow();
 
     const draft = res.json;
     if (draft.media_id) {
@@ -536,6 +538,18 @@ export class ArticleRender implements MDRendererCallback {
     }
     else {
       item.innerText = '渲染失败';
+    }
+  }
+
+  async runStartWorkflow() {
+    if (this.note) {
+      await WorkflowDataManager.getInstance().runWorkflow(this.app, this.note.path, 'start');
+    }
+  }
+
+  async runEndWorkflow() {
+    if (this.note) {
+      await WorkflowDataManager.getInstance().runWorkflow(this.app, this.note.path, 'end');
     }
   }
 

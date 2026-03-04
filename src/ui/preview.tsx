@@ -44,6 +44,7 @@ export function Preview() {
   const isCollapsed = usePluginStore.use.isCollapsed();
   const setIsCollapsed = usePluginStore.use.setIsCollapsed();
   const plugin = usePluginStore.use.plugin() as NoteToMpPlugin;
+  const isAuthed = NMPSettings.getInstance().isAuthKeyVaild();
 
   const [announcements, setAnnouncements] = useState<IAnnouncement[]>([]);
 
@@ -101,6 +102,11 @@ export function Preview() {
           <Tabs.Trigger className={styles.Trigger} value="wechat">公众号</Tabs.Trigger>
           <Tabs.Trigger className={styles.Trigger} value="zhihu">知乎</Tabs.Trigger>
           <Tabs.Trigger className={styles.Trigger} value="toutiao">头条</Tabs.Trigger>
+          {
+            isAuthed && (
+              <Tabs.Trigger className={styles.Trigger} value="twitter">𝕏 文章</Tabs.Trigger>
+            )
+          }
           <Tabs.Trigger className={styles.Trigger} value="redbook">小红书</Tabs.Trigger>
           <div 
             className={styles.CollapseBtn} 
@@ -120,6 +126,13 @@ export function Preview() {
         <Tabs.Content value="toutiao" forceMount className={styles.Content}>
           <NoteRender platform="toutiao"/>
         </Tabs.Content>
+        {
+          isAuthed && (
+            <Tabs.Content value="twitter" forceMount className={styles.Content}>
+              <NoteRender platform="twitter"/>
+            </Tabs.Content>
+          )
+        }
         <Tabs.Content value="redbook" forceMount className={styles.Content}>
           <RedBook />
         </Tabs.Content>

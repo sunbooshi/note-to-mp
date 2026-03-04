@@ -25,6 +25,7 @@ import NoteToMpPlugin from './main';
 import { wxGetToken,wxEncrypt, requestLatestVersion } from './weixin-api';
 import { cleanMathCache } from './core/markdown/math';
 import { NMPSettings } from './settings';
+import AssetsManager from './assets';
 import { DocModal } from './doc-modal';
 import { compareVersions } from './utils';
 import { WorkflowModal } from './ui/workflow/workflow';
@@ -351,16 +352,30 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 				    .inputEl.setAttr('style', 'width: 520px; height: 60px;');
 		})
 		const customCSSDoc = '使用指南：<a href="https://docs.dualhue.cn/customcss">https://docs.dualhue.cn/customcss</a>';
-		new Setting(containerEl)
+		const customCSSSetting = new Setting(containerEl)
 			.setName('自定义CSS笔记')
 			.setDesc(sanitizeHTMLToDom(customCSSDoc))
 			.addText(text => {
 				text.setPlaceholder('请输入自定义CSS笔记标题')
 				.setValue(this.settings.customCSSNote)
 				.onChange(async (value) => {
-					this.settings.customCSSNote = value.trim();
-					await this.plugin.saveSettings();
-					await this.plugin.assetsManager.loadCustomCSS();
+					const note = value.trim();
+					try {
+						if (note.length > 0) {
+							await this.plugin.assetsManager.loadCSSFromNote(note);
+						}
+						this.settings.customCSSNote = note;
+						await this.plugin.saveSettings();
+						await this.plugin.assetsManager.loadCustomCSS();
+						customCSSSetting.setDesc(sanitizeHTMLToDom(customCSSDoc));
+						customCSSSetting.descEl.removeAttribute('style');
+					}
+					catch (error) {
+						console.error(error);
+						const errorMsg = AssetsManager.formatError(error);
+						customCSSSetting.setDesc(errorMsg);
+						customCSSSetting.descEl.setAttr('style', 'color: var(--text-error); white-space: pre-wrap;');
+					}
 				})
 				.inputEl.setAttr('style', 'width: 320px;')
 		});
