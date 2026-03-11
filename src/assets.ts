@@ -195,12 +195,54 @@ export default class AssetsManager {
             return null;
         }
         cssContent = removeFrontMatter(cssContent);
+        
+        let isExplicitLess = /```[\s]*less[\s]*/gi.test(cssContent);
+
         cssContent = cssContent.replace(/```[\s]*css[\s]*/gi, '')
                                .replace(/```[\s]*less[\s]*/gi, '')
                                .replace(/```/g, '');
 
-        this.customCSS = await compileCSS(cssContent);
+        if (isExplicitLess || this.isLessCode(cssContent)) {
+            this.customCSS = await compileCSS(cssContent);
+        } else {
+            this.customCSS = cssContent;
+        }
+        
         return this.customCSS;
+    }
+
+    private isLessCode(content: string): boolean {
+        // 去掉注释
+        const cleanContent = content.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+        
+        // 1. 检查变量 (@variable:)
+        if (/@[\w-]+\s*:/g.test(cleanContent)) return true;
+        
+        // 2. 检查父选择器 (&)
+        if (/&\s*[:.]/g.test(cleanContent)) return true;
+        
+        // 3. 检查嵌套 (简单的启发式：在一个块级作用域内寻找另一个左大括号)
+        // 这个有点复杂，我们可以检查是否有类似 .a { .b { 的结构
+        // 或者更简单的，是否存在类似 { ... { 的模式 (非单行)
+        let braceCount = 0;
+        for (let i = 0; i < cleanContent.length; i++) {
+            if (cleanContent[i] === '{') {
+                braceCount++;
+                if (braceCount > 1) {
+                    // 检查是否是嵌套，而不是多个同级选择器
+                    // 如果我们在一个块还没关闭时又看到了一个 {，那很有可能是嵌套
+                    // 注意：这只是个简单的启发式
+                    return true;
+                }
+            } else if (cleanContent[i] === '}') {
+                braceCount--;
+            }
+        }
+
+        // 4. 检查 Mixin 定义或调用 (.mixin-name() 或 #mixin-name())
+        if (/[.#][\w-]+\s*\(([^)]*)\)/g.test(cleanContent)) return true;
+
+        return false;
     }
 
     async loadExpertSettings() {
