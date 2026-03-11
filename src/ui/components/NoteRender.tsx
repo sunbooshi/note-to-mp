@@ -91,6 +91,9 @@ export function NoteRender({platform}:{platform:string}) {
     else if (platform == 'toutiao') {
       url = 'https://mp.toutiao.com/profile_v4/graphic/publish';
     }
+    else if (platform == 'twitter') {
+      url = 'https://x.com/compose/articles';
+    }
     else if (platform == 'redbook') {
       url = 'https://creator.xiaohongshu.com/';
     }
@@ -111,7 +114,12 @@ export function NoteRender({platform}:{platform:string}) {
 
     try {
       setLoading(true);
-      await renderRef.current.copyWithoutCSS(contentRef.current!);
+      if (platform == 'twitter' && NMPSettings.getInstance().isAuthKeyVaild()) {
+        await renderRef.current.copyHTML(contentRef.current!);
+      }
+      else {
+        await renderRef.current.copyWithoutCSS(contentRef.current!);
+      }
       setLoading(false);
       if (NMPSettings.getInstance().isAuthKeyVaild()) {
         showMsg('复制成功，快去粘贴吧！');
@@ -133,6 +141,9 @@ export function NoteRender({platform}:{platform:string}) {
   }
   else if (platform == 'toutiao') {
     btnTitle = '去头条';
+  }
+  else if (platform == 'twitter') {
+    btnTitle = '去 𝕏';
   }
   else if (platform == 'redbook') {
     btnTitle = '去小红书';

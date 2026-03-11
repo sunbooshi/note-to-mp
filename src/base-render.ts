@@ -106,8 +106,10 @@ export class BaseRender implements MDRendererCallback {
 
   async copyWithoutCSS(container: HTMLElement) {
     await this.cachedElementsToImages(container);
+    const base = container.getElementsByClassName('note-to-mp-base');
+    let content = base.length == 0 ? container.innerHTML : base[0].innerHTML;
+
     if (!this.settings.isAuthKeyVaild()) {
-      const content = container.innerHTML;
       await navigator.clipboard.write([new ClipboardItem({
         'text/html': new Blob([content], { type: 'text/html' })
       })]);
@@ -116,7 +118,7 @@ export class BaseRender implements MDRendererCallback {
 
     await this.imageManager.uploadToOSS(container, this.settings.authKey, this.app.vault);
 
-    const content = container.innerHTML;
+    content = base.length == 0 ? container.innerHTML : base[0].innerHTML;
     await navigator.clipboard.write([new ClipboardItem({
       'text/html': new Blob([content], { type: 'text/html' })
     })]);
@@ -135,6 +137,19 @@ export class BaseRender implements MDRendererCallback {
     a.click();
     URL.revokeObjectURL(url);
     a.remove();
+  }
+
+  async copyHTML(container: HTMLElement) {
+    await this.cachedElementsToImages(container);
+    const base = container.getElementsByClassName('note-to-mp-base');
+    const root = base.length == 0 ? container : base[0] as HTMLElement;
+    const lm = this.imageManager;
+    const content = await lm.embleImages(root, this.app.vault);
+    const blob = new Blob([content], { type: 'text/html' });
+
+    await navigator.clipboard.write([new ClipboardItem({
+      'text/html': blob
+    })]);
   }
 
   async processCachedElements(root: HTMLElement) {

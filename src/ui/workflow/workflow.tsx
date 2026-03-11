@@ -20,12 +20,17 @@
  * THE SOFTWARE.
  */
 
-import { App, Modal, requestUrl } from "obsidian";
+import { App, Modal, requestUrl, TFile, Notice } from "obsidian";
 import * as ReactDOM from 'react-dom/client';
 import * as Tabs from "@radix-ui/react-tabs";
-import { NMPSettings } from "src/settings";
+import { NMPSettings } from "@/settings";
 import { useEffect, useState, useRef } from "react";
 import { CaretSortIcon, ChevronDownIcon, ChevronUpIcon, CheckIcon } from "@radix-ui/react-icons";
+import { WorkflowDataManager } from "@/core/WorkflowManager";
+import { usePluginStore } from "@/store/PluginStore";
+import { ArticleRender } from "src/article-render";
+import { LoadingOrb } from "../components/Loading";
+import { ResultViewer } from "./resultviewer";
 import * as Select from "@radix-ui/react-select";
 
 import styles from "./workflow.module.css";
@@ -606,6 +611,111 @@ export class WorkflowModal extends Modal {
     let { contentEl } = this;
     this.view = ReactDOM.createRoot(contentEl);
     this.view.render(<Workflow />);
+  }
+
+  onClose() {
+    let { contentEl } = this;
+    this.view?.unmount();
+    this.view = null;
+    contentEl.empty();
+  }
+}
+
+function WorkflowRun({note}: {note: TFile}) {
+  const [loading, setLoading] = useState(true);
+  const [running, setRunning] = useState(false);
+  const [finished, setFinished] = useState(false);
+  const [result, setResult] = useState<any>(null);
+  const [message, setMessage] = useState('数据解析中...');
+  const app = usePluginStore(state => state.app);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const renderRef = useRef<ArticleRender>(new ArticleRender(app));
+
+  const run = async() => {
+    setRunning(true);
+    setMessage('运行中...');
+    let startRes = null;
+    let endRes = null;
+    try {
+      startRes = await WorkflowDataManager.getInstance().runWorkflow(app, note.path, 'start', true);
+      endRes = await WorkflowDataManager.getInstance().runWorkflow(app, note.path, 'end', true);
+      setMessage('✅运行完成');
+      setFinished(true);
+      if (startRes) {
+        setResult(startRes);
+      }
+      if (endRes) {
+        setResult(endRes);
+      }
+    } catch (e) {
+      setMessage('工作流运行失败: ' + e.message);
+    } finally {
+      setRunning(false);
+    }
+  }
+
+  const renderNote = async (note: TFile) => {
+    if (!contentRef.current) return '';
+    await renderRef.current.renderMarkdown(contentRef.current!, note);
+  };
+
+  useEffect(() => {
+    if (!contentRef.current) return;
+    renderNote(note).then(() => {
+      setLoading(false);
+      setMessage('数据准备完成');
+    }).catch((e) => {
+      setMessage('解析失败: ' + e.message);
+      setLoading(false);
+    });
+  }, [note, contentRef]);
+
+  if (finished) {
+    return (
+      <div className={styles.WorkflowRun}>
+        <h2>{message}</h2>
+        <ResultViewer data={result} />
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.WorkflowRun}>
+      <h2>工作流调用</h2>
+      <div style={{maxHeight: 1, overflow: 'hidden'}}>
+        <div ref={contentRef} style={{padding:10}}></div>
+      </div>
+      <div style={{display: 'flex', alignItems: 'center', gap: 10, height: 44}}>
+        {running && (
+          <LoadingOrb />
+        )}
+        <div>
+          {message}
+        </div>
+      </div>
+      <div style={{display: 'flex', justifyContent: 'flex-end', marginTop: 10, marginRight: 10}}>
+        {!loading && (
+          <button onClick={run} disabled={running}>开始调用</button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export class WorkflowRunModal extends Modal {
+  view: ReactDOM.Root | null = null;
+  note: TFile;
+
+  constructor(app: App, note: TFile) {
+    super(app);
+    this.note = note;
+  }
+  
+  onOpen() {
+    let { contentEl, modalEl } = this;
+    modalEl.style.minHeight = '200px';
+    this.view = ReactDOM.createRoot(contentEl);
+    this.view.render(<WorkflowRun note={this.note} />);
   }
 
   onClose() {
