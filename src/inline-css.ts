@@ -161,7 +161,7 @@ section .note-callout-custom {
 }
 
 .block-math-svg svg {
-  scale: 0.85;
+  scale: 1;
 }
 
 .block-math-section {
@@ -170,7 +170,8 @@ section .note-callout-custom {
 }
 
 .inline-math-svg svg {
-  font-size: 0.85em;
+  font-size: 1em;
+  overflow: visible;
 }
 
 /* --------------------------------------- */

@@ -244,7 +244,7 @@ export class ArticleRender implements MDRendererCallback {
   }
 
   async copyArticle(container: HTMLElement, css: string, appid: string | null) {
-    if (appid) {
+    if (appid && this.settings.isAuthKeyVaild()) {
       await this.uploadImages(appid, container);
     }
     const content = this.getArticleContent(container, css);
@@ -527,7 +527,10 @@ export class ArticleRender implements MDRendererCallback {
   }
 
   updateElementByID(container:HTMLElement, id: string, html: string): void {
-    const item = container.querySelector('#' + id) as HTMLElement;
+    let item = container;
+    if (container.id !== id) {
+      item = container.querySelector('#' + id) as HTMLElement;
+    }
     if (!item) return;
     const doc = sanitizeHTMLToDom(html);
     item.empty();
