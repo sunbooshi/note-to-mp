@@ -83,11 +83,8 @@ export class ImageBGModal extends Modal {
   }
 
   handleMessage(event: MessageEvent) {
-    console.log('handleMessage', event);
-    console.log('origin', event.origin);
     if (this.url.startsWith(event.origin)) {
       const { type, settings } = event.data;
-      console.log('type', type);
       if (type === 'gradify-save-config') {
         this.saveConfig(settings);
       }
