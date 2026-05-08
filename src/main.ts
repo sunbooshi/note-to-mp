@@ -88,7 +88,7 @@ export default class NoteToMpPlugin extends Plugin {
 		});
 
 		this.addCommand({
-			id: 'note-to-mp-image',
+			id: 'note-to-mp-image-background',
 			name: '图片背景设置',
 			callback: () => {
 				new ImageBGModal(this.app, this).open();
