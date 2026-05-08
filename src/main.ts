@@ -31,6 +31,8 @@ import { NotePubModal } from './note-pub';
 import { usePluginStore } from './store/PluginStore';
 import './styles.css';
 import { WorkflowModal, WorkflowRunModal } from './ui/workflow/workflow';
+import './lib/shot-render.es.js';
+import { ImageBGModal } from './image-bg-modal';
 
 
 export default class NoteToMpPlugin extends Plugin {
@@ -82,6 +84,14 @@ export default class NoteToMpPlugin extends Plugin {
 			name: '插入样式小部件',
 			callback: () => {
 				new WidgetsModal(this.app).open();
+			}
+		});
+
+		this.addCommand({
+			id: 'note-to-mp-image-background',
+			name: '图片背景设置',
+			callback: () => {
+				new ImageBGModal(this.app, this).open();
 			}
 		});
 
