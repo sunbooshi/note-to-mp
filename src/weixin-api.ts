@@ -155,6 +155,7 @@ export interface DraftArticle {
     theme?: string;
     highlight?: string;
     css?: string;
+    disable_image_background?: boolean;
 }
 
 function convertArticle(data: DraftArticle) {
@@ -319,6 +320,7 @@ export function getMetadata(app: App, file: TFile) {
         theme: undefined,
         highlight: undefined,
         css: undefined,
+        disable_image_background: false,
     }
     const metadata = app.metadataCache.getFileCache(file);
     if (metadata?.frontmatter) {
@@ -343,6 +345,7 @@ export function getMetadata(app: App, file: TFile) {
             res.pic_crop_1_1 = '0_0.525_0.404_1';
         }
         res.css = getFrontmatterValue(frontmatter, keys.css);
+        res.disable_image_background = frontmatter[keys.disable_image_background] ?? false;
     }
     return res;
 }

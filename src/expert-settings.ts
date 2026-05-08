@@ -44,6 +44,7 @@ export interface ExpertSettings {
     highlight: string;
     crop: string;
     css: string;
+    disable_image_background: string;
   }
 }
 
@@ -63,6 +64,7 @@ export const defaultExpertSettings: ExpertSettings = {
     highlight: '代码高亮',
     crop: '封面裁剪',
     css: '自定义样式笔记',
+    disable_image_background: '禁用图片背景',
   }
 };
 

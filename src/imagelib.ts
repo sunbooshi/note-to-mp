@@ -26,9 +26,9 @@ import { NMPSettings } from "./settings";
 import { IsWasmReady, LoadWasm } from "./wasm/wasm";
 import  AssetsManager from "./assets";
 
-declare function GoWebpToJPG(data: Uint8Array): Uint8Array;
-declare function GoWebpToPNG(data: Uint8Array): Uint8Array;
-declare function GoAddWatermark(img: Uint8Array, watermark: Uint8Array): Uint8Array;
+declare function GoWebpToJPG(data: Uint8Array): ArrayBuffer;
+declare function GoWebpToPNG(data: Uint8Array): ArrayBuffer;
+declare function GoAddWatermark(img: Uint8Array, watermark: Uint8Array): ArrayBuffer;
 
 export function IsImageLibReady() {
   return IsWasmReady();
@@ -65,4 +65,47 @@ export async function UploadImageToWx(data: Blob, filename: string, token: strin
     data = new Blob([watermarkImg], { type: data.type });
   }
   return await wxUploadImage(data, filename, token, type);
+}
+
+export function ImageToShot(img: HTMLImageElement) {
+  const shotRender = document.createElement('shot-render');
+  shotRender.setAttribute('image', img.src);
+  shotRender.setAttribute('src', img.src);
+
+  const extra = NMPSettings.getInstance().extraSettings;
+  if (!extra?.imageFrame) {
+    return null;
+  }
+
+  const cfg = extra.imageFrame;
+  shotRender.setAttribute('gradient', cfg.backgroundMode === 'solid' ? cfg.solidColor : cfg.gradient);
+  shotRender.setAttribute('direction', cfg.direction);
+  shotRender.setAttribute('padding', String(cfg.padding));
+  shotRender.setAttribute('border-style', cfg.borderStyle);
+  shotRender.setAttribute('border-radius', String(cfg.borderRadius));
+  shotRender.setAttribute('background-radius', String(cfg.backgroundRadius));
+  if (cfg.showShadow) {
+    shotRender.setAttribute('show-shadow', '');
+  }
+  if (cfg.watermark) {
+    shotRender.setAttribute('watermark-text', cfg.watermark.text);
+    shotRender.setAttribute('watermark-font', cfg.watermark.font);
+    shotRender.setAttribute('watermark-size', String(cfg.watermark.size));
+    shotRender.setAttribute('watermark-color', cfg.watermark.color);
+    shotRender.setAttribute('watermark-position', cfg.watermark.position);
+    shotRender.setAttribute('watermark-opacity', String(cfg.watermark.opacity));
+  }
+
+  const imgId = img.getAttribute('data-img-id');
+  if (imgId) {
+    shotRender.setAttribute('data-img-id', imgId);
+  }
+
+  const w = img.getAttribute('width') || img.style.width;
+  const h = img.getAttribute('height') || img.style.height;
+  if (w) shotRender.setAttribute('image-width', w);
+  if (h) shotRender.setAttribute('image-height', h);
+  shotRender.setAttribute('style', 'width: fit-content;');
+
+  return shotRender;
 }

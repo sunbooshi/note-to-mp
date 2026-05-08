@@ -22,6 +22,32 @@
 
 import { wxKeyInfo } from './weixin-api';
 
+export interface WatermarkSettings {
+    text: string;
+    font: string;
+    size: number;
+    color: string;
+    position: string;
+    opacity: number;
+}
+
+export interface ImageFrameSettings {
+    backgroundMode: string;
+    gradient: string;
+    solidColor: string;
+    direction: string;
+    padding: number;
+    backgroundRadius: number;
+    borderStyle: string;
+    borderRadius: number;
+    showShadow: boolean;
+    watermark: WatermarkSettings;
+}
+
+export interface ExtraSettings {
+    imageFrame: ImageFrameSettings | null;
+}
+
 export class NMPSettings {
     defaultStyle: string;
     defaultHighlight: string;
@@ -44,6 +70,7 @@ export class NMPSettings {
     isLoaded: boolean = false;
     enableEmptyLine: boolean = false;
     dismissedAnnouncements: string[] = [];
+    extraSettings: ExtraSettings | null = null;
 
     private static instance: NMPSettings;
 
@@ -106,6 +133,7 @@ export class NMPSettings {
             isVip,
             expireat,
             dismissedAnnouncements,
+            extraSettings,
         } = data;
 
         const settings = NMPSettings.getInstance();
@@ -169,6 +197,9 @@ export class NMPSettings {
         if (dismissedAnnouncements) {
              settings.dismissedAnnouncements = dismissedAnnouncements;
         }
+        if (extraSettings) {
+            settings.extraSettings = extraSettings;
+        }
         settings.isLoaded = true;
     }
 
@@ -195,6 +226,7 @@ export class NMPSettings {
             'isVip': settings.isVip,
             'expireat': settings.expireat,
             'dismissedAnnouncements': settings.dismissedAnnouncements,
+            'extraSettings': settings.extraSettings,
         }
     }
 
