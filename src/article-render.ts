@@ -553,7 +553,7 @@ export class ArticleRender implements MDRendererCallback {
         width: width,
         height: height,
         pixelRatio: 1, 
-        cacheBust: true, 
+        cacheBust: false, 
         skipFonts: true,
         style: {
           margin: '0',
