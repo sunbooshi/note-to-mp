@@ -24,6 +24,7 @@ import { App, TFile } from 'obsidian';
 import { BaseRender } from './base-render';
 import { MDRendererCallback } from './core/markdown/extension';
 import { RedBookParser } from './core/markdown/redbook-parser';
+import { removeFrontMatter } from './utils';
 
 export class RedBookRender extends BaseRender implements MDRendererCallback {
   redBookParser: RedBookParser;
@@ -54,6 +55,7 @@ export class RedBookRender extends BaseRender implements MDRendererCallback {
       }
 
       this.note = af;
+      md = removeFrontMatter(md);
       
       this.articleHTML = await this.redBookParser.parse(md);
       this.setArticle(container, this.articleHTML);

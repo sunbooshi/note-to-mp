@@ -444,6 +444,14 @@ export class ArticleRender implements MDRendererCallback {
     a.remove();
   }
 
+  async getHtmlWithImages(container: HTMLElement) {
+    await this.cachedElementsToImages(container);
+    const lm = this.imageManager;
+    const section = container.querySelector('#article-section') as HTMLElement;
+    const content = await lm.embleImages(section, this.app.vault);
+    return content;
+  }
+
   async processCachedElements(root: HTMLElement) {
     const af = this.note;
     if (!af) {

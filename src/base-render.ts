@@ -28,7 +28,9 @@ import { MDRendererCallback } from './core/markdown/extension';
 import { MarkedParser } from './core/markdown/parser';
 import { LocalImageManager, LocalFile } from './core/markdown/local-file';
 import { debounce, removeFrontMatter } from './utils';
+import { getMetadata } from './weixin-api';
 import { toPng } from 'html-to-image';
+import { ImageToShot } from './imagelib';
 
 
 export class BaseRender implements MDRendererCallback {
@@ -169,6 +171,24 @@ export class BaseRender implements MDRendererCallback {
         }
       }
     }
+
+    const metadata = getMetadata(this.app, this.note!);
+    
+    if (this.settings.extraSettings
+        && this.settings.extraSettings.imageFrame
+        && !metadata.disable_image_background
+        && this.settings.isAuthKeyVaild()) {
+      const img = root.querySelectorAll('img');
+      img.forEach((img) => {
+        if (img.getAttribute('data-source') !== 'note') return;
+        if (img.closest('shot-render')) return;
+        const shotRender = ImageToShot(img);
+        if (shotRender) {
+          img.replaceWith(shotRender);
+        }
+      });
+    }
+
     component.unload();
   }
 
@@ -183,6 +203,95 @@ export class BaseRender implements MDRendererCallback {
       } else if (category === 'excalidraw') {
         await this.replaceExcalidrawWithImage(container, elementId);
       }
+    }
+
+    // 处理shot-render
+    const shotRenders = root.querySelectorAll('shot-render');
+    for (const shotRender of shotRenders) {
+      await this.replaceShotRenderWithImage(root, shotRender as HTMLElement);
+    }
+  }
+
+  private async replaceShotRenderWithImage(container: HTMLElement, shotRender: HTMLElement) {
+    // 复制节点并创建一个临时隐藏容器
+    const clone = shotRender.cloneNode(true) as HTMLElement;
+    const tempContainer = document.createElement('div');
+    
+    // 必须将容器加入 DOM 才能正确测量和渲染，设置为 fixed 且移出视口
+    // 注意：不能使用 visibility: hidden，否则 toPng 可能会渲染出空白图片
+    tempContainer.style.cssText = `
+      position: fixed;
+      left: -10000px;
+      top: 0;
+      width: 1280px;
+      height: auto;
+      z-index: -1;
+    `;
+    
+    document.body.appendChild(tempContainer);
+    tempContainer.appendChild(clone);
+
+    // 设置克隆节点的样式，限制最大宽度为 1280px
+    clone.style.maxWidth = '1280px';
+    clone.style.width = 'fit-content';
+    clone.style.margin = '0';
+    clone.style.display = 'block';
+
+    try {
+      // 等待 Web Component 内部渲染完成（主要是 Shadow DOM 内容）
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      // 等待内部图片加载完成
+      const images = Array.from(clone.querySelectorAll('img'));
+      await Promise.all(images.map(img => {
+        if ((img as HTMLImageElement).complete) return Promise.resolve();
+        return new Promise(resolve => {
+          img.onload = resolve;
+          img.onerror = resolve;
+        });
+      }));
+
+      const width = clone.offsetWidth;
+      const height = clone.offsetHeight;
+
+      if (width === 0 || height === 0) {
+        console.warn('shot-render clone has 0 size');
+        return;
+      }
+
+      const pngDataUrl = await toPng(clone, { 
+        width: width,
+        height: height,
+        pixelRatio: 1, 
+        cacheBust: false, 
+        skipFonts: true,
+        style: {
+          margin: '0',
+          maxWidth: '1280px',
+        }
+      });
+
+      if (pngDataUrl && pngDataUrl.length > 100) {
+        const img = document.createElement('img');
+        img.src = pngDataUrl;
+
+        const imgId = shotRender.getAttribute('data-img-id');
+        if (imgId) {
+          img.setAttribute('data-img-id', imgId);
+        }
+
+        const style = shotRender.getAttribute('style');
+        if (style) {
+          img.setAttribute('style', style);
+        }
+
+        shotRender.replaceWith(img);
+      }
+    } catch (error) {
+      console.warn('Failed to render shot-render clone:', error);
+    } finally {
+      // 移除临时容器
+      document.body.removeChild(tempContainer);
     }
   }
 
