@@ -39,13 +39,24 @@ function RedBookInternal() {
     if (!activeNote) return;
 
     const renderContent = async () => {
+      const tempDiv = document.createElement('div');
       try {
-        const tempDiv = document.createElement('div');
+        tempDiv.style.position = 'fixed';
+        tempDiv.style.left = '-9999px';
+        tempDiv.style.top = '-9999px';
+        tempDiv.style.width = '750px';
+        tempDiv.style.height = 'auto';
+        document.body.appendChild(tempDiv);
+
         await htmlRenderRef.current.renderMarkdown(tempDiv, activeNote);
         const html = await htmlRenderRef.current.getHtmlWithImages(tempDiv);
         setHtmlContent(html);
       } catch (error) {
         console.error('Render failed:', error);
+      } finally {
+        if (tempDiv.parentNode) {
+          document.body.removeChild(tempDiv);
+        }
       }
     };
 

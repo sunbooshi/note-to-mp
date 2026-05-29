@@ -50,12 +50,24 @@ export interface MdToImageConverterProps {
   htmlContent: string;
 }
 
+const formatFontFamily = (font: string) => {
+  if (!font || font === '默认') return undefined;
+  const systemKeywords = ['system-ui', 'sans-serif', 'serif', 'monospace', 'cursive', 'fantasy', 'inherit', 'initial', 'revert', 'unset'];
+  if (systemKeywords.includes(font.toLowerCase())) {
+    return font;
+  }
+  if ((font.startsWith('"') && font.endsWith('"')) || (font.startsWith("'") && font.endsWith("'"))) {
+    return font;
+  }
+  return `"${font}"`;
+};
+
 const DEFAULT_SETTINGS: MdToImageSettings = {
   pageMode: 'single',
   width: 750,
   height: 1000,
   presetRatio: 'xhs-3-4',
-  fontFamily: 'system-ui',
+  fontFamily: '默认',
   fontSize: 16,
   backgroundType: 'theme',
   backgroundColor: '#ffffff',
@@ -275,6 +287,7 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
 
   // Local fonts state
   const [fontList, setFontList] = useState<string[]>([
+    '默认',
     'system-ui',
     'Microsoft YaHei',
     'PingFang SC',
@@ -299,7 +312,7 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
             const fonts = await (window as any).queryLocalFonts();
             const uniqueFamilies = Array.from(new Set(fonts.map((f: any) => f.family))) as string[];
             if (uniqueFamilies.length > 0) {
-              setFontList(uniqueFamilies.sort());
+              setFontList(['默认', ...uniqueFamilies.sort()]);
             }
           }
         } catch (e) {
@@ -347,17 +360,101 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
     }
 
     if (settings.pageMode === 'hr') {
-      const offsets: number[] = [0];
+      const hrOffsets: number[] = [0];
       for (let i = 0; i < children.length; i++) {
         const child = children[i];
         if (child.tagName === 'HR') {
-          const nextStart = child.offsetTop + child.offsetHeight;
-          if (nextStart < height - 10) {
-            offsets.push(nextStart);
+          let nextIndex = i + 1;
+          while (nextIndex < children.length && children[nextIndex].tagName === 'HR') {
+            nextIndex++;
           }
+          if (nextIndex < children.length) {
+            const nextStart = children[nextIndex].offsetTop;
+            if (nextStart < height - 10) {
+              if (!hrOffsets.includes(nextStart)) {
+                hrOffsets.push(nextStart);
+              }
+            }
+          }
+          i = nextIndex - 1;
         }
       }
-      setPageOffsets(offsets);
+
+      if (!hrOffsets.includes(height)) {
+        hrOffsets.push(height);
+      }
+      hrOffsets.sort((a, b) => a - b);
+
+      const viewportHeightVal = Math.max(50, settings.height - 2 * settings.padding);
+      const finalOffsets: number[] = [];
+
+      for (let k = 0; k < hrOffsets.length - 1; k++) {
+        const segmentStart = hrOffsets[k];
+        const segmentEnd = hrOffsets[k + 1];
+
+        finalOffsets.push(segmentStart);
+
+        let currentTop = segmentStart;
+        while (currentTop < segmentEnd) {
+          const pageEnd = currentTop + viewportHeightVal;
+          if (pageEnd >= segmentEnd) {
+            break;
+          }
+
+          let splitPoint = pageEnd;
+          let foundIntersecting = false;
+
+          for (let i = 0; i < children.length; i++) {
+            const child = children[i];
+            const childTop = child.offsetTop;
+            const childBottom = childTop + child.offsetHeight;
+
+            if (childBottom <= currentTop || childTop >= segmentEnd) {
+              continue;
+            }
+
+            if (childTop < pageEnd && childBottom > pageEnd) {
+              foundIntersecting = true;
+              const isHeading = /^(H[1-6])$/i.test(child.tagName);
+              const fitsInOnePage = child.offsetHeight <= viewportHeightVal;
+
+              if (isHeading || fitsInOnePage) {
+                if (childTop > currentTop) {
+                  splitPoint = childTop;
+                } else {
+                  splitPoint = pageEnd;
+                }
+              } else {
+                splitPoint = pageEnd;
+              }
+              break;
+            }
+
+            if (childTop >= pageEnd) {
+              splitPoint = childTop;
+              foundIntersecting = true;
+              break;
+            }
+          }
+
+          if (!foundIntersecting) {
+            splitPoint = pageEnd;
+          }
+
+          if (splitPoint <= currentTop) {
+            splitPoint = currentTop + viewportHeightVal;
+          }
+
+          if (splitPoint >= segmentEnd) {
+            break;
+          }
+
+          finalOffsets.push(splitPoint);
+          currentTop = splitPoint;
+        }
+      }
+
+      setPageOffsets(finalOffsets);
       setContentHeight(height);
       return;
     }
@@ -570,7 +667,7 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
             style={{
               width: viewportWidth,
               transform: `translateY(-${offsetY}px)`,
-              fontFamily: settings.fontFamily,
+              fontFamily: formatFontFamily(settings.fontFamily),
               fontSize: `${settings.fontSize}px`,
               background: 'transparent',
               backgroundColor: 'transparent',
@@ -765,6 +862,9 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
       {activeTheme && (
         <style dangerouslySetInnerHTML={{ __html: activeTheme.css.replace(/\.note-to-mp/g, `.${instanceId}`) }} />
       )}
+      {isSplitByHr && (
+        <style dangerouslySetInnerHTML={{ __html: `.${instanceId} hr { display: none !important; }` }} />
+      )}
 
       {/* --- Top Panel: Actions Toolbar --- */}
       <div className={styles.toolbar}>
@@ -885,7 +985,7 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
               className={`${instanceId} ${isSplitByHr ? 'split-by-hr' : ''}`}
               style={{
                 width: viewportWidth,
-                fontFamily: settings.fontFamily,
+                fontFamily: formatFontFamily(settings.fontFamily),
                 fontSize: `${settings.fontSize}px`,
                 lineHeight: 1.6,
                 background: 'transparent',
