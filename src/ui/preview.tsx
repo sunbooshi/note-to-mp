@@ -107,7 +107,7 @@ export function Preview() {
               <Tabs.Trigger className={styles.Trigger} value="twitter">𝕏 文章</Tabs.Trigger>
             )
           }
-          <Tabs.Trigger className={styles.Trigger} value="redbook">小红书</Tabs.Trigger>
+          <Tabs.Trigger className={styles.Trigger} value="redbook">贴图</Tabs.Trigger>
           <div 
             className={styles.CollapseBtn} 
             data-floating={isCollapsed} 

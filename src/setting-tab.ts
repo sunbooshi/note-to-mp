@@ -396,12 +396,14 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 		});
 		
 		let descHtml = '详情说明：<a href="https://docs.dualhue.cn/subscribe">https://docs.dualhue.cn/subscribe</a>';
-		if (this.settings.isVip) {
-			descHtml = '<span style="color:rgb(245, 70, 85);font-weight: bold;">👑永久会员</span><br/>' + descHtml;
-		}
-		else if (this.settings.expireat) {
-			const timestr = this.settings.expireat.toLocaleString();
-			descHtml = `有效期至：${timestr} <br/>${descHtml}`
+		if (this.settings.isAuthKeyVaild()) {
+			if (this.settings.isVip) {
+				descHtml = '<span style="color:rgb(245, 70, 85);font-weight: bold;">👑永久会员</span><br/>' + descHtml;
+			}
+			else if (this.settings.expireat) {
+				const timestr = this.settings.expireat.toLocaleString();
+				descHtml = `有效期至：${timestr} <br/>${descHtml}`
+			}
 		}
 		new Setting(containerEl)
 			.setName('注册码（AuthKey）')

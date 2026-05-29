@@ -1,0 +1,886 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 500px;
+  background-color: var(--background-secondary);
+  color: #0f172a;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.container * {
+  box-sizing: border-box;
+}
+
+/* --- Topactions Toolbar --- */
+.toolbar {
+  display: flex;
+  flex-direction: row;
+  padding: 10px;
+  border-bottom: 1px solid var(--border-color, var(--color-base-40, rgba(0, 0, 0, 0.08)));
+  background-color: var(--background-primary);
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.toolbarActions {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 10px;
+  row-gap: 5px;
+  padding: 0 10px;
+  align-items: center;
+}
+
+.toolbarBtn {
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 12px !important;
+  cursor: pointer !important;
+  border-radius: 6px !important;
+  background-color: var(--background-primary) !important;
+  color: var(--text-normal) !important;
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08)) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.2s ease !important;
+}
+
+.toolbarBtn:hover:not(:disabled) {
+  background-color: var(--background-secondary-alt, #f1f5f9) !important;
+  border-color: var(--border-color-hover, rgba(0, 0, 0, 0.15)) !important;
+}
+
+.toolbarBtn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  background-color: var(--background-secondary) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* --- Main Split Content --- */
+.mainContent {
+  position: relative;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  min-height: 0;
+  height: 100%;
+}
+
+.backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: transparent;
+  z-index: 95;
+  cursor: pointer;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.backdropHidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.backdropVisible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* --- Left: Preview Area --- */
+.previewArea {
+  flex: 1;
+  padding: 20px 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: #f1f5f9;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+
+.previewArea::-webkit-scrollbar {
+  width: 6px;
+}
+
+.previewArea::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+}
+
+/* Floating Settings Gear Button */
+.settingsToggleBtn {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  z-index: 90 !important;
+  transition: all 0.2s ease !important;
+  color: #475569 !important;
+  padding: 0 !important;
+  outline: none !important;
+}
+
+.settingsToggleBtn:hover {
+  transform: scale(1.05) !important;
+  background: #ffffff !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2) !important;
+  color: #0f172a !important;
+}
+
+.settingsToggleBtn svg {
+  transition: transform 0.3s ease;
+}
+
+.settingsToggleBtn:hover svg {
+  transform: rotate(45deg);
+}
+
+/* Zoom Scale Wrapper for Preview */
+.previewScaleWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: top center;
+}
+
+.previewTitle {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #475569;
+  font-weight: 600;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Page Card list */
+.pagesList {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+:global(.md-to-image-page-frame) {
+  position: relative;
+  background-color: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.pageBadge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Page inner offset container */
+.pageOffsetContainer {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* Custom CSS styling element container (This gets rendered) */
+.renderedContent {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* --- Right: Settings Sidebar (White Glassmorphic Floating Panel) --- */
+.settingsArea {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  bottom: 16px;
+  width: 340px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  z-index: 100;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  transition: opacity 0.2s ease;
+  scrollbar-width: none;
+}
+
+.settingsArea::-webkit-scrollbar {
+  display: none;
+}
+
+.settingsArea.collapsed {
+  transform: translateX(110%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.settingsArea.expanded {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Settings Sidebar Header */
+.settingsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 10px;
+}
+
+.closeBtn {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 4px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #64748b !important;
+  border-radius: 4px !important;
+  transition: all 0.2s ease !important;
+}
+
+.closeBtn:hover {
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: #0f172a !important;
+}
+
+.sectionTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  border-left: 3px solid #6366f1;
+  padding-left: 10px;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.inputDesc {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: -2px;
+}
+
+/* Inputs, Selects */
+.inputText {
+  width: 100%;
+  background: #f8fafc;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #0f172a;
+  font-size: 13px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.inputText:focus {
+  border-color: #6366f1;
+  background: #ffffff;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+}
+
+/* Double input group (Width & Height) */
+.doubleRow {
+  display: flex;
+  gap: 12px;
+}
+
+.doubleRow > div {
+  flex: 1;
+}
+
+/* Sliders Header */
+.sliderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sliderValue {
+  font-size: 12px;
+  font-weight: 700;
+  color: #4f46e5;
+  background: rgba(99, 102, 241, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Colors & Gradients Presets */
+.colorRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.colorPickerWrapper {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.colorPicker {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  background: none;
+}
+
+.gradientPresets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.gradientBtn {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  transition: transform 0.15s ease, border-color 0.15s ease !important;
+}
+
+.gradientBtn:hover {
+  transform: scale(1.15) !important;
+  border-color: rgba(0, 0, 0, 0.25) !important;
+}
+
+.gradientBtn[data-state="on"],
+.gradientBtn.active {
+  box-shadow: 0 0 0 2px #6366f1 !important;
+  transform: scale(1.1) !important;
+}
+
+/* Color swatches grid */
+.colorSwatchesGrid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.colorSwatch {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  position: relative !important;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
+  overflow: hidden !important;
+}
+
+.colorSwatch:hover {
+  transform: scale(1.15) !important;
+  border-color: rgba(0, 0, 0, 0.25) !important;
+  z-index: 2 !important;
+}
+
+.colorSwatch.active {
+  box-shadow: 0 0 0 2px #6366f1 !important;
+  transform: scale(1.1) !important;
+  border-color: transparent !important;
+  z-index: 2 !important;
+}
+
+/* Transparent swatch checkerboard background pattern */
+.colorSwatch.transparentCheckerboard {
+  background-color: #ffffff;
+  background-image: linear-gradient(45deg, #e2e8f0 25%, transparent 25%, transparent 75%, #e2e8f0 75%, #e2e8f0),
+                    linear-gradient(45deg, #e2e8f0 25%, transparent 25%, transparent 75%, #e2e8f0 75%, #e2e8f0);
+  background-size: 8px 8px;
+  background-position: 0 0, 4px 4px;
+}
+
+/* Custom color picker swatch */
+.colorSwatch.customSwatch {
+  background: linear-gradient(135deg, #ff0000 0%, #ffff00 25%, #00ff00 50%, #00ffff 75%, #0000ff 100%);
+}
+
+.customColorPicker {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  width: 40px;
+  height: 40px;
+  opacity: 0;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Loading Spinner */
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Preview Loading Area */
+.previewLoading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 10;
+}
+
+.loadingSpinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(99, 102, 241, 0.15);
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Offscreen container for clean image export rendering */
+.offscreenExportContainer {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* --- Switch Wrapper --- */
+.switchWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+/* --- Radix UI Select component styling --- */
+.SelectTrigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: #f8fafc;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #0f172a;
+  font-size: 13px;
+  outline: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.SelectTrigger:focus {
+  border-color: #6366f1;
+  background: #ffffff;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+}
+
+.SelectIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+}
+
+.SelectContent {
+  max-height: 40vh;
+  overflow: hidden;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  z-index: 1000;
+  width: var(--radix-select-trigger-width);
+}
+
+.SelectViewport {
+  padding: 5px;
+}
+
+.SelectItem {
+  font-size: 13px;
+  color: #0f172a;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  padding: 8px 35px 8px 25px;
+  position: relative;
+  user-select: none;
+  cursor: pointer;
+}
+
+.SelectItem[data-highlighted] {
+  outline: none;
+  background-color: #6366f1;
+  color: white;
+}
+
+.SelectItemIndicator {
+  position: absolute;
+  left: 5px;
+  width: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.SelectScrollButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 25px;
+  background-color: white;
+  color: #64748b;
+  cursor: default;
+}
+
+.SelectLabel {
+  padding: 0 25px;
+  font-size: 11px;
+  line-height: 25px;
+  color: #64748b;
+}
+
+/* --- Radix UI Slider component styling --- */
+.SliderRoot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  user-select: none;
+  touch-action: none;
+  width: 100%;
+  height: 20px;
+}
+
+.SliderTrack {
+  background-color: #e2e8f0;
+  position: relative;
+  flex-grow: 1;
+  border-radius: 9999px;
+  height: 6px;
+}
+
+.SliderRange {
+  position: absolute;
+  background-color: #6366f1;
+  border-radius: 9999px;
+  height: 100%;
+}
+
+.SliderThumb {
+  display: block;
+  width: 16px;
+  height: 16px;
+  background-color: #6366f1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.SliderThumb:hover {
+  transform: scale(1.25);
+  background-color: #4f46e5;
+}
+
+.SliderThumb:focus {
+  outline: none;
+  box-shadow: 0 0 0 5px rgba(99, 102, 241, 0.3);
+}
+
+/* --- Radix UI ToggleGroup component styling --- */
+.ToggleGroup {
+  display: flex;
+  background: #f1f5f9;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  padding: 2px;
+  width: 100%;
+}
+
+.ToggleGroupItem {
+  flex: 1;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #64748b !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 8px !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  text-align: center !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.ToggleGroupItem:hover {
+  color: #0f172a !important;
+}
+
+.ToggleGroupItem[data-state="on"] {
+  background: #6366f1 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.2) !important;
+}
+
+/* Preset grid toggle group style */
+.PresetGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.PresetItem {
+  background: #f8fafc !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  box-shadow: none !important;
+  color: #64748b !important;
+  padding: 8px 4px !important;
+  border-radius: 6px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  text-align: center !important;
+  transition: all 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.PresetItem:hover {
+  border-color: rgba(0, 0, 0, 0.15) !important;
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.PresetItem[data-state="on"] {
+  background: rgba(99, 102, 241, 0.08) !important;
+  border-color: #6366f1 !important;
+  color: #4f46e5 !important;
+}
+
+/* Dark mode overrides for UI elements */
+:global(.theme-dark) .container {
+  background-color: var(--background-secondary);
+  color: #f1f5f9;
+}
+
+:global(.theme-dark) .toolbar {
+  border-bottom-color: var(--border-color, var(--color-base-40, rgba(255, 255, 255, 0.08)));
+  background-color: var(--background-primary);
+}
+
+:global(.theme-dark) .inputText,
+:global(.theme-dark) .SelectTrigger {
+  background-color: #1e293b;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+}
+
+:global(.theme-dark) .PresetItem {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #cbd5e1 !important;
+}
+
+:global(.theme-dark) .PresetItem:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: #f1f5f9 !important;
+}
+
+:global(.theme-dark) .PresetItem[data-state="on"] {
+  background: rgba(99, 102, 241, 0.15) !important;
+  border-color: #6366f1 !important;
+  color: #818cf8 !important;
+}
+
+:global(.theme-dark) .inputText:focus,
+:global(.theme-dark) .SelectTrigger:focus {
+  border-color: #6366f1;
+  background-color: #0f172a;
+}
+
+:global(.theme-dark) .SelectContent,
+:global(.theme-dark) .SelectScrollButton {
+  background-color: #1e293b;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+:global(.theme-dark) .SelectItem {
+  color: #f1f5f9;
+}
+
+:global(.theme-dark) .SelectItem[data-highlighted] {
+  background-color: #6366f1;
+  color: white;
+}
+
+:global(.theme-dark) .ToggleGroup {
+  background: #0f172a;
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+:global(.theme-dark) .ToggleGroupItem {
+  color: #94a3b8 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+:global(.theme-dark) .ToggleGroupItem:hover {
+  color: #f1f5f9 !important;
+}
+
+:global(.theme-dark) .ToggleGroupItem[data-state="on"] {
+  background: #6366f1 !important;
+  color: #ffffff !important;
+}
+
+:global(.theme-dark) .settingsArea {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #f1f5f9;
+}
+
+:global(.theme-dark) .settingsHeader {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+:global(.theme-dark) .closeBtn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #f1f5f9 !important;
+}
+
+:global(.theme-dark) .settingsToggleBtn {
+  background: rgba(30, 41, 59, 0.85) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #cbd5e1 !important;
+}
+
+:global(.theme-dark) .settingsToggleBtn:hover {
+  background: #1e293b !important;
+  color: #f1f5f9 !important;
+}
+
+:global(.theme-dark) .colorSwatch,
+:global(.theme-dark) .gradientBtn {
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+:global(.theme-dark) .sectionTitle {
+  color: #f1f5f9;
+}
+
+:global(.theme-dark) .label {
+  color: #cbd5e1;
+}
+
+:global(.theme-dark) .inputDesc {
+  color: #94a3b8;
+}
+
+:global(.theme-dark) .SliderTrack {
+  background-color: #334155;
+}
+
+:global(.theme-dark) .previewArea {
+  background-color: #0f172a;
+}
+
+:global(.theme-dark) .backdrop {
+  background-color: transparent;
+}
+
+:global(.theme-dark) .previewLoading {
+  color: #94a3b8;
+}
+

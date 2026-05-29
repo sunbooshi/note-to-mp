@@ -21,111 +21,60 @@
  */
 
 import { useRef, useEffect, useState } from 'react';
-import { useNotification } from './Notification';
 import { usePluginStore } from 'src/store/PluginStore';
 import { useRenderStore } from 'src/store/RenderStore';
-import { uevent } from 'src/utils';
-import { Loading } from './Loading';
-import { RedBookRender } from 'src/redbook-render';
+import { ArticleRender } from 'src/article-render';
+import { ConfigStore, createConfigStore, ConfigContext } from 'src/store/ConfigStore';
+import MdToImageConverter from './MdToImageConverter';
 
-import styles from './Wechat.module.css';
-
-export function RedBook() {
-  const { notify } = useNotification();
+function RedBookInternal() {
   const app = usePluginStore((s) => s.app);
   const activeNote = useRenderStore.use.note();
   const renderVersion = useRenderStore.use.renderVersion();
+  const htmlRenderRef = useRef<ArticleRender>(new ArticleRender(app));
 
-  const contentRef = useRef<HTMLDivElement>(null);
-  
-  const renderRef = useRef<RedBookRender>(new RedBookRender(app));
+  const [htmlContent, setHtmlContent] = useState('');
 
-  const [loading, setLoading] = useState(false);
-
-  const showMsg = (msg: string) => {
-    notify({type: 'success', title: msg});
-  };
-
-  const showErr = (msg: string) => {
-    notify({type: 'error', title: msg});
-  };
-
-  useEffect(()=>{
-    if (!contentRef.current) return;
+  useEffect(() => {
     if (!activeNote) return;
 
-    renderRef.current.renderMarkdown(contentRef.current, activeNote).catch(error=>{
-      showErr('渲染失败：' + error.message);
-    });
-  }, [activeNote, renderVersion, contentRef]);
+    const renderContent = async () => {
+      const tempDiv = document.createElement('div');
+      try {
+        tempDiv.style.position = 'fixed';
+        tempDiv.style.left = '-9999px';
+        tempDiv.style.top = '-9999px';
+        tempDiv.style.width = '750px';
+        tempDiv.style.height = 'auto';
+        document.body.appendChild(tempDiv);
 
-  const handleRefresh = async () => {
-    if (!activeNote) return;
-    setLoading(true);
-    try {
-      useRenderStore.getState().setRenderVersion();
-      setLoading(false);
-      showMsg('刷新成功');
-    } catch (error) {
-      setLoading(false); 
-      showErr('失败：' + error.message);
-    }
-  };
-  
-  const onHelpClick = () => {
-    const { shell } = require('electron');
-    shell.openExternal('https://docs.dualhue.cn/doc')
-    uevent('open-help');
-  };
+        await htmlRenderRef.current.renderMarkdown(tempDiv, activeNote);
+        const html = await htmlRenderRef.current.getHtmlWithImages(tempDiv);
+        setHtmlContent(html);
+      } catch (error) {
+        console.error('Render failed:', error);
+      } finally {
+        if (tempDiv.parentNode) {
+          document.body.removeChild(tempDiv);
+        }
+      }
+    };
 
-  const gotoRedBook = () => {
-    const { shell } = require('electron');
-    const url = 'https://creator.xiaohongshu.com/';
-    shell.openExternal(url);
-    uevent('open-redbook');
+    renderContent();
+  }, [activeNote, renderVersion]);
+
+  return <MdToImageConverter htmlContent={htmlContent} />;
+}
+
+export function RedBook() {
+  const storeRef = useRef<ConfigStore>(null);
+  if (!storeRef.current) {
+    storeRef.current = createConfigStore();
   }
 
-  const handleCopy = async () => {
-    if (contentRef.current == null) {
-      showErr('未初始化！');
-      return;
-    }
-    try {
-      setLoading(true);
-      await renderRef.current.copyWithoutCSS(contentRef.current!);
-      setLoading(false);
-      showMsg('复制成功，快去小红书粘贴吧！');
-    } catch (error) {
-      setLoading(false);
-      showErr('错误：' + error.message);
-    }
-    uevent('copy-redbook');
-  };
-
-  const isCollapsed = usePluginStore.use.isCollapsed();
-
   return (
-    <div className={styles.Root} data-collapsed={isCollapsed}>
-      <div className={styles.Panel}>
-        <div className={styles.PanelRight}>
-          <button onClick={handleCopy}>复制</button>
-          <button onClick={gotoRedBook}>去小红书</button>
-          <button onClick={handleRefresh}>刷新</button>
-          <button onClick={onHelpClick}>帮助</button>
-        </div>
-      </div>
-      <div className={styles.RenderWrapper}>
-        <div className={styles.RenderRoot}>
-          <div ref={contentRef}></div>
-        </div>
-      </div>
-      {loading ? ( 
-        <div className={styles.Loading}>
-          <div className={styles.LoadingWrapper}>
-            <Loading />
-          </div>
-        </div>
-        ) : (<></>)}
-    </div>
+    <ConfigContext.Provider value={storeRef.current}>
+      <RedBookInternal />
+    </ConfigContext.Provider>
   );
-};
+}

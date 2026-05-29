@@ -152,6 +152,7 @@ const WechatInternal: React.FC = () => {
       setLoading(false);
       showErr('发布失败:' + error.message);
     }
+    uevent('pub');
   };
 
   const handlePostImage = async () => {
@@ -175,6 +176,7 @@ const WechatInternal: React.FC = () => {
       setLoading(false);
       showErr('发布失败:' + error.message);
     }
+    uevent('pub-images');
   };
 
   const handleCopy = async () => {
@@ -201,6 +203,7 @@ const WechatInternal: React.FC = () => {
       setLoading(false);
       showErr('错误：' + error.message);
     }
+    uevent('copy');
   };
 
     const handleExport = async () => {
@@ -219,6 +222,7 @@ const WechatInternal: React.FC = () => {
       setLoading(false);
       showErr('导出失败:' + error.message);
     }
+    uevent('export-html');
   };
 
   const isCollapsed = usePluginStore.use.isCollapsed();
@@ -233,7 +237,7 @@ const WechatInternal: React.FC = () => {
           <button onClick={handleRefresh}>刷新</button>
           <div className={styles.LineBreak}></div>
           <button onClick={handlePost}>发文章</button>
-          <button onClick={handlePostImage}>发图文</button>
+          <button onClick={handlePostImage}>发贴图</button>
           <button onClick={handleCopy}>复制</button>
           <ThemeList disabled={!!metadataTheme} />
           { isMember ? 

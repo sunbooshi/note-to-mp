@@ -231,7 +231,14 @@ export class NMPSettings {
     }
 
     async updateKeyInfo() {
-        if (this.authKey.length == 0) return false;
+        if (this.authKey.length == 0) {
+            if (this.isVip || this.expireat) {
+                this.isVip = false;
+                this.expireat = null;
+                return true;
+            }
+            return false;
+        }
         const res = await wxKeyInfo(this.authKey);
         let updated = false;
         if (res.status == 200) {
