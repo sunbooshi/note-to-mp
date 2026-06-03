@@ -365,7 +365,7 @@ export function Workflow() {
                       </Select.ScrollUpButton>
                       <Select.Viewport className={styles.SelectViewport}>
                         {wxInfo.length === 0 ? (
-                          <Select.Item value="" className={styles.SelectItem} disabled>
+                          <Select.Item value="none" className={styles.SelectItem} disabled>
                             <Select.ItemText>暂无账号</Select.ItemText>
                           </Select.Item>
                         ) : (

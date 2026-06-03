@@ -165,7 +165,7 @@ const RadixSelect: React.FC<{
             <Select.Viewport className={styles.SelectViewport}>
               <Select.Group>
                 {label && <Select.Label className={styles.SelectLabel}>{label}</Select.Label>}
-                {options.map((opt) => (
+                {options.filter((opt) => opt.value && opt.value.trim() !== '').map((opt) => (
                   <Select.Item className={styles.SelectItem} value={opt.value} key={opt.value}>
                     <Select.ItemText>{opt.label}</Select.ItemText>
                     <Select.ItemIndicator className={styles.SelectItemIndicator}>
@@ -310,7 +310,13 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
           const status = await navigator.permissions.query({ name: 'local-fonts' as any });
           if (status.state === 'granted' || status.state === 'prompt') {
             const fonts = await (window as any).queryLocalFonts();
-            const uniqueFamilies = Array.from(new Set(fonts.map((f: any) => f.family))) as string[];
+            const uniqueFamilies = Array.from(
+              new Set(
+                fonts
+                  .map((f: any) => f.family)
+                  .filter((f: any) => typeof f === 'string' && f.trim() !== '')
+              )
+            ) as string[];
             if (uniqueFamilies.length > 0) {
               setFontList(['默认', ...uniqueFamilies.sort()]);
             }
