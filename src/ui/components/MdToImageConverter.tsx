@@ -134,6 +134,81 @@ const dataUrlToBlob = (dataUrl: string) => {
   return new Blob([u8arr], { type: mime });
 };
 
+// Find the nearest text line boundary to targetY within an element
+// to avoid cutting through the middle of a text line when splitting pages
+const findNearestLineBoundary = (
+  element: HTMLElement,
+  targetY: number,
+  offsetCalibration: number
+): number => {
+  let bestSplit = targetY;
+  let bestDistance = Infinity;
+
+  // Pass 1: Check text line boundaries using Range API
+  const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+  let textNode;
+  while ((textNode = walker.nextNode() as Text)) {
+    if (!textNode.textContent || !textNode.textContent.trim()) continue;
+
+    const range = document.createRange();
+    range.selectNodeContents(textNode);
+    const rects = range.getClientRects();
+
+    for (let r = 0; r < rects.length; r++) {
+      const rect = rects[r];
+      const lineTop = rect.top + offsetCalibration;
+      const lineBottom = rect.bottom + offsetCalibration;
+
+      if (lineBottom <= targetY) {
+        // Line is entirely above target - split after this line
+        const distance = targetY - lineBottom;
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestSplit = lineBottom;
+        }
+      } else if (lineTop < targetY && lineBottom > targetY) {
+        // Line crosses target - split at top of this line
+        const distance = targetY - lineTop;
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestSplit = lineTop;
+        }
+      }
+    }
+  }
+
+  // Pass 2: Fallback - check element boundaries (block-level children)
+  // This helps when getClientRects() on text nodes doesn't return results
+  // (e.g., inside visibility:hidden containers in some browsers)
+  const descendants = element.querySelectorAll('*');
+  for (let i = 0; i < descendants.length; i++) {
+    const el = descendants[i] as HTMLElement;
+    const rect = el.getBoundingClientRect();
+    if (rect.height < 1) continue; // Skip hidden/inline elements
+
+    const elTop = rect.top + offsetCalibration;
+    const elBottom = rect.bottom + offsetCalibration;
+
+    if (elBottom <= targetY) {
+      // Element ends above target - split after it
+      const distance = targetY - elBottom;
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestSplit = elBottom;
+      }
+    } else if (elTop < targetY && elBottom > targetY) {
+      // Element crosses target - split at its top
+      const distance = targetY - elTop;
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestSplit = elTop;
+      }
+    }
+  }
+
+  return bestSplit;
+};
+
 interface SelectOption {
   value: string;
   label: string;
@@ -365,6 +440,17 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
       return;
     }
 
+    // Calibrate coordinate system: offsetTop = viewportY + offsetCalibration
+    // Use the first visible (non-display:none) child for accurate calibration
+    let offsetCalibration = 0;
+    for (const child of children) {
+      const rect = child.getBoundingClientRect();
+      if (rect.height > 0) {
+        offsetCalibration = child.offsetTop - rect.top;
+        break;
+      }
+    }
+
     if (settings.pageMode === 'hr') {
       const hrOffsets: number[] = [0];
       for (let i = 0; i < children.length; i++) {
@@ -409,6 +495,7 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
 
           let splitPoint = pageEnd;
           let foundIntersecting = false;
+          let intersectingChild: HTMLElement | null = null;
 
           for (let i = 0; i < children.length; i++) {
             const child = children[i];
@@ -421,6 +508,7 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
 
             if (childTop < pageEnd && childBottom > pageEnd) {
               foundIntersecting = true;
+              intersectingChild = child;
               const isHeading = /^(H[1-6])$/i.test(child.tagName);
               const fitsInOnePage = child.offsetHeight <= viewportHeightVal;
 
@@ -445,6 +533,14 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
 
           if (!foundIntersecting) {
             splitPoint = pageEnd;
+          }
+
+          // Refine split point to avoid cutting through text lines
+          if (splitPoint === pageEnd && intersectingChild) {
+            const refined = findNearestLineBoundary(intersectingChild, pageEnd, offsetCalibration);
+            if (refined > currentTop + 10 && refined < pageEnd) {
+              splitPoint = refined;
+            }
           }
 
           if (splitPoint <= currentTop) {
@@ -477,6 +573,7 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
 
       let splitPoint = pageEnd;
       let foundIntersecting = false;
+      let intersectingChild: HTMLElement | null = null;
 
       for (let i = 0; i < children.length; i++) {
         const child = children[i];
@@ -485,6 +582,7 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
 
         if (childTop < pageEnd && childBottom > pageEnd) {
           foundIntersecting = true;
+          intersectingChild = child;
           const isHeading = /^(H[1-6])$/i.test(child.tagName);
           const fitsInOnePage = child.offsetHeight <= viewportHeightVal;
 
@@ -509,6 +607,19 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
 
       if (!foundIntersecting) {
         splitPoint = pageEnd;
+      }
+
+      // Refine split point to avoid cutting through text lines
+      if (splitPoint === pageEnd && intersectingChild) {
+        const refined = findNearestLineBoundary(intersectingChild, pageEnd, offsetCalibration);
+        if (refined > currentTop + 10 && refined < pageEnd) {
+          splitPoint = refined;
+        }
+      }
+
+      // Safety: ensure progress
+      if (splitPoint <= currentTop) {
+        splitPoint = currentTop + viewportHeightVal;
       }
 
       offsets.push(splitPoint);
@@ -675,6 +786,7 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
               transform: `translateY(-${offsetY}px)`,
               fontFamily: formatFontFamily(settings.fontFamily),
               fontSize: `${settings.fontSize}px`,
+              lineHeight: 1.6,
               background: 'transparent',
               backgroundColor: 'transparent',
               backgroundImage: 'none',
