@@ -33,13 +33,14 @@ import styles from './Wechat.module.css';
 import { NMPSettings } from 'src/settings';
 import AssetsManager from 'src/assets';
 
-export function NoteRender({platform}:{platform:string}) {
+export function NoteRender({platform, visible}:{platform:string, visible:boolean}) {
   const { notify } = useNotification();
   const app = usePluginStore((s) => s.app);
   const activeNote = useRenderStore.use.note();
   const renderVersion = useRenderStore.use.renderVersion();
 
   const contentRef = useRef<HTMLDivElement>(null);
+  const lastRenderedRef = useRef<string>('');
   
   const renderRef = useRef<BaseRender>(new BaseRender(app));
 
@@ -55,13 +56,16 @@ export function NoteRender({platform}:{platform:string}) {
   };
 
   useEffect(()=>{
+    if (!visible) return;
     if (!contentRef.current) return;
     if (!activeNote) return;
-
+    const renderKey = activeNote.path + ':' + renderVersion;
+    if (lastRenderedRef.current === renderKey) return;
+    lastRenderedRef.current = renderKey;
     renderRef.current.renderMarkdown(contentRef.current, activeNote).catch(error=>{
       showErr('渲染失败：' + error.message);
     });
-  }, [activeNote, renderVersion, contentRef]);
+  }, [activeNote, renderVersion, contentRef, visible]);
 
   const handleRefresh = async () => {
     if (!activeNote) return;

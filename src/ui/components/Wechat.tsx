@@ -38,7 +38,7 @@ import styles from './Wechat.module.css';
 import { NMPSettings } from 'src/settings';
 import AssetsManager from 'src/assets';
 
-const WechatInternal: React.FC = () => {
+const WechatInternal: React.FC<{visible: boolean}> = ({visible}) => {
   const { notify } = useNotification();
   const app = usePluginStore((s) => s.app);
   const activeNote = useRenderStore.use.note();
@@ -64,6 +64,7 @@ const WechatInternal: React.FC = () => {
 
   const styleRef = useRef<HTMLStyleElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const lastRenderedRef = useRef<string>('');
   
   const renderRef = useRef<ArticleRender>(new ArticleRender(app));
 
@@ -88,12 +89,16 @@ const WechatInternal: React.FC = () => {
   }, [appid]);
 
   useEffect(()=>{
+    if (!visible) return;
     if (!contentRef.current) return;
     if (!activeNote) return;
+    const renderKey = activeNote.path + ':' + renderVersion;
+    if (lastRenderedRef.current === renderKey) return;
+    lastRenderedRef.current = renderKey;
     renderRef.current.renderMarkdown(contentRef.current, activeNote).catch(error=>{
       showErr('渲染失败：' + error.message);
     });
-  }, [activeNote, renderVersion, contentRef]);
+  }, [activeNote, renderVersion, contentRef, visible]);
 
   useEffect(()=> {
     if (!activeNote) return;
@@ -264,7 +269,7 @@ const WechatInternal: React.FC = () => {
 };
 
 // 保持 Wechat 组件作为 Provider 的包装器
-export function Wechat() {
+export function Wechat({visible}: {visible: boolean}) {
   const storeRef = useRef<ConfigStore>(null);
   if (!storeRef.current) {
     storeRef.current = createConfigStore();
@@ -272,7 +277,7 @@ export function Wechat() {
 
   return (
     <ConfigContext.Provider value={storeRef.current}>
-      <WechatInternal />
+      <WechatInternal visible={visible} />
     </ConfigContext.Provider>
   )
 }

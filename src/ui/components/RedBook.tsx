@@ -27,16 +27,21 @@ import { ArticleRender } from 'src/article-render';
 import { ConfigStore, createConfigStore, ConfigContext } from 'src/store/ConfigStore';
 import MdToImageConverter from './MdToImageConverter';
 
-function RedBookInternal() {
+function RedBookInternal({visible}: {visible: boolean}) {
   const app = usePluginStore((s) => s.app);
   const activeNote = useRenderStore.use.note();
   const renderVersion = useRenderStore.use.renderVersion();
   const htmlRenderRef = useRef<ArticleRender>(new ArticleRender(app));
+  const lastRenderedRef = useRef<string>('');
 
   const [htmlContent, setHtmlContent] = useState('');
 
   useEffect(() => {
+    if (!visible) return;
     if (!activeNote) return;
+    const renderKey = activeNote.path + ':' + renderVersion;
+    if (lastRenderedRef.current === renderKey) return;
+    lastRenderedRef.current = renderKey;
 
     const renderContent = async () => {
       const tempDiv = document.createElement('div');
@@ -61,12 +66,12 @@ function RedBookInternal() {
     };
 
     renderContent();
-  }, [activeNote, renderVersion]);
+  }, [activeNote, renderVersion, visible]);
 
   return <MdToImageConverter htmlContent={htmlContent} />;
 }
 
-export function RedBook() {
+export function RedBook({visible}: {visible: boolean}) {
   const storeRef = useRef<ConfigStore>(null);
   if (!storeRef.current) {
     storeRef.current = createConfigStore();
@@ -74,7 +79,7 @@ export function RedBook() {
 
   return (
     <ConfigContext.Provider value={storeRef.current}>
-      <RedBookInternal />
+      <RedBookInternal visible={visible} />
     </ConfigContext.Provider>
   );
 }
