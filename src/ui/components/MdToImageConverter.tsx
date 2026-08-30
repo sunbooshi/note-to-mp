@@ -19,7 +19,7 @@ import { ArticleRender } from 'src/article-render';
 import { getMetadata, wxAddDraftImages, DraftImages, DraftImageMediaId } from 'src/weixin-api';
 import { UploadImageToWx } from 'src/imagelib';
 import { RedBookRender } from 'src/redbook-render';
-import { uevent } from 'src/utils';
+import { uevent, openInBrowser } from 'src/utils';
 import AccountSelect from './AccountSelect';
 import { toPng } from 'html-to-image';
 
@@ -958,8 +958,7 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
 
   // GOTO REDBOOK CREATOR
   const gotoRedBook = () => {
-    const { shell } = require('electron');
-    shell.openExternal('https://creator.xiaohongshu.com/');
+    openInBrowser('https://creator.xiaohongshu.com/');
     uevent('open-redbook');
   };
 

@@ -21,6 +21,7 @@
  */
 
 import { wxKeyInfo } from './weixin-api';
+import type { UnsplashPhoto } from './unsplash';
 
 export interface WatermarkSettings {
     text: string;
@@ -71,6 +72,7 @@ export class NMPSettings {
     enableEmptyLine: boolean = false;
     dismissedAnnouncements: string[] = [];
     extraSettings: ExtraSettings | null = null;
+    favoriteCovers: UnsplashPhoto[] = [];
 
     private static instance: NMPSettings;
 
@@ -101,6 +103,7 @@ export class NMPSettings {
         this.expertSettingsNote = '';
         this.enableEmptyLine = false;
         this.dismissedAnnouncements = [];
+        this.favoriteCovers = [];
     }
 
     resetStyelAndHighlight() {
@@ -134,6 +137,7 @@ export class NMPSettings {
             expireat,
             dismissedAnnouncements,
             extraSettings,
+            favoriteCovers,
         } = data;
 
         const settings = NMPSettings.getInstance();
@@ -200,6 +204,9 @@ export class NMPSettings {
         if (extraSettings) {
             settings.extraSettings = extraSettings;
         }
+        if (Array.isArray(favoriteCovers)) {
+            settings.favoriteCovers = favoriteCovers;
+        }
         settings.isLoaded = true;
     }
 
@@ -227,6 +234,7 @@ export class NMPSettings {
             'expireat': settings.expireat,
             'dismissedAnnouncements': settings.dismissedAnnouncements,
             'extraSettings': settings.extraSettings,
+            'favoriteCovers': settings.favoriteCovers,
         }
     }
 

@@ -22,10 +22,11 @@
 
 import * as React from "react";
 import { useConfigContext } from "src/store/ConfigStore";
+import { usePluginStore } from "src/store/PluginStore";
 import styles from "./Cover.module.css";
 import AssetsManager from "src/assets";
 import { trimEmbedTag } from "src/utils";
-import { UnsplashCoverPicker } from "./UnsplashCoverPicker";
+import { UnsplashCoverModal } from "./UnsplashCoverPicker";
 
 function getCoverURL(cover: string): string | null {
 	if (cover.startsWith('http')) return cover;
@@ -35,13 +36,13 @@ function getCoverURL(cover: string): string | null {
 }
 
 export function Cover({ readOnly = false, initialCover = '' }: { readOnly?: boolean; initialCover?: string }) {
+	const app = usePluginStore((s) => s.app);
 	const localCover = useConfigContext(s=>s.cover);
 	const setCover = useConfigContext(s=>s.setCover);
 
 	const displayedCover = readOnly && initialCover ? getCoverURL(initialCover) : (localCover ? URL.createObjectURL(localCover) : null);
 
 	const coverContainerRef = React.useRef<HTMLDivElement>(null);
-	const [unsplashOpen, setUnsplashOpen] = React.useState(false);
 	const [showSourceOptions, setShowSourceOptions] = React.useState(false);
 
 	// 来源按钮：点击封面区域外部或按 Esc 时还原为添加封面
@@ -84,7 +85,7 @@ export function Cover({ readOnly = false, initialCover = '' }: { readOnly?: bool
 		event?.preventDefault();
 		event?.stopPropagation();
 		setShowSourceOptions(false);
-		setUnsplashOpen(true);
+		new UnsplashCoverModal(app, (file) => setCover(file)).open();
 	};
 
 	const handleCloseClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -169,14 +170,6 @@ export function Cover({ readOnly = false, initialCover = '' }: { readOnly?: bool
 					</div>
 				)}
 			</div>
-			<UnsplashCoverPicker
-				open={unsplashOpen}
-				onOpenChange={setUnsplashOpen}
-				onPick={(file) => {
-					setCover(file);
-					setUnsplashOpen(false);
-				}}
-			/>
 		</div>
 	);
 }

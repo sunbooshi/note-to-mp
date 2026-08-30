@@ -31,7 +31,7 @@ import { getMetadata } from 'src/weixin-api';
 import { usePluginStore } from 'src/store/PluginStore';
 import { useRenderStore } from 'src/store/RenderStore';
 import { ConfigStore, createConfigStore, ConfigContext, useConfigContext } from 'src/store/ConfigStore'
-import { uevent } from 'src/utils';
+import { uevent, openInBrowser } from 'src/utils';
 import { Loading } from './Loading';
 
 import styles from './Wechat.module.css';
@@ -43,6 +43,7 @@ const WechatInternal: React.FC<{visible: boolean}> = ({visible}) => {
   const app = usePluginStore((s) => s.app);
   const activeNote = useRenderStore.use.note();
   const renderVersion = useRenderStore.use.renderVersion();
+  const previewVisible = usePluginStore.use.previewVisible();
 
   const [metadataAppid, setMetadataAppid] = useState('');
   const [metadataTheme, setMetadataTheme] = useState('');
@@ -89,6 +90,7 @@ const WechatInternal: React.FC<{visible: boolean}> = ({visible}) => {
   }, [appid]);
 
   useEffect(()=>{
+    if (!previewVisible) return;
     if (!visible) return;
     if (!contentRef.current) return;
     if (!activeNote) return;
@@ -98,7 +100,7 @@ const WechatInternal: React.FC<{visible: boolean}> = ({visible}) => {
     renderRef.current.renderMarkdown(contentRef.current, activeNote).catch(error=>{
       showErr('渲染失败：' + error.message);
     });
-  }, [activeNote, renderVersion, contentRef, visible]);
+  }, [activeNote, renderVersion, contentRef, visible, previewVisible]);
 
   useEffect(()=> {
     if (!activeNote) return;
@@ -125,14 +127,12 @@ const WechatInternal: React.FC<{visible: boolean}> = ({visible}) => {
   };
   
   const onHelpClick = () => {
-    const { shell } = require('electron');
-    shell.openExternal('https://docs.dualhue.cn/doc')
+    openInBrowser('https://docs.dualhue.cn/doc');
     uevent('open-help');
   };
 
   const gotoMP = () => {
-    const { shell } = require('electron');
-    shell.openExternal('https://mp.weixin.qq.com')
+    openInBrowser('https://mp.weixin.qq.com');
     uevent('open-mp');
   }
 

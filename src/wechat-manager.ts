@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 Sun Booshi
+ * Copyright (c) 2024-2026 Sun Booshi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,32 +20,27 @@
  * THE SOFTWARE.
  */
 
-import { App, Plugin } from 'obsidian';
-import { create } from 'zustand';
-import { createSelectors } from './createSelectors';
+import { App, Modal } from "obsidian";
+import * as ReactDOM from 'react-dom/client';
+import { createWechatManager } from "./ui/wechat-manager";
 
-interface IPluginState {
-  app: App;
-  setApp: (app: App) => void;
-  plugin: Plugin;
-  setPlugin: (plugin: Plugin) => void;
-  isReourceLoaded: boolean;
-  setResourceLoaded: (loaded: boolean) => void;
-  isCollapsed: boolean;
-  setIsCollapsed: (collapsed: boolean) => void;
-  previewVisible: boolean;
-  setPreviewVisible: (visible: boolean) => void;
+export class WechatManagerModal extends Modal {
+  root: ReactDOM.Root | null = null;
+
+  constructor(app: App) {
+    super(app);
+  }
+
+  onOpen() {
+    const { contentEl, modalEl } = this;
+    modalEl.style.width = '900px';
+    this.root = createWechatManager(contentEl, this);
+  }
+
+  onClose() {
+    const { contentEl } = this;
+    this.root?.unmount();
+    this.root = null;
+    contentEl.empty();
+  }
 }
-
-export const usePluginStore = createSelectors(create<IPluginState>((set) => ({
-  app: null as unknown as App,
-  setApp: (app) => set({ app }),
-  plugin: null as unknown as Plugin,
-  setPlugin: (plugin) => set({ plugin }),
-  isReourceLoaded: false,
-  setResourceLoaded: (loaded) => set({isReourceLoaded:loaded}),
-  isCollapsed: false,
-  setIsCollapsed: (collapsed) => set({isCollapsed: collapsed}),
-  previewVisible: false,
-  setPreviewVisible: (visible) => set({previewVisible: visible}),
-})));

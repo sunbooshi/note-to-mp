@@ -1,5 +1,6 @@
 import { Announcement as IAnnouncement } from "src/weixin-api";
 import { Cross2Icon, BellIcon } from "@radix-ui/react-icons";
+import { openInBrowser } from "src/utils";
 import styles from "./Announcement.module.css";
 
 interface AnnouncementProps {
@@ -10,8 +11,7 @@ interface AnnouncementProps {
 export const Announcement: React.FC<AnnouncementProps> = ({ announcement, onDismiss }) => {
   const handleAction = () => {
     if (announcement.action_url) {
-      const { shell } = require('electron');
-      shell.openExternal(announcement.action_url);
+      openInBrowser(announcement.action_url);
       onDismiss();
     }
   };

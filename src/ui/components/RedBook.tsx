@@ -29,6 +29,7 @@ import MdToImageConverter from './MdToImageConverter';
 
 function RedBookInternal({visible}: {visible: boolean}) {
   const app = usePluginStore((s) => s.app);
+  const previewVisible = usePluginStore.use.previewVisible();
   const activeNote = useRenderStore.use.note();
   const renderVersion = useRenderStore.use.renderVersion();
   const htmlRenderRef = useRef<ArticleRender>(new ArticleRender(app));
@@ -37,6 +38,7 @@ function RedBookInternal({visible}: {visible: boolean}) {
   const [htmlContent, setHtmlContent] = useState('');
 
   useEffect(() => {
+    if (!previewVisible) return;
     if (!visible) return;
     if (!activeNote) return;
     const renderKey = activeNote.path + ':' + renderVersion;

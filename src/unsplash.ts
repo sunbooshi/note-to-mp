@@ -41,7 +41,11 @@ export interface UnsplashUrls {
 export interface UnsplashUser {
 	name: string;
 	bio: string | null;
-	links?: Record<string, string>;
+	links: {
+		self: string;
+		html: string;
+		photos: string;
+	};
 }
 
 export interface UnsplashPhoto {
@@ -54,17 +58,16 @@ export interface UnsplashPhoto {
 	blur_hash: string | null;
 	urls: UnsplashUrls;
 	links: {
-		self?: string;
+		self: string;
 		html: string;
 		download?: string;
+		download_location?: string;
 	};
 	user: UnsplashUser;
 }
 
 export interface UnsplashSearchResponse {
-	total: number;
-	total_pages: number;
-	results: UnsplashPhoto[];
+	photos: UnsplashPhoto[];
 }
 
 /**
@@ -72,18 +75,16 @@ export interface UnsplashSearchResponse {
  */
 export const CoverCategories: { key: string; label: string }[] = [
 	{ key: "random", label: "随机" },
-	{ key: "landscape", label: "风景" },
-	{ key: "mountain", label: "山景" },
-	{ key: "ocean", label: "海洋" },
-	{ key: "city", label: "城市" },
-	{ key: "office", label: "办公" },
-	{ key: "technology", label: "科技" },
 	{ key: "nature", label: "自然" },
-	{ key: "food", label: "美食" },
+	{ key: "technology", label: "科技" },
+	{ key: "ai", label: "AI" },
+	{ key: "writing", label: "写作" },
+	{ key: "business", label: "商业" },
+	{ key: "minimal", label: "极简" },
+	{ key: "art", label: "文艺" },
 	{ key: "travel", label: "旅行" },
-	{ key: "architecture", label: "建筑" },
-	{ key: "people", label: "人物" },
-	{ key: "business", label: "商务" },
+	{ key: "abstract", label: "抽象" },
+	{ key: "plant", label: "植物" },
 ];
 
 const RandomCategoryKeys = CoverCategories
@@ -92,6 +93,38 @@ const RandomCategoryKeys = CoverCategories
 
 export function pickRandomCoverCategory(): string {
 	return RandomCategoryKeys[Math.floor(Math.random() * RandomCategoryKeys.length)];
+}
+
+export async function getRandomCover(): Promise<UnsplashSearchResponse> {
+	const authKey = NMPSettings.getInstance().authKey;
+	if (!authKey) {
+		throw new Error("请先设置注册码（AuthKey）");
+	}
+
+	const url = `${CoverSearchHost}/v1/cover/random`;
+		const res = await requestUrl({
+		url,
+		method: "GET",
+		throw: false,
+		headers: {
+			Authorization: `Bearer ${authKey}`,
+		},
+	});
+
+	if (res.status !== 200) {
+		let message = `获取封面图片失败（HTTP ${res.status}）`;
+		try {
+			const data = res.json;
+			if (data && typeof data.message === "string" && data.message) {
+				message = data.message;
+			}
+		} catch (error) {
+			// 忽略响应体解析失败
+		}
+		throw new Error(message);
+	}
+
+	return res.json as UnsplashSearchResponse;
 }
 
 /**
@@ -139,14 +172,53 @@ export async function searchCoverImages(
 	return res.json as UnsplashSearchResponse;
 }
 
+
+export async function getDownloadLocation(photo: UnsplashPhoto): Promise<string> {
+	const authKey = NMPSettings.getInstance().authKey;
+	if (!authKey) {
+		throw new Error("请先设置注册码（AuthKey）");
+	}
+
+	if (!photo.links.download_location) {
+		throw new Error("下载链接缺失");
+	}
+
+	const res = await requestUrl({
+		url: `${CoverSearchHost}/v1/cover/download?url=${encodeURIComponent(photo.links.download_location)}`,
+		method: "GET",
+		throw: false,
+		headers: {
+			Authorization: `Bearer ${authKey}`,
+		},
+	});
+
+	if (res.status !== 200) {
+		let message = `获取下载链接失败（HTTP ${res.status}）`;
+		try {
+			const data = res.json;
+			if (data && typeof data.message === "string" && data.message) {
+				message = data.message;
+			}
+		} catch (error) {
+			// 忽略响应体解析失败
+		}
+		throw new Error(message);
+	}
+
+	const data = res.json as { url?: string };
+
+	if (!data.url) {
+		throw new Error("下载链接缺失");
+	}
+
+	return data.url;
+}
+
 /**
  * 下载 Unsplash 图片并转换为 File，复用本地封面的处理逻辑。
  */
 export async function downloadUnsplashPhoto(photo: UnsplashPhoto): Promise<File> {
-	const url = photo.urls.regular || photo.urls.small || photo.urls.thumb;
-	if (!url) {
-		throw new Error("图片地址缺失");
-	}
+	const url = await getDownloadLocation(photo);
 
 	const res = await requestUrl({
 		url,
