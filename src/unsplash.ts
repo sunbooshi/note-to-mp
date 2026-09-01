@@ -30,7 +30,7 @@ import { mimeToImageExt } from "./utils";
  *   GET /v1/cover/search?query=xxx&page=1&per_page=10
  *   Authorization: Bearer {authkey}
  */
-export const CoverSearchHost = "http://10.1.1.178:8090";
+export const CoverSearchHost = "https://obsidian.dualhue.cn";
 
 export interface UnsplashUrls {
 	thumb: string;
