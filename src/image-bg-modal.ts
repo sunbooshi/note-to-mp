@@ -31,7 +31,7 @@ export interface ImageBGModalPlugin {
 export class ImageBGModal extends Modal {
   listener: any = null;
   plugin: ImageBGModalPlugin;
-  url: string = 'https://widgets.dualhue.cn/background';
+  url: string = 'https://widgets.dualhue.cn/background?v=20260830';
   constructor(app: App, plugin: ImageBGModalPlugin) {
     super(app);
     this.plugin = plugin;

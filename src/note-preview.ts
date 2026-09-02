@@ -24,6 +24,7 @@ import { EventRef, ItemView, Workspace, WorkspaceLeaf, TFile, Plugin } from 'obs
 import { uevent } from './utils';
 import { LocalFile } from './core/markdown/local-file';
 import { useRenderStore } from './store/RenderStore';
+import { usePluginStore } from './store/PluginStore';
 import { createPreview } from './ui/preview';
 import * as ReactDOM from 'react-dom/client';
 
@@ -57,6 +58,7 @@ export class NotePreview extends ItemView {
 
     async onOpen() {
         useRenderStore.getState().setNote(this.app.workspace.getActiveFile());
+        usePluginStore.getState().setPreviewVisible(true);
         this.listeners = [
             this.workspace.on('file-open', (file) => {
                 useRenderStore.getState().setNote(file);
@@ -66,7 +68,26 @@ export class NotePreview extends ItemView {
             }),
         ];
         this.preview = createPreview(this.containerEl.children[1] as HTMLElement);
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                this.onVisibilityChange(entry.isIntersecting);
+            }
+        );
+
+        observer.observe(
+            this.containerEl
+        );
+
+        this.register(() => {
+            observer.disconnect();
+        });
+
         uevent('open');
+    }
+
+    onVisibilityChange(visible: boolean) {
+        usePluginStore.getState().setPreviewVisible(visible);
     }
 
     async onClose() {

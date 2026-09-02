@@ -44,8 +44,6 @@ export function setVersion(version: string) {
 	}
 }
 
-
-
 export function uevent(name: string) {
 	const url = `https://u.dualhue.cn/event?name=${name}&platform=${PlugPlatform}&v=${PluginVersion}`;
 	requestUrl(url).then().catch(error => {
@@ -206,4 +204,9 @@ export function matchesVersionRequirement(currentVersion: string, targetVersion:
 		default:
 			return true;
 	}
+}
+
+export function openInBrowser(url: string) {
+	const { shell } = require('electron');
+  shell.openExternal(url);
 }

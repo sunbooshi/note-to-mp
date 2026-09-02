@@ -25,7 +25,7 @@ import { Platform } from 'obsidian';
 import { useNotification } from './Notification';
 import { usePluginStore } from 'src/store/PluginStore';
 import { useRenderStore } from 'src/store/RenderStore';
-import { uevent } from 'src/utils';
+import { uevent, openInBrowser } from 'src/utils';
 import { Loading } from './Loading';
 import { BaseRender } from 'src/base-render';
 
@@ -33,13 +33,15 @@ import styles from './Wechat.module.css';
 import { NMPSettings } from 'src/settings';
 import AssetsManager from 'src/assets';
 
-export function NoteRender({platform}:{platform:string}) {
+export function NoteRender({platform, visible}:{platform:string, visible:boolean}) {
   const { notify } = useNotification();
   const app = usePluginStore((s) => s.app);
   const activeNote = useRenderStore.use.note();
   const renderVersion = useRenderStore.use.renderVersion();
+  const previewVisible = usePluginStore.use.previewVisible();
 
   const contentRef = useRef<HTMLDivElement>(null);
+  const lastRenderedRef = useRef<string>('');
   
   const renderRef = useRef<BaseRender>(new BaseRender(app));
 
@@ -55,13 +57,17 @@ export function NoteRender({platform}:{platform:string}) {
   };
 
   useEffect(()=>{
+    if (!previewVisible) return;
+    if (!visible) return;
     if (!contentRef.current) return;
     if (!activeNote) return;
-
+    const renderKey = activeNote.path + ':' + renderVersion;
+    if (lastRenderedRef.current === renderKey) return;
+    lastRenderedRef.current = renderKey;
     renderRef.current.renderMarkdown(contentRef.current, activeNote).catch(error=>{
       showErr('渲染失败：' + error.message);
     });
-  }, [activeNote, renderVersion, contentRef]);
+  }, [activeNote, renderVersion, contentRef, visible, previewVisible]);
 
   const handleRefresh = async () => {
     if (!activeNote) return;
@@ -77,8 +83,7 @@ export function NoteRender({platform}:{platform:string}) {
   };
   
   const onHelpClick = () => {
-    const { shell } = require('electron');
-    shell.openExternal('https://docs.dualhue.cn/doc')
+    openInBrowser('https://docs.dualhue.cn/doc');
     uevent('open-help');
   };
 

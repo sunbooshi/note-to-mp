@@ -251,6 +251,123 @@ export async function wxBatchGetMaterial(token: string, type: string, offset: nu
     return await res.json;
 }
 
+// 获取草稿列表
+export interface DraftNewsItem {
+    article_type?: string;
+    title: string;
+    author?: string;
+    digest?: string;
+    content?: string;
+    content_source_url?: string;
+    thumb_media_id?: string;
+    need_open_comment?: number;
+    only_fans_can_comment?: number;
+    url?: string;
+    image_info?: DraftImageInfo;
+}
+
+export interface DraftBatchItem {
+    media_id: string;
+    content: {
+        news_item: DraftNewsItem[];
+    };
+    update_time: number;
+}
+
+export interface DraftBatchResult {
+    total_count: number;
+    item_count: number;
+    item: DraftBatchItem[];
+    errcode?: number;
+    errmsg?: string;
+}
+
+export async function wxDraftBatchget(token: string, offset: number = 0, count: number = 10, no_content: number = 0) {
+    const url = 'https://api.weixin.qq.com/cgi-bin/draft/batchget?access_token=' + token;
+    const body = {
+        offset,
+        count,
+        ...(no_content ? { no_content } : {}),
+    };
+
+    const res = await requestUrl({
+        method: 'POST',
+        url: url,
+        throw: false,
+        body: JSON.stringify(body)
+    });
+
+    return await res.json as DraftBatchResult;
+}
+
+// 删除草稿
+export async function wxDraftDelete(token: string, mediaId: string) {
+    const url = 'https://api.weixin.qq.com/cgi-bin/draft/delete?access_token=' + token;
+    const body = {
+        media_id: mediaId
+    };
+
+    const res = await requestUrl({
+        method: 'POST',
+        url: url,
+        throw: false,
+        body: JSON.stringify(body)
+    });
+
+    return await res.json;
+}
+
+// 发布草稿
+export async function wxFreePublishSubmit(token: string, mediaId: string) {
+    const url = 'https://api.weixin.qq.com/cgi-bin/freepublish/submit?access_token=' + token;
+    const body = {
+        media_id: mediaId
+    };
+
+    const res = await requestUrl({
+        method: 'POST',
+        url: url,
+        throw: false,
+        body: JSON.stringify(body)
+    });
+
+    return await res.json;
+}
+
+// 发布状态查询
+export async function wxFreePublishGet(token: string, publishId: string) {
+    const url = 'https://api.weixin.qq.com/cgi-bin/freepublish/get?access_token=' + token;
+    const body = {
+        publish_id: publishId
+    };
+
+    const res = await requestUrl({
+        method: 'POST',
+        url: url,
+        throw: false,
+        body: JSON.stringify(body)
+    });
+
+    return await res.json;
+}
+
+// 获取永久素材，图片类型时返回图片二进制内容
+export async function wxGetMaterial(token: string, mediaId: string) {
+    const url = 'https://api.weixin.qq.com/cgi-bin/material/get_material?access_token=' + token;
+    const body = {
+        media_id: mediaId
+    };
+
+    const res = await requestUrl({
+        method: 'POST',
+        url: url,
+        throw: false,
+        body: JSON.stringify(body)
+    });
+
+    return res;
+}
+
 export async function getUploadImageURL(authkey: string, ext: string) {
     const url = PluginHost + '/v1/oss/url/' + ext + '/' + authkey;
     const res = await requestUrl({
@@ -281,8 +398,8 @@ export async function putImageToOSS(authKey:string, uploadURL: string, data: Blo
 }
 
 export async function uploadImageToOSS(authkey: string, data: Blob, filename: string) {
-    if (data.size > 1048576) { // 1MB = 1024 * 1024 bytes
-        throw new Error(`图片 "${filename}" 大小超过1MB限制`);
+    if (data.size > 3 * 1024 * 1024) { // 3MB
+        throw new Error(`图片 "${filename}" 大小超过3MB限制`);
     }
     
     const ext = filename.split('.').pop() || 'jpg';

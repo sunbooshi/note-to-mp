@@ -22,9 +22,11 @@
 
 import * as React from "react";
 import { useConfigContext } from "src/store/ConfigStore";
+import { usePluginStore } from "src/store/PluginStore";
 import styles from "./Cover.module.css";
 import AssetsManager from "src/assets";
 import { trimEmbedTag } from "src/utils";
+import { UnsplashCoverModal } from "./UnsplashCoverPicker";
 
 function getCoverURL(cover: string): string | null {
 	if (cover.startsWith('http')) return cover;
@@ -34,15 +36,39 @@ function getCoverURL(cover: string): string | null {
 }
 
 export function Cover({ readOnly = false, initialCover = '' }: { readOnly?: boolean; initialCover?: string }) {
+	const app = usePluginStore((s) => s.app);
 	const localCover = useConfigContext(s=>s.cover);
 	const setCover = useConfigContext(s=>s.setCover);
 
 	const displayedCover = readOnly && initialCover ? getCoverURL(initialCover) : (localCover ? URL.createObjectURL(localCover) : null);
 
-	const fileInputRef = React.useRef<HTMLInputElement>(null);
+	const coverContainerRef = React.useRef<HTMLDivElement>(null);
+	const [showSourceOptions, setShowSourceOptions] = React.useState(false);
+
+	// 来源按钮：点击封面区域外部或按 Esc 时还原为添加封面
+	React.useEffect(() => {
+		if (!showSourceOptions) return;
+		const handleDocumentMouseDown = (event: MouseEvent) => {
+			if (coverContainerRef.current && !coverContainerRef.current.contains(event.target as Node)) {
+				setShowSourceOptions(false);
+			}
+		};
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				setShowSourceOptions(false);
+			}
+		};
+		document.addEventListener('mousedown', handleDocumentMouseDown);
+		document.addEventListener('keydown', handleKeyDown);
+		return () => {
+			document.removeEventListener('mousedown', handleDocumentMouseDown);
+			document.removeEventListener('keydown', handleKeyDown);
+		};
+	}, [showSourceOptions]);
 
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		if (readOnly) return;
+		setShowSourceOptions(false);
 		if (event.target.files && event.target.files.length > 0) {
 			setCover(event.target.files[0]);
 		} else {
@@ -50,33 +76,58 @@ export function Cover({ readOnly = false, initialCover = '' }: { readOnly?: bool
 		}
 	};
 
-	const handleImageClick = () => {
+	const handleImageClick = (event: React.MouseEvent<HTMLDivElement>) => {
 		if (readOnly) return;
-		// Trigger the hidden file input when the image is clicked
-		fileInputRef.current?.click();
+		setShowSourceOptions((v) => !v);
+	};
+
+	const handleOpenUnsplash = (event?: React.MouseEvent) => {
+		event?.preventDefault();
+		event?.stopPropagation();
+		setShowSourceOptions(false);
+		new UnsplashCoverModal(app, (file) => setCover(file)).open();
 	};
 
 	const handleCloseClick = (event: React.MouseEvent<HTMLButtonElement>) => {
 		if (readOnly) return;
-		// Prevent the default label behavior (triggering the input) first
 		event.preventDefault();
-		// Stop event propagation to prevent the parent label's onClick from firing
 		event.stopPropagation();
+		setShowSourceOptions(false);
 		setCover(null);
 	};
 
 	return (
-		<div className={styles.CoverContainer}>
-			<label className={styles.CoverLabel} onClick={(!readOnly && displayedCover) ? handleImageClick : undefined}>
-				<input
-					type="file"
-					accept=".jpeg, .jpg, .png"
-					className={styles.CoverInput}
-					onChange={handleFileChange}
-					ref={fileInputRef} // Attach ref to the input
-					disabled={readOnly}
-				/>
-				{displayedCover ? (
+		<div className={styles.CoverContainer} ref={coverContainerRef}>
+			<div className={styles.CoverLabel} onClick={handleImageClick}>
+				{showSourceOptions ? (
+					<div className={styles.CoverSourceOptions} onClick={(event) => event.stopPropagation()}>
+						<label className={styles.CoverSourceButton}>
+							<input
+								type="file"
+								accept=".jpeg, .jpg, .png"
+								className={styles.CoverInput}
+								onChange={handleFileChange}
+								disabled={readOnly}
+								onClick={(event) => event.stopPropagation()}
+							/>
+							本地图片
+						</label>
+						<label
+							className={styles.CoverSourceButton}
+							role="button"
+							tabIndex={0}
+							onClick={handleOpenUnsplash}
+							onKeyDown={(event) => {
+								if (event.key === 'Enter' || event.key === ' ') {
+									event.preventDefault();
+									handleOpenUnsplash();
+								}
+							}}
+						>
+							Unsplash 图片
+						</label>
+					</div>
+				) : displayedCover ? (
 					<>
 						<img
 							src={displayedCover}
@@ -118,7 +169,7 @@ export function Cover({ readOnly = false, initialCover = '' }: { readOnly?: bool
 						<div>添加封面</div>
 					</div>
 				)}
-			</label>
+			</div>
 		</div>
 	);
 }

@@ -47,6 +47,7 @@ export function Preview() {
   const isAuthed = NMPSettings.getInstance().isAuthKeyVaild();
 
   const [announcements, setAnnouncements] = useState<IAnnouncement[]>([]);
+  const [activeTab, setActiveTab] = useState('wechat');
 
   useEffect(() => {
     if (isReourceLoaded) {
@@ -75,6 +76,13 @@ export function Preview() {
     }
   }, [isReourceLoaded, plugin]);
 
+  useEffect(() => {
+    // 授权失效会导致 twitter 栏位被卸载，避免受控 tab 停留在不存在的 value 上
+    if (!isAuthed && activeTab === 'twitter') {
+      setActiveTab('wechat');
+    }
+  }, [isAuthed, activeTab]);
+
   const handleDismiss = (id: string) => {
     const settings = NMPSettings.getInstance();
     if (!settings.dismissedAnnouncements.includes(id)) {
@@ -97,7 +105,7 @@ export function Preview() {
           onDismiss={() => handleDismiss(ann.id)} 
         />
       ))}
-      <Tabs.Root defaultValue="wechat" className={styles.Root}>
+      <Tabs.Root value={activeTab} onValueChange={setActiveTab} className={styles.Root}>
         <Tabs.List className={styles.List} data-collapsed={isCollapsed}>
           <Tabs.Trigger className={styles.Trigger} value="wechat">公众号</Tabs.Trigger>
           <Tabs.Trigger className={styles.Trigger} value="zhihu">知乎</Tabs.Trigger>
@@ -118,23 +126,23 @@ export function Preview() {
           </div>
         </Tabs.List>
         <Tabs.Content value="wechat" forceMount className={styles.Content}>
-          <Wechat />
+          <Wechat visible={activeTab === 'wechat'} />
         </Tabs.Content>
         <Tabs.Content value="zhihu" forceMount className={styles.Content}>
-          <NoteRender platform="zhihu"/>
+          <NoteRender platform="zhihu" visible={activeTab === 'zhihu'}/>
         </Tabs.Content>
         <Tabs.Content value="toutiao" forceMount className={styles.Content}>
-          <NoteRender platform="toutiao"/>
+          <NoteRender platform="toutiao" visible={activeTab === 'toutiao'}/>
         </Tabs.Content>
         {
           isAuthed && (
             <Tabs.Content value="twitter" forceMount className={styles.Content}>
-              <NoteRender platform="twitter"/>
+              <NoteRender platform="twitter" visible={activeTab === 'twitter'}/>
             </Tabs.Content>
           )
         }
         <Tabs.Content value="redbook" forceMount className={styles.Content}>
-          <RedBook />
+          <RedBook visible={activeTab === 'redbook'} />
         </Tabs.Content>
       </Tabs.Root>
     </NotificationProvider>

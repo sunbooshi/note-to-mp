@@ -1,0 +1,271 @@
+.PickerBody {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 12px;
+	min-height: 0;
+}
+
+.ContentArea {
+	position: relative;
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	min-height: 0;
+}
+
+.LoadingToast {
+	position: absolute;
+	inset: 0;
+	z-index: 10;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	background-color: rgba(0, 0, 0, 0.45);
+	color: #fff;
+	font-size: 12px;
+}
+
+.Spinner {
+	width: 12px;
+	height: 12px;
+	border: 2px solid rgba(255, 255, 255, 0.35);
+	border-top-color: #fff;
+	border-radius: 50%;
+	animation: ntm-spin 0.8s linear infinite;
+}
+
+@keyframes ntm-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.Toolbar {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-shrink: 0;
+}
+
+.CategoryBar {
+	display: flex;
+	flex: 1;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.ToolbarDivider {
+	width: 1px;
+	align-self: stretch;
+	flex-shrink: 0;
+	background-color: var(--background-modifier-border);
+}
+
+.CategoryButton {
+	padding: 5px 12px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 16px;
+	background: transparent;
+	color: var(--text-normal);
+	font-size: 12px;
+	cursor: pointer;
+	transition: background-color 150ms, border-color 150ms, color 150ms;
+}
+
+.CategoryButton:hover {
+	background-color: var(--background-modifier-hover);
+}
+
+.CategoryActive {
+	border-color: var(--interactive-accent);
+	background-color: color-mix(in srgb, var(--interactive-accent) 15%, transparent);
+	color: var(--interactive-accent);
+}
+
+.ToolButton {
+	padding: 4px 10px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 6px;
+	background: var(--background-secondary);
+	color: var(--text-normal);
+	font-size: 12px;
+	cursor: pointer;
+}
+
+.ToolButton:hover:not(:disabled) {
+	background-color: var(--background-modifier-hover);
+}
+
+.ToolButton:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.PhotoGrid {
+	display: grid;
+	flex: 1;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 12px;
+	overflow-y: auto;
+	padding: 2px;
+	min-height: 0;
+}
+
+.PhotoCard {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.PhotoCard .FavoriteButton {
+	position: absolute;
+	top: 6px;
+	right: 6px;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	width: 28px;
+	height: 28px;
+	border: none;
+	border-radius: 50%;
+	background-color: rgba(0, 0, 0, 0.45);
+	color: #fff;
+	cursor: pointer;
+	transition: background-color 150ms, transform 150ms;
+}
+
+.PhotoCard .FavoriteButton:hover {
+	background-color: rgba(0, 0, 0, 0.7);
+	transform: scale(1.1);
+}
+
+.PhotoCard .FavoriteButton.FavoriteActive {
+	background-color: rgba(0, 0, 0, 0.6);
+	color: #ffcf3f;
+	box-shadow: 0 0 0 1px rgba(255, 207, 63, 0.8);
+}
+
+.PhotoLink {
+	position: relative;
+	display: block;
+	aspect-ratio: 3 / 2;
+	border-radius: 8px;
+	overflow: hidden;
+	background-color: var(--background-secondary);
+	text-decoration: none;
+}
+
+.PhotoThumbLink {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+.PhotoThumb {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.PhotoOverlay {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 6px;
+	padding: 4px 8px;
+	background: linear-gradient(transparent, rgba(0, 0, 0, 0.65));
+	color: #fff;
+	font-size: 11px;
+	opacity: 1;
+}
+
+.PhotoAuthor {
+	color: inherit;
+	text-decoration: none;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.PhotoAuthor:hover {
+	text-decoration: underline;
+}
+
+.UseButton {
+	padding: 4px 0;
+	border: none;
+	border-radius: 6px;
+	background-color: var(--interactive-accent);
+	color: var(--text-on-accent);
+	font-size: 12px;
+	cursor: pointer;
+}
+
+.UseButton:hover:not(:disabled) {
+	background-color: color-mix(in srgb, var(--interactive-accent) 88%, white);
+}
+
+.UseButton:disabled {
+	background-color: var(--interactive-accent);
+	color: var(--text-on-accent);
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.ErrorBox {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: 1;
+	min-height: 0;
+	padding: 24px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 8px;
+	background-color: color-mix(in srgb, var(--color-red) 8%, transparent);
+	color: var(--color-red);
+	font-size: 13px;
+}
+
+.LoadingBox {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: 1;
+	min-height: 0;
+	color: var(--text-muted);
+	font-size: 13px;
+}
+
+.EmptyBox {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: 1;
+	min-height: 0;
+	padding: 24px;
+	color: var(--text-muted);
+	font-size: 13px;
+}
+
+.Footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding-top: 10px;
+	border-top: 1px solid var(--background-modifier-border);
+	font-size: 11px;
+	color: var(--text-faint);
+	flex-shrink: 0;
+}

@@ -33,6 +33,7 @@ import './styles.css';
 import { WorkflowModal, WorkflowRunModal } from './ui/workflow/workflow';
 import './lib/shot-render.es.js';
 import { ImageBGModal } from './image-bg-modal';
+import { WechatManagerModal } from './wechat-manager';
 
 
 export default class NoteToMpPlugin extends Plugin {
@@ -92,6 +93,14 @@ export default class NoteToMpPlugin extends Plugin {
 			name: '图片背景设置',
 			callback: () => {
 				new ImageBGModal(this.app, this).open();
+			}
+		});
+
+		this.addCommand({
+			id: 'note-to-mp-wechat-manager',
+			name: '公众号内容管理',
+			callback: () => {
+				new WechatManagerModal(this.app).open();
 			}
 		});
 
