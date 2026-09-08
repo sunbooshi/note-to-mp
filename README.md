@@ -1,5 +1,5 @@
 # NoteToMP
-> [!TIP]NoteToMP
+> [!TIP]
 > **让 Obsidian 成为你的内容创作与发布工作台。**
 
 **写作留在 Obsidian，设计、排版与发布交给 NoteToMP。**
