@@ -9,7 +9,7 @@
 **写作 → 设计 → 排版 → 配图 → 发布 → 自动化**
 
 [![Obsidian](https://img.shields.io/badge/Obsidian-Plugin-7C3AED)](https://obsidian.md/)
-[![GitHub Stars](https://img.shields.io/github/stars/sunbooshi/note-to-mp？style=flat)](https://github.com/sunbooshi/note-to-mp)
+[![GitHub Stars](https://img.shields.io/github/stars/sunbooshi/note-to-mp?style=flat)](https://github.com/sunbooshi/note-to-mp)
 [![GitHub Release](https://img.shields.io/github/v/release/sunbooshi/note-to-mp)](https://github.com/sunbooshi/note-to-mp/releases)
 [![License](https://img.shields.io/github/license/sunbooshi/note-to-mp)](https://github.com/sunbooshi/note-to-mp)
 
