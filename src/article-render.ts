@@ -35,6 +35,7 @@ import { debounce, removeFrontMatter, trimEmbedTag } from './utils';
 import { PrepareImageLib, IsImageLibReady, WebpToJPG } from './imagelib';
 import { toPng } from 'html-to-image';
 import { WorkflowDataManager } from "./core/WorkflowManager";
+import { getAccountName, runPostPublish } from './post-publish';
 
 
 export class ArticleRender implements MDRendererCallback {
@@ -324,13 +325,13 @@ export class ArticleRender implements MDRendererCallback {
     metadata.content = this.getArticleContent(container, css);
     metadata.thumb_media_id = mediaId;
 
-    return {token, metadata};
+    return {token, metadata, appid};
   }
 
   async postArticle(appid:string, localCover: File | null = null, container: HTMLElement, css: string) {
     await this.runStartWorkflow();
 
-    const { token, metadata } = await this.prepareArticle(appid, localCover, container, css);
+    const { token, metadata, appid: actualAppid } = await this.prepareArticle(appid, localCover, container, css);
 
     // 创建草稿
     const res = await wxAddDraft(token, metadata);
@@ -345,6 +346,10 @@ export class ArticleRender implements MDRendererCallback {
     await this.runEndWorkflow();
 
     if (draft.media_id) {
+      if (this.note) {
+        // 发布后处理：失败不影响已完成的发布结果
+        void runPostPublish(this.app, this.note, getAccountName(actualAppid));
+      }
       return draft.media_id;
     }
     else {

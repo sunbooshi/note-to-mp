@@ -27,6 +27,8 @@ import { NotePubModal } from './note-pub';
 export const PUBLISH_LIST_FIELD = '发布列表';
 /** 合并发布，frontmatter 属性名 */
 export const MERGE_PUBLISH_FIELD = '合并发布';
+/** 公众号，frontmatter 属性名 */
+export const ACCOUNT_FIELD = '公众号';
 /** 单次批量发布的最大笔记数量 */
 export const MAX_BATCH_NOTES = 8;
 
@@ -78,7 +80,17 @@ export function resolvePublishList(app: App, file: TFile): TFile[] {
     return [];
   }
 
-  const entries = Array.isArray(rawList) ? rawList : [rawList];
+  // 未加引号的 [[笔记]] 会被 YAML 解析成嵌套数组，这里统一展平一层
+  const entries: unknown[] = [];
+  for (const item of Array.isArray(rawList) ? rawList : [rawList]) {
+    if (Array.isArray(item)) {
+      entries.push(...item);
+    }
+    else {
+      entries.push(item);
+    }
+  }
+
   const notes: TFile[] = [];
   const seen = new Set<string>();
 
@@ -122,6 +134,21 @@ export function resolveMerge(app: App, file: TFile): boolean {
 }
 
 /**
+ * 读取 frontmatter 中的「公众号」属性，默认为空。
+ * 返回公众号名称或 appid，未配置时返回 undefined（使用设置中的第一个公众号）。
+ */
+export function resolveAccount(app: App, file: TFile): string | undefined {
+  const frontmatter = app.metadataCache.getFileCache(file)?.frontmatter;
+  const raw = frontmatter?.[ACCOUNT_FIELD];
+  const value = Array.isArray(raw) ? raw[0] : raw;
+  if (typeof value !== 'string') {
+    return undefined;
+  }
+  const account = value.trim();
+  return account || undefined;
+}
+
+/**
  * 批量发布命令的执行入口。
  * 以当前激活的笔记作为「参数笔记」，读取其 frontmatter 配置并打开发布弹窗。
  */
@@ -143,5 +170,6 @@ export function runBatchPublish(app: App) {
   }
 
   const merge = resolveMerge(app, file);
-  new NotePubModal(app, notes, merge).open();
+  const account = resolveAccount(app, file);
+  new NotePubModal(app, notes, merge, account).open();
 }

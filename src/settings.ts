@@ -73,6 +73,7 @@ export class NMPSettings {
     dismissedAnnouncements: string[] = [];
     extraSettings: ExtraSettings | null = null;
     favoriteCovers: UnsplashPhoto[] = [];
+    postPublishChoice: string = '';
 
     private static instance: NMPSettings;
 
@@ -104,6 +105,7 @@ export class NMPSettings {
         this.enableEmptyLine = false;
         this.dismissedAnnouncements = [];
         this.favoriteCovers = [];
+        this.postPublishChoice = '';
     }
 
     resetStyelAndHighlight() {
@@ -138,6 +140,7 @@ export class NMPSettings {
             dismissedAnnouncements,
             extraSettings,
             favoriteCovers,
+            postPublishChoice,
         } = data;
 
         const settings = NMPSettings.getInstance();
@@ -207,6 +210,9 @@ export class NMPSettings {
         if (Array.isArray(favoriteCovers)) {
             settings.favoriteCovers = favoriteCovers;
         }
+        if (postPublishChoice !== undefined) {
+            settings.postPublishChoice = postPublishChoice;
+        }
         settings.isLoaded = true;
     }
 
@@ -235,6 +241,7 @@ export class NMPSettings {
             'dismissedAnnouncements': settings.dismissedAnnouncements,
             'extraSettings': settings.extraSettings,
             'favoriteCovers': settings.favoriteCovers,
+            'postPublishChoice': settings.postPublishChoice,
         }
     }
 

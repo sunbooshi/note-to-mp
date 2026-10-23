@@ -27,6 +27,7 @@ import { ArticleRender } from "src/article-render";
 import { usePluginStore } from 'src/store/PluginStore';
 import { NMPSettings } from "src/settings";
 import { DraftArticle, wxAddDrafts } from "src/weixin-api";
+import { getAccountName, runPostPublish } from "src/post-publish";
 import { PageLoading, LoadingOrb } from "./components/Loading";
 import NoteList, { NoteItem, NoteItemStatus } from './components/NoteList';
 import { BellIcon } from "@radix-ui/react-icons"
@@ -201,6 +202,7 @@ function MergePubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
 
   const renderRef = useRef<ArticleRender>(new ArticleRender(app));
   const articlesRef = useRef<DraftArticle[]>([]);
+  const publishedRef = useRef<{ note: TFile; appid: string }[]>([]);
 
   const [message, setMessage] = useState('拖动笔记可以调整顺序');
   const [cssContent, setCSSContent] = useState('');
@@ -244,6 +246,7 @@ function MergePubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
 
     setPublishing(true);
     articlesRef.current = [];
+    publishedRef.current = [];
     prepare(0);
   }
 
@@ -278,8 +281,9 @@ function MergePubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
         setMessage('请先设置公众号');
         return;
       }
-      const { token, metadata } = await renderRef.current.prepareArticle(currentAppid, undefined, contentRef.current!, css);
+      const { token, metadata, appid: actualAppid } = await renderRef.current.prepareArticle(currentAppid, undefined, contentRef.current!, css);
       articlesRef.current.push(metadata);
+      publishedRef.current.push({ note: noteItems[index].note, appid: actualAppid });
       if (index + 1 == notes.length) {
         await publish(token)
         updateItemStatus(index, NoteItemStatus.Done)
@@ -301,6 +305,12 @@ function MergePubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
     if (res.status != 200) {
       console.error(res.text);
       setMessage(`创建草稿失败, https状态码: ${res.status} 可能是文章包含异常内容，请尝试手动复制到公众号编辑器！`);
+    }
+    else {
+      // 发布后处理：对合集中的每篇笔记分别触发，失败不影响已完成的发布结果
+      for (const item of publishedRef.current) {
+        void runPostPublish(app, item.note, getAccountName(item.appid));
+      }
     }
     setPublishing(false);
     setMessage('发布成功！');
@@ -367,10 +377,10 @@ function MergePubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
   );
 }
 
-function PubContent({ modal, notes }: { modal: Modal, notes: TFile[] }) {
+function PubContent({ modal, notes, appid }: { modal: Modal, notes: TFile[], appid?: string }) {
   const storeRef = useRef<ConfigStore>(null);
   if (!storeRef.current) {
-    storeRef.current = createConfigStore();
+    storeRef.current = createConfigStore(appid ? { appid } : {});
   }
   return (
     <ConfigContext.Provider value={storeRef.current}>
@@ -379,10 +389,10 @@ function PubContent({ modal, notes }: { modal: Modal, notes: TFile[] }) {
   );
 }
 
-function MergeContent({ modal, notes }: { modal: Modal, notes: TFile[] }) {
+function MergeContent({ modal, notes, appid }: { modal: Modal, notes: TFile[], appid?: string }) {
   const storeRef = useRef<ConfigStore>(null);
   if (!storeRef.current) {
-    storeRef.current = createConfigStore();
+    storeRef.current = createConfigStore(appid ? { appid } : {});
   }
   return (
     <ConfigContext.Provider value={storeRef.current}>
@@ -391,14 +401,14 @@ function MergeContent({ modal, notes }: { modal: Modal, notes: TFile[] }) {
   );
 }
 
-export function createPubview(conatainer: HTMLElement, modal: Modal, notes: TFile[]) {
+export function createPubview(conatainer: HTMLElement, modal: Modal, notes: TFile[], appid?: string) {
   const root = ReactDOM.createRoot(conatainer);
-  root.render(<PubContent modal={modal} notes={notes} />);
+  root.render(<PubContent modal={modal} notes={notes} appid={appid} />);
   return root;
 }
 
-export function createMergePubview(conatainer: HTMLElement, modal: Modal, notes: TFile[]) {
+export function createMergePubview(conatainer: HTMLElement, modal: Modal, notes: TFile[], appid?: string) {
   const root = ReactDOM.createRoot(conatainer);
-  root.render(<MergeContent modal={modal} notes={notes} />);
+  root.render(<MergeContent modal={modal} notes={notes} appid={appid} />);
   return root;
 }

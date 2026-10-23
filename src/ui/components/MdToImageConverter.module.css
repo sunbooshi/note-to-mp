@@ -206,11 +206,19 @@
   pointer-events: none;
 }
 
-/* Page inner offset container */
-.pageOffsetContainer {
+/* Page content container (rendered sliced HTML) */
+:global(.md-to-image-page-content) {
   width: 100%;
-  height: 100%;
-  position: relative;
+  box-sizing: border-box;
+}
+
+/* Remove page-leading/trailing margins to avoid overflow after slicing */
+:global(.md-to-image-page-sliced) > :first-child {
+  margin-top: 0 !important;
+}
+
+:global(.md-to-image-page-sliced) > :last-child {
+  margin-bottom: 0 !important;
 }
 
 /* Custom CSS styling element container (This gets rendered) */

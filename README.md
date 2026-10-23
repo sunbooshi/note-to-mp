@@ -241,13 +241,15 @@ flowchart LR
   - "[[笔记一]]"
   - "[[文件/笔记二]]"
 合并发布: true
+公众号: 我的公众号
 ---
 ```
 
 - **发布列表**：需要发布的笔记列表，支持 Wikilink 或路径，最多 8 篇，超出的会被忽略，不存在的笔记会自动跳过。
 - **合并发布**：是否将多篇笔记合并为一篇草稿发布，默认为 `true`。
+- **公众号**：要发布到的公众号，填写公众号名称或 appid，默认为空；为空时使用设置中的第一个公众号。名称不存在时会提示并中止发布。
 
-打开参数笔记后，通过命令面板执行「批量发布公众号文章」（命令 ID：`note-to-mp-batch-pub`）即可开始发布。
+打开参数笔记后，通过命令面板执行「批量发布公众号文章」（命令 ID：`batch-pub`）即可开始发布。
 
 ### 素材管理与封面
 
@@ -313,6 +315,32 @@ parameters:
 ### Agent 支持
 
 得益于 Obsidian CLI，现在可以通过 [note-pub-skill](https://github.com/sunbooshi/note-pub-skill) 这个 SKILL，在各类 AGENT 中直接调用 NoteToMP 插件排版并发布文章到公众号。
+
+### 发布后处理（QuickAdd）
+
+文章成功发送到公众号草稿箱后，NoteToMP 可以自动调用一个 [QuickAdd](https://github.com/chhoumann/quickadd) Choice，由用户自行实现发布状态记录、属性更新、发布日志等后处理逻辑。NoteToMP 只负责触发，不直接修改用户笔记。
+
+使用前请先在 **设置 → 第三方插件 → NoteToMP → 发布后处理** 中填写 QuickAdd Choice 名称（留空则不启用，需先安装并启用 QuickAdd 插件）。
+
+调用 QuickAdd 时会传入以下变量：
+
+| 参数 | 类型 | 说明 |
+|---|---|---|
+| `notePath` | string | 本次发布笔记在仓库中的完整相对路径 |
+| `publishedAt` | string | 发布成功时间，ISO 8601 格式 |
+| `status` | string | 发布结果，成功时为 `success` |
+| `platform` | string | 发布目标平台标识，如 `wechat` |
+| `accountName` | string | 发布目标公众号名称 |
+
+例如在 QuickAdd 宏中使用这些变量：
+
+```js
+const { notePath, publishedAt, status, platform, accountName } = variables;
+```
+
+完整的示例脚本见 [examples/quickadd/note-to-mp-post-publish.js](examples/quickadd/note-to-mp-post-publish.js)：它会把发布日期（精确到分钟）、发布状态（已发布 / 未发布）、发布账号写入笔记属性。使用时先把脚本保存到仓库内任意非隐藏目录，然后在 QuickAdd 中新建一个宏、添加 User Script 步骤指向该脚本，最后把宏的名称填入本设置。
+
+仅在发布确认成功后触发。发布失败、取消或后处理本身出错都不会影响已经完成的发布结果。
 
 
 ---

@@ -15,6 +15,7 @@ import { useConfigContext } from 'src/store/ConfigStore';
 import { useNotification } from './Notification';
 import { NMPSettings } from 'src/settings';
 import AssetsManager from 'src/assets';
+import InlineCSS from 'src/inline-css';
 import { ArticleRender } from 'src/article-render';
 import { getMetadata, wxAddDraftImages, DraftImages, DraftImageMediaId } from 'src/weixin-api';
 import { UploadImageToWx } from 'src/imagelib';
@@ -209,6 +210,236 @@ const findNearestLineBoundary = (
   return bestSplit;
 };
 
+const ATOMIC_TAGS = new Set(['IMG', 'SVG', 'VIDEO', 'CANVAS', 'IFRAME', 'HR', 'INPUT', 'BR', 'OBJECT', 'EMBED']);
+
+interface ContentLeaf {
+  node: Node;
+  parent: Node;
+  index: number;
+  top: number;
+  bottom: number;
+  isText: boolean;
+}
+
+interface BoundaryPoint {
+  node: Node;
+  offset: number;
+}
+
+// 按文档顺序收集所有文本节点和原子元素（图片、分割线等），并记录它们在
+// 内容坐标系中的垂直位置。容器元素不收集，但会递归进入其子节点。
+function collectContentLeaves(container: HTMLElement, calibration: number): ContentLeaf[] {
+  const leaves: ContentLeaf[] = [];
+  const range = document.createRange();
+
+  const walk = (parent: Node) => {
+    const nodes = parent.childNodes;
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i];
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node as Text;
+        if (!text.textContent || !text.textContent.trim()) continue;
+        range.selectNodeContents(text);
+        const rect = range.getBoundingClientRect();
+        if (rect.width === 0 && rect.height === 0) continue;
+        leaves.push({ node, parent, index: i, top: rect.top + calibration, bottom: rect.bottom + calibration, isText: true });
+      }
+      else if (node.nodeType === Node.ELEMENT_NODE) {
+        const el = node as Element;
+        const tag = el.tagName.toUpperCase();
+        if (ATOMIC_TAGS.has(tag)) {
+          const rect = el.getBoundingClientRect();
+          // 忽略不可见的零尺寸元素（如被隐藏的分割线），BR 除外
+          if (tag !== 'BR' && rect.width === 0 && rect.height === 0) continue;
+          leaves.push({ node, parent, index: i, top: rect.top + calibration, bottom: rect.bottom + calibration, isText: false });
+        }
+        else if (el.childNodes.length === 0) {
+          // 空的块级元素（如占位块），按原子元素处理
+          const rect = el.getBoundingClientRect();
+          if (rect.height > 0) {
+            leaves.push({ node, parent, index: i, top: rect.top + calibration, bottom: rect.bottom + calibration, isText: false });
+          }
+        }
+        else {
+          walk(node);
+        }
+      }
+    }
+  };
+
+  walk(container);
+  return leaves;
+}
+
+function leafStartPoint(leaf: ContentLeaf): BoundaryPoint {
+  return leaf.isText ? { node: leaf.node, offset: 0 } : { node: leaf.parent, offset: leaf.index };
+}
+
+// 在文本节点中二分查找跨越 y 的那一行首个字符的位置。
+function findTextBoundary(text: Text, y: number, calibration: number): BoundaryPoint {
+  const len = text.length;
+  const range = document.createRange();
+  let lo = 0;
+  let hi = len;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    range.setStart(text, 0);
+    range.setEnd(text, mid + 1);
+    const rect = range.getBoundingClientRect();
+    if (rect.bottom + calibration > y) {
+      hi = mid;
+    }
+    else {
+      lo = mid + 1;
+    }
+  }
+  // 避免在代理对（如 emoji）中间切分，导致字符损坏
+  if (lo > 0 && lo < len) {
+    const prev = text.data.charCodeAt(lo - 1);
+    const cur = text.data.charCodeAt(lo);
+    if (prev >= 0xD800 && prev <= 0xDBFF && cur >= 0xDC00 && cur <= 0xDFFF) {
+      lo += 1;
+    }
+  }
+  return { node: text, offset: lo };
+}
+
+// 节点在其父节点中是否为第一个「有意义」的孩子（纯空白文本节点不计入）。
+function isFirstMeaningfulChild(parent: Node, child: Node): boolean {
+  for (let i = 0; i < parent.childNodes.length; i++) {
+    const node = parent.childNodes[i];
+    if (node === child) return true;
+    if (node.nodeType === Node.TEXT_NODE && !(node.textContent || '').trim()) continue;
+    return false;
+  }
+  return false;
+}
+
+function indexOfChild(parent: Node, child: Node): number {
+  for (let i = 0; i < parent.childNodes.length; i++) {
+    if (parent.childNodes[i] === child) return i;
+  }
+  return 0;
+}
+
+// 把一个落在「叶子起点」的边界点上提到最近的整块边界。
+// 只要当前节点是父节点的第一个有意义的孩子，就说明父节点之前没有任何内容，
+// 因此可以安全地把边界移到父节点之前（不会漏掉内容）。
+// 否则 Range.cloneContents() 会把跨页元素的祖先容器克隆成空壳，
+// 导致上一页末尾残留一个空列表（<ul></ul>）或空列表项 / 空段落。
+function hoistToBlockBoundary(container: HTMLElement, leaf: ContentLeaf): BoundaryPoint {
+  let node: Node = leaf.node;
+  while (node.parentNode) {
+    const parent = node.parentNode;
+    // 边界始终表达在父节点层级（即「node 之前」），
+    // 这样 node 本身不会被算作区间的一部分而被克隆成空壳。
+    const point: BoundaryPoint = { node: parent, offset: indexOfChild(parent, node) };
+    // 父节点里还有其它内容，或者已经到达容器，就不能再往上提了
+    if (parent === container || !isFirstMeaningfulChild(parent, node)) {
+      return point;
+    }
+    node = parent;
+  }
+  return leafStartPoint(leaf);
+}
+
+// 找到内容延伸到 y 以下的第一个 DOM 位置。
+// 文本会在行边界处切分；图片等原子元素整体保留到下一页。
+function findContentBoundary(
+  container: HTMLElement,
+  leaves: ContentLeaf[],
+  y: number,
+  calibration: number
+): BoundaryPoint | null {
+  for (const leaf of leaves) {
+    if (leaf.bottom <= y) continue;
+    if (leaf.isText) {
+      const point = findTextBoundary(leaf.node as Text, y, calibration);
+      // offset 为 0 表示整段文本都在 y 之下，属于下一页
+      return point.offset === 0 ? hoistToBlockBoundary(container, leaf) : point;
+    }
+    return hoistToBlockBoundary(container, leaf);
+  }
+  return null;
+}
+
+function sliceContentByLeaves(
+  container: HTMLElement,
+  leaves: ContentLeaf[],
+  calibration: number,
+  start: number,
+  end: number
+): string {
+  if (end <= start || leaves.length === 0) return '';
+
+  const startPoint = findContentBoundary(container, leaves, start, calibration) ?? leafStartPoint(leaves[0]);
+  const endPoint = findContentBoundary(container, leaves, end, calibration);
+
+  const range = document.createRange();
+  range.setStart(startPoint.node, startPoint.offset);
+  if (endPoint) {
+    range.setEnd(endPoint.node, endPoint.offset);
+  }
+  else {
+    range.setEnd(container, container.childNodes.length);
+  }
+
+  if (range.collapsed) return '';
+
+  const fragment = range.cloneContents();
+  const wrapper = document.createElement('div');
+  wrapper.appendChild(fragment);
+  return wrapper.innerHTML;
+}
+
+function normalizeBoundaries(offsets: number[], height: number): number[] {
+  const boundaries: number[] = [];
+  for (const offset of offsets) {
+    const value = Math.max(0, Math.min(height, Math.round(offset)));
+    if (boundaries.length === 0 || value > boundaries[boundaries.length - 1] + 1) {
+      boundaries.push(value);
+    }
+  }
+  if (boundaries.length === 0 || boundaries[0] !== 0) {
+    boundaries.unshift(0);
+  }
+  const last = boundaries[boundaries.length - 1];
+  if (height > last + 1) {
+    boundaries.push(height);
+  }
+  else {
+    boundaries[boundaries.length - 1] = height;
+  }
+  return boundaries;
+}
+
+// 根据分页偏移量，将测量容器中的 HTML 内容实际切分成每页独立的 HTML。
+function buildPageHtmls(container: HTMLElement, calibration: number, offsets: number[], height: number): string[] {
+  const leaves = collectContentLeaves(container, calibration);
+  // 防止 bottom margin 等导致 scrollHeight 小于实际内容底部，从而截断最后一行
+  const contentBottom = leaves.reduce((max, leaf) => Math.max(max, leaf.bottom), height);
+  const boundaries = normalizeBoundaries(offsets, contentBottom);
+  const pages: string[] = [];
+  for (let i = 0; i < boundaries.length - 1; i++) {
+    pages.push(sliceContentByLeaves(container, leaves, calibration, boundaries[i], boundaries[i + 1]));
+  }
+  const nonEmpty = pages.filter((page) => page.trim().length > 0);
+  return nonEmpty.length > 0 ? nonEmpty : [''];
+}
+
+// 多页/分割线模式下，限制过高的图片，避免单张图片超过一页而被截断。
+function clampOversizedImages(container: HTMLElement, maxHeight: number) {
+  const images = container.querySelectorAll('img');
+  images.forEach((img) => {
+    const height = img.getBoundingClientRect().height;
+    if (height <= maxHeight) return;
+    img.style.maxHeight = `${maxHeight}px`;
+    img.style.maxWidth = '100%';
+    img.style.width = 'auto';
+    img.style.height = 'auto';
+  });
+}
+
 interface SelectOption {
   value: string;
   label: string;
@@ -352,7 +583,9 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
       const list = AssetsManager.getInstance().themes.map((t) => ({
         id: t.className || t.name,
         name: t.name,
-        css: `${highlightCSS}\n\n${t.css}\n\n${baseCSS}\n\n${customCSS}`,
+        // 与 ArticleRender.getCSS() 保持一致：InlineCSS 里包含 callout、表格、公式、
+        // 卡片等微信专属样式，缺少它会导致这些元素在贴图中没有样式。
+        css: `${InlineCSS}\n\n${highlightCSS}\n\n${t.css}\n\n${baseCSS}\n\n${customCSS}`,
       }));
       setThemes(list);
     };
@@ -416,11 +649,11 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
 
   // Measurement references
   const previewAreaRef = useRef<HTMLDivElement>(null);
-  const measureRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef<HTMLElement>(null);
   const exportContainerRef = useRef<HTMLDivElement>(null);
   
   const [contentHeight, setContentHeight] = useState(0);
-  const [pageOffsets, setPageOffsets] = useState<number[]>([0]);
+  const [pageHtmls, setPageHtmls] = useState<string[]>([]);
   const [previewScale, setPreviewScale] = useState(1);
   const [scaleReady, setScaleReady] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -432,10 +665,18 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
 
     const container = measureRef.current;
     const children = Array.from(container.children) as HTMLElement[];
+
+    const viewportHeightVal = Math.max(50, settings.height - 2 * settings.padding);
+
+    // 多页/分割线模式下，限制过高图片的高度，避免单张图片超过一页被截断
+    if (settings.pageMode !== 'single') {
+      clampOversizedImages(container, viewportHeightVal);
+    }
+
     const height = container.scrollHeight;
 
     if (settings.pageMode === 'single') {
-      setPageOffsets([0]);
+      setPageHtmls([htmlContent]);
       setContentHeight(height);
       return;
     }
@@ -477,7 +718,6 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
       }
       hrOffsets.sort((a, b) => a - b);
 
-      const viewportHeightVal = Math.max(50, settings.height - 2 * settings.padding);
       const finalOffsets: number[] = [];
 
       for (let k = 0; k < hrOffsets.length - 1; k++) {
@@ -556,14 +796,13 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
         }
       }
 
-      setPageOffsets(finalOffsets);
+      setPageHtmls(buildPageHtmls(container, offsetCalibration, finalOffsets, height));
       setContentHeight(height);
       return;
     }
 
     const offsets: number[] = [0];
     let currentTop = 0;
-    const viewportHeightVal = Math.max(50, settings.height - 2 * settings.padding);
 
     while (currentTop < height) {
       const pageEnd = currentTop + viewportHeightVal;
@@ -626,9 +865,9 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
       currentTop = splitPoint;
     }
 
-    setPageOffsets(offsets);
+    setPageHtmls(buildPageHtmls(container, offsetCalibration, offsets, height));
     setContentHeight(height);
-  }, [settings.pageMode, settings.height, settings.padding]);
+  }, [settings.pageMode, settings.height, settings.padding, htmlContent]);
 
   // Handle auto resize changes of contents
   useEffect(() => {
@@ -679,9 +918,8 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
   }, [settings.width]);
 
   const viewportWidth = settings.width - 2 * settings.padding;
-  const viewportHeight = Math.max(50, settings.height - 2 * settings.padding);
 
-  const totalPages = settings.pageMode === 'single' ? 1 : Math.max(1, pageOffsets.length);
+  const totalPages = settings.pageMode === 'single' ? 1 : Math.max(1, pageHtmls.length);
   const pageHeight = settings.pageMode === 'single' ? contentHeight + 2 * settings.padding : settings.height;
   const isSplitByHr = settings.pageMode === 'hr';
 
@@ -738,20 +976,9 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
     };
   };
 
-  const getPageContentHeight = (index: number) => {
-    if (settings.pageMode === 'single') return contentHeight;
-    const start = pageOffsets[index] !== undefined ? pageOffsets[index] : index * viewportHeight;
-    const end = pageOffsets[index + 1] !== undefined ? pageOffsets[index + 1] : contentHeight;
-    return Math.max(50, end - start);
-  };
-
   const renderPage = (pageIndex: number, isExportTrack = false) => {
     const bgStyle = getBackgroundStyle();
-    const offsetY = settings.pageMode === 'single'
-      ? 0
-      : (pageOffsets[pageIndex] !== undefined ? pageOffsets[pageIndex] : pageIndex * viewportHeight);
-
-    const currentPageContentHeight = getPageContentHeight(pageIndex);
+    const pageContent = settings.pageMode === 'single' ? htmlContent : (pageHtmls[pageIndex] ?? '');
 
     return (
       <div
@@ -771,29 +998,21 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
             Page {pageIndex + 1} / {totalPages}
           </div>
         )}
-        <div
-          className={styles.pageOffsetContainer}
+        {/* 使用 section 作为内容容器：InlineCSS 中的 callout 样式依赖 `section .note-callout`，
+            与微信路径的 <section class="note-to-mp"> 包裹结构保持一致 */}
+        <section
+          className={`md-to-image-page-content ${settings.pageMode === 'single' ? '' : 'md-to-image-page-sliced'} ${instanceId} ${isSplitByHr ? 'split-by-hr' : ''}`}
           style={{
             width: viewportWidth,
-            height: currentPageContentHeight,
-            overflow: 'hidden',
+            fontFamily: formatFontFamily(settings.fontFamily),
+            fontSize: `${settings.fontSize}px`,
+            lineHeight: 1.6,
+            background: 'transparent',
+            backgroundColor: 'transparent',
+            backgroundImage: 'none',
           }}
-        >
-          <div
-            className={`md-to-image-rendered-content ${instanceId} ${isSplitByHr ? 'split-by-hr' : ''}`}
-            style={{
-              width: viewportWidth,
-              transform: `translateY(-${offsetY}px)`,
-              fontFamily: formatFontFamily(settings.fontFamily),
-              fontSize: `${settings.fontSize}px`,
-              lineHeight: 1.6,
-              background: 'transparent',
-              backgroundColor: 'transparent',
-              backgroundImage: 'none',
-            }}
-            dangerouslySetInnerHTML={{ __html: htmlContent }}
-          />
-        </div>
+          dangerouslySetInnerHTML={{ __html: pageContent }}
+        />
       </div>
     );
   };
@@ -1097,7 +1316,9 @@ export const MdToImageConverter: React.FC<MdToImageConverterProps> = ({ htmlCont
               zIndex: -1,
             }}
           >
-            <div
+            {/* section 容器：保证 callout 等依赖 `section` 祖先的样式在测量时同样生效，
+                否则测量出的高度与实际渲染不一致，分页会错位 */}
+            <section
               ref={measureRef}
               className={`${instanceId} ${isSplitByHr ? 'split-by-hr' : ''}`}
               style={{

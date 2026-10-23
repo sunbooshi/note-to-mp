@@ -106,7 +106,7 @@ export default class NoteToMpPlugin extends Plugin {
 		});
 
 		this.addCommand({
-			id: 'note-to-mp-pub',
+			id: 'pub',
 			name: '发布公众号文章',
 			callback: () => {
 				const file = this.app.workspace.getActiveFile();
@@ -123,7 +123,7 @@ export default class NoteToMpPlugin extends Plugin {
 		});
 
 		this.addCommand({
-			id: 'note-to-mp-batch-pub',
+			id: 'batch-pub',
 			name: '批量发布公众号文章',
 			callback: () => {
 				runBatchPublish(this.app);
