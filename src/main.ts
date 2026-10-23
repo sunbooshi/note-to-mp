@@ -28,6 +28,7 @@ import AssetsManager from './assets';
 import { setVersion, uevent } from './utils';
 import { WidgetsModal } from './widgets-modal';
 import { NotePubModal } from './note-pub';
+import { runBatchPublish } from './batch-pub';
 import { usePluginStore } from './store/PluginStore';
 import './styles.css';
 import { WorkflowModal, WorkflowRunModal } from './ui/workflow/workflow';
@@ -105,7 +106,7 @@ export default class NoteToMpPlugin extends Plugin {
 		});
 
 		this.addCommand({
-			id: 'note-to-mp-pub',
+			id: 'pub',
 			name: '发布公众号文章',
 			callback: () => {
 				const file = this.app.workspace.getActiveFile();
@@ -118,6 +119,14 @@ export default class NoteToMpPlugin extends Plugin {
 					return;
 				}
 				new NotePubModal(this.app, [file]).open();
+			}
+		});
+
+		this.addCommand({
+			id: 'batch-pub',
+			name: '批量发布公众号文章',
+			callback: () => {
+				runBatchPublish(this.app);
 			}
 		});
 

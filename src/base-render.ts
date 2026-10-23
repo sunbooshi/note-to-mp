@@ -27,7 +27,7 @@ import AssetsManager from './assets';
 import { MDRendererCallback } from './core/markdown/extension';
 import { MarkedParser } from './core/markdown/parser';
 import { LocalImageManager, LocalFile } from './core/markdown/local-file';
-import { debounce, removeFrontMatter } from './utils';
+import { debounce, removeFrontMatter, inlineBlobImages } from './utils';
 import { getMetadata } from './weixin-api';
 import { toPng } from 'html-to-image';
 import { ImageToShot } from './imagelib';
@@ -319,6 +319,11 @@ export class BaseRender implements MDRendererCallback {
   private async replaceExcalidrawWithImage(container: HTMLElement, id: string) {
     const innerDiv = container.querySelector('div') as HTMLElement;
     if (!innerDiv) return;
+
+    // Excalidraw 插件的嵌入图是 URL.createObjectURL 生成的 blob 地址，图片 load 之后
+    // 就会被插件 revoke。这里先把已解码的画面内联成 data URL，避免后面的 toPng 或
+    // 远程渲染再按 src 请求时出现 net::ERR_FILE_NOT_FOUND。
+    await inlineBlobImages(container);
 
     if (NMPSettings.getInstance().excalidrawToPNG) {
       const originalImg = container.querySelector('img') as HTMLImageElement;

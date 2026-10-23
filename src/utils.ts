@@ -210,3 +210,59 @@ export function openInBrowser(url: string) {
 	const { shell } = require('electron');
   shell.openExternal(url);
 }
+
+/**
+ * 把容器中已经解码的 <img src="blob:..."> 转成 data URL。
+ *
+ * Excalidraw 插件渲染嵌入的绘图时，会用 URL.createObjectURL 生成一次性的 blob 地址，
+ * 并在图片 load 之后立刻 revoke。之后再按 src 请求（html-to-image 的 toPng、
+ * 把 innerHTML 发给远程渲染服务、DOM 被克隆或重新挂载）就会报
+ * `GET blob:app://obsidian.md/xxx net::ERR_FILE_NOT_FOUND`。
+ *
+ * 已经解码进 <img> 的画面不受 revoke 影响，所以直接画到 canvas 上转成 data URL，
+ * 后续无论是导出 PNG 还是远程渲染都不再依赖那个失效的 blob 地址。
+ *
+ * @param root 要处理的根节点
+ * @param maxWidth 转换后的最大宽度，避免把超大的 SVG 光栅化成巨型 data URL
+ * @returns 成功转换的图片数量
+ */
+export async function inlineBlobImages(root: HTMLElement, maxWidth: number = 2000): Promise<number> {
+	let count = 0;
+	const images = Array.from(root.querySelectorAll('img')) as HTMLImageElement[];
+	for (const img of images) {
+		if (!img.src.startsWith('blob:')) {
+			continue;
+		}
+		if (!img.complete) {
+			try {
+				await img.decode();
+			}
+			catch (e) {
+				// blob 已经失效且图片还没解码，无法恢复
+				continue;
+			}
+		}
+		const width = img.naturalWidth || img.width;
+		const height = img.naturalHeight || img.height;
+		if (!width || !height) {
+			continue;
+		}
+		try {
+			const scale = Math.min(1, maxWidth / width);
+			const canvas = document.createElement('canvas');
+			canvas.width = Math.max(1, Math.round(width * scale));
+			canvas.height = Math.max(1, Math.round(height * scale));
+			const ctx = canvas.getContext('2d');
+			if (!ctx) {
+				continue;
+			}
+			ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+			img.src = canvas.toDataURL('image/png');
+			count++;
+		}
+		catch (e) {
+			console.warn('inline blob image failed', e);
+		}
+	}
+	return count;
+}

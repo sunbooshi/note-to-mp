@@ -31,10 +31,11 @@ import { MDRendererCallback } from './core/markdown/extension';
 import { MarkedParser } from './core/markdown/parser';
 import { LocalImageManager, LocalFile } from './core/markdown/local-file';
 import { CardDataManager } from './core/markdown/code';
-import { debounce, removeFrontMatter, trimEmbedTag } from './utils';
+import { debounce, removeFrontMatter, trimEmbedTag, inlineBlobImages } from './utils';
 import { PrepareImageLib, IsImageLibReady, WebpToJPG } from './imagelib';
 import { toPng } from 'html-to-image';
 import { WorkflowDataManager } from "./core/WorkflowManager";
+import { getAccountName, runPostPublish } from './post-publish';
 
 
 export class ArticleRender implements MDRendererCallback {
@@ -324,13 +325,13 @@ export class ArticleRender implements MDRendererCallback {
     metadata.content = this.getArticleContent(container, css);
     metadata.thumb_media_id = mediaId;
 
-    return {token, metadata};
+    return {token, metadata, appid};
   }
 
   async postArticle(appid:string, localCover: File | null = null, container: HTMLElement, css: string) {
     await this.runStartWorkflow();
 
-    const { token, metadata } = await this.prepareArticle(appid, localCover, container, css);
+    const { token, metadata, appid: actualAppid } = await this.prepareArticle(appid, localCover, container, css);
 
     // 创建草稿
     const res = await wxAddDraft(token, metadata);
@@ -345,6 +346,10 @@ export class ArticleRender implements MDRendererCallback {
     await this.runEndWorkflow();
 
     if (draft.media_id) {
+      if (this.note) {
+        // 发布后处理：失败不影响已完成的发布结果
+        void runPostPublish(this.app, this.note, getAccountName(actualAppid));
+      }
       return draft.media_id;
     }
     else {
@@ -617,6 +622,11 @@ export class ArticleRender implements MDRendererCallback {
   private async replaceExcalidrawWithImage(container: HTMLElement, id: string) {
     const innerDiv = container.querySelector('div') as HTMLElement;
     if (!innerDiv) return;
+
+    // Excalidraw 插件的嵌入图是 URL.createObjectURL 生成的 blob 地址，图片 load 之后
+    // 就会被插件 revoke。这里先把已解码的画面内联成 data URL，避免后面的 toPng 或
+    // 远程渲染再按 src 请求时出现 net::ERR_FILE_NOT_FOUND。
+    await inlineBlobImages(container);
 
     if (NMPSettings.getInstance().excalidrawToPNG) {
       const originalImg = container.querySelector('img') as HTMLImageElement;

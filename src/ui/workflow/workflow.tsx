@@ -338,7 +338,7 @@ export function Workflow() {
   return (
     <div className={styles.Container}>
       <div className={styles.Header}>
-        <span style={{fontSize: '18px', fontWeight: 'bold'}}>工作流Token管理</span><span>&nbsp;|&nbsp;</span><a href="https://docs.dualhue.cn" target="_blank">帮助文档</a>
+        <span style={{fontSize: '18px', fontWeight: 'bold'}}>工作流Token管理</span><span>&nbsp;|&nbsp;</span><a href="https://docs.dualhue.cn/workflow" target="_blank">帮助文档</a>
       </div>
 
       <Tabs.Root defaultValue="create" value={activeTab} onValueChange={setActiveTab} className={styles.Root}>

@@ -29,6 +29,7 @@ import AssetsManager from './assets';
 import { DocModal } from './doc-modal';
 import { compareVersions } from './utils';
 import { WorkflowModal } from './ui/workflow/workflow';
+import { isQuickAddAvailable, hasQuickAddChoice } from './post-publish';
 
 export class NoteToMpSettingTab extends PluginSettingTab {
 	plugin: NoteToMpPlugin;
@@ -394,6 +395,24 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 				})
 				.inputEl.setAttr('style', 'width: 320px;')
 		});
+
+		const postPublishDoc = '文章发布成功后自动调用 QuickAdd Choice，留空则不启用。需要先安装并启用 QuickAdd 插件。';
+		const postPublishSetting = new Setting(containerEl)
+			.setName('发布后处理')
+			.setDesc(postPublishDoc)
+			.addText(text => {
+				text.setPlaceholder('请输入 QuickAdd Choice 名称')
+					.setValue(this.settings.postPublishChoice)
+					.onChange(async (value) => {
+						const name = value.trim();
+						this.settings.postPublishChoice = name;
+						await this.plugin.saveSettings();
+						this.checkPostPublishChoice(postPublishSetting, postPublishDoc, name);
+					})
+					.inputEl.setAttr('style', 'width: 320px;')
+			});
+
+		this.checkPostPublishChoice(postPublishSetting, postPublishDoc, this.settings.postPublishChoice);
 		
 		let descHtml = '详情说明：<a href="https://docs.dualhue.cn/subscribe">https://docs.dualhue.cn/subscribe</a>';
 		if (this.settings.isAuthKeyVaild()) {
@@ -477,6 +496,28 @@ export class NoteToMpSettingTab extends PluginSettingTab {
 			})
 		})
 		this.checkUpdate();
+	}
+
+	checkPostPublishChoice(setting: Setting, defaultDesc: string, name: string) {
+		const reset = () => {
+			setting.setDesc(defaultDesc);
+			setting.descEl.removeAttribute('style');
+		};
+		if (!name) {
+			reset();
+			return;
+		}
+		if (!isQuickAddAvailable(this.app)) {
+			setting.setDesc('未检测到 QuickAdd 插件，请先安装并启用 QuickAdd');
+			setting.descEl.setAttr('style', 'color: var(--text-error); white-space: pre-wrap;');
+			return;
+		}
+		if (!hasQuickAddChoice(this.app, name)) {
+			setting.setDesc(`未找到名为「${name}」的 QuickAdd Choice`);
+			setting.descEl.setAttr('style', 'color: var(--text-error); white-space: pre-wrap;');
+			return;
+		}
+		reset();
 	}
 
 	checkUpdate() {
