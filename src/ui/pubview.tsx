@@ -307,9 +307,11 @@ function MergePubview({ modal, notes }: { modal: Modal, notes: TFile[] }) {
       setMessage(`创建草稿失败, https状态码: ${res.status} 可能是文章包含异常内容，请尝试手动复制到公众号编辑器！`);
     }
     else {
+      const draft = res.json;
       // 发布后处理：对合集中的每篇笔记分别触发，失败不影响已完成的发布结果
-      for (const item of publishedRef.current) {
-        void runPostPublish(app, item.note, getAccountName(item.appid));
+      for (const index in publishedRef.current) {
+        const item = publishedRef.current[index];
+        void runPostPublish(app, item.note, getAccountName(item.appid), draft.media_id, articlesRef.current[index].thumb_media_id);
       }
     }
     setPublishing(false);

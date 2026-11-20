@@ -38,6 +38,10 @@ export interface PostPublishParams {
   platform: 'wechat';
   /** 发布目标公众号名称 */
   accountName: string;
+  /** 草稿文章 media_id */
+  draftMediaId: string;
+  /** 封面图片 media_id */
+  coverMediaId: string;
 }
 
 interface QuickAddChoice {
@@ -86,7 +90,7 @@ export function getAccountName(appid: string): string {
  * 该函数不抛出异常，后处理失败不会影响已经完成的发布结果。
  * 为避免阻塞发布流程，调用方无需 await。
  */
-export async function runPostPublish(app: App, note: TFile, accountName: string): Promise<void> {
+export async function runPostPublish(app: App, note: TFile, accountName: string, draftMediaId: string, coverMediaId: string): Promise<void> {
   const settings = NMPSettings.getInstance();
   const choiceName = settings.postPublishChoice?.trim();
   if (!choiceName) {
@@ -112,7 +116,11 @@ export async function runPostPublish(app: App, note: TFile, accountName: string)
     status: 'success',
     platform: 'wechat',
     accountName,
+    draftMediaId,
+    coverMediaId
   };
+
+  console.log(`[NoteToMP] 触发发布后处理：Choice=${choiceName}, Params=`, params);
 
   try {
     const quickAddApi = getQuickAddPlugin(app).api;
