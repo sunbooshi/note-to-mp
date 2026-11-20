@@ -93,7 +93,26 @@ export class ArticleRender implements MDRendererCallback {
   }
 
   getArticleText(container: HTMLElement) {
-    return container.innerText.trimStart();
+    // 克隆一份内容，避免修改原始 DOM
+    const clone = container.cloneNode(true) as HTMLElement;
+    // 图片标题（如 ![cat](xxx.jpg) 中的 cat）不参与正文文本
+    clone.querySelectorAll('figcaption').forEach((el) => el.remove());
+
+    // innerText 依赖元素处于渲染状态（否则会退化成 textContent，丢失换行）
+    // 因此将克隆节点临时挂载到文档中不可见的位置
+    const holder = document.createElement('div');
+    holder.style.cssText = 'position: absolute; left: -99999px; top: 0; width: ' +
+      `${container.offsetWidth || 800}px; pointer-events: none;`;
+    document.body.appendChild(holder);
+    holder.appendChild(clone);
+
+    let text = '';
+    try {
+      text = clone.innerText.trimStart();
+    } finally {
+      holder.remove();
+    }
+    return text;
   }
 
   errorContent(error: any) {
@@ -348,7 +367,7 @@ export class ArticleRender implements MDRendererCallback {
     if (draft.media_id) {
       if (this.note) {
         // 发布后处理：失败不影响已完成的发布结果
-        void runPostPublish(this.app, this.note, getAccountName(actualAppid));
+        void runPostPublish(this.app, this.note, getAccountName(actualAppid), draft.media_id, metadata.thumb_media_id);
       }
       return draft.media_id;
     }
