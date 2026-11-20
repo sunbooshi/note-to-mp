@@ -1,3 +1,13 @@
+## 2.4.2
+- 修复贴图文本中残留图片标题的bug
+- 发布后处理新增如下参数：
+  - draftMediaId: 草稿文章 media_id
+  - coverMediaId: 封面图片 media_id
+
+> [!WARNING]
+> 对于合并发布的笔记，草稿文章draftMediaId为同一个
+
+
 ## 2.4.1
 
 本次更新新增 Obsidian CLI 批量发布与发布后处理能力，并修复了贴图分页后的内容残留问题。
