@@ -394,3 +394,5 @@ note-to-mp/
 # 💬 反馈与交流
 
 如果遇到问题或者有功能建议，欢迎通过 GitHub Issue 反馈，也欢迎加入用户交流群。
+
+<img src="./images/20240702203745.jpg" width="360">
