@@ -331,11 +331,16 @@ parameters:
 | `status` | string | 发布结果，成功时为 `success` |
 | `platform` | string | 发布目标平台标识，如 `wechat` |
 | `accountName` | string | 发布目标公众号名称 |
+| `draftMediaId` | string | 草稿文章 media_id |
+| `coverMediaId` | string | 封面图片 media_id |
+
+> [!WARNING]
+> 对于合并发布的笔记，草稿文章draftMediaId为同一个
 
 例如在 QuickAdd 宏中使用这些变量：
 
 ```js
-const { notePath, publishedAt, status, platform, accountName } = variables;
+const { notePath, publishedAt, status, platform, accountName, draftMediaId, coverMediaId } = variables;
 ```
 
 完整的示例脚本见 [examples/quickadd/note-to-mp-post-publish.js](examples/quickadd/note-to-mp-post-publish.js)：它会把发布日期（精确到分钟）、发布状态（已发布 / 未发布）、发布账号写入笔记属性。使用时先把脚本保存到仓库内任意非隐藏目录，然后在 QuickAdd 中新建一个宏、添加 User Script 步骤指向该脚本，最后把宏的名称填入本设置。
